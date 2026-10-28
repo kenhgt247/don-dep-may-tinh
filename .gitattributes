@@ -1,0 +1,5 @@
+# Giữ nguyên định dạng file (BOM + CRLF) để PowerShell 5.1 đọc đúng tiếng Việt
+*.ps1 -text
+*.bat -text
+*.txt -text
+*.ico binary

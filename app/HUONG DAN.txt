@@ -1,0 +1,48 @@
+﻿﻿DỌN DẸP MÁY TÍNH — phiên bản 0.2.0
+================================
+
+CÁCH MỞ
+  1. Giải nén cả thư mục ra (ví dụ ra Desktop). Không chạy trực tiếp trong file .zip.
+  2. Bấm đúp vào "Don Dep May Tinh.exe".
+     Nếu Windows hiện cảnh báo màu xanh "Windows protected your PC":
+     bấm "More info" → "Run anyway".
+     (Nếu không mở được file .exe, bấm đúp "Mo app Don Dep.bat" thay thế.)
+  3. Muốn có biểu tượng trên Desktop và menu Start: vào tab "Tự động"
+     → bấm "Tạo biểu tượng".
+  4. App tự báo khi có bản mới. Trang chủ: github.com/kenhgt247/don-dep-may-tinh
+
+5 TAB CỦA APP
+  1. Dọn dẹp
+     - "Quét máy" (chỉ xem, chưa xóa gì) → bỏ chọn những gì muốn giữ → "Dọn dẹp ngay".
+     - Rác hệ thống: file tạm, bộ nhớ đệm trình duyệt / Zalo / Teams, thùng rác,
+       gói cập nhật Zalo, bản Zalo cũ (chưa chọn sẵn)...
+     - Bấm "Quyền admin" để quét thêm gói cập nhật Windows cũ và file ngủ đông.
+     - Bấm vào một ảnh trong danh sách để xem trước ở khung bên phải.
+  2. Bản đồ ổ đĩa
+     - Chọn ổ → "Phân tích ổ đĩa" → thấy thư mục nào chiếm nhiều chỗ nhất.
+     - Bấm đúp để đi sâu vào từng thư mục, "Lên trên" để quay lại.
+     - Chọn thư mục / file rồi bấm "Thêm vào danh sách chuyển đi" để chuyển nó
+       lên Drive hoặc ổ ngoài. Mục màu xám (Windows, chương trình) không chuyển được.
+  3. File trùng
+     - Tìm các file giống hệt nhau. Mỗi nhóm tự giữ lại 1 bản, các bản thừa
+       được chuyển vào Thùng rác (vẫn khôi phục được từ Thùng rác).
+  4. Đã chuyển đi
+     - Danh sách mọi file đã từng chuyển lên Drive / ổ ngoài.
+     - Đánh dấu rồi bấm "Lấy về chỗ cũ" để tải file về đúng vị trí ban đầu.
+  5. Tự động
+     - Chạy ngầm cùng Windows: biểu tượng nhỏ ở góc phải thanh Taskbar,
+       báo ngay khi một ổ còn trống dưới mức bạn đặt (mặc định 5 GB).
+     - Tự dọn RÁC HỆ THỐNG theo lịch (không bao giờ tự đụng file cá nhân).
+
+APP BẢO VỆ BẠN NHƯ THẾ NÀO
+  - Không làm gì khi bạn chưa bấm Yes ở bảng xác nhận.
+  - Không cho chuyển nếu nơi nhận không đủ chỗ, hoặc chuyển xong ổ nhận
+    còn ít hơn mức "Giữ trống tối thiểu".
+  - File chỉ bị xóa khỏi máy sau khi đã chép xong và kiểm tra đúng.
+  - Không bao giờ đụng tới dữ liệu tin nhắn Zalo, thư mục Windows và chương trình.
+  - Với Google Drive, app chỉ thấy được file do chính nó tải lên.
+
+FILE ĐÃ CHUYỂN NẰM Ở ĐÂU
+  - Google Drive: thư mục DonDep / <tên máy> / ...
+  - Ổ ngoài: <thư mục bạn chọn>\DonDep\<tên máy>\...
+  - Nhật ký và danh sách: Documents\DonDepMayTinh (nút "Mở nhật ký").

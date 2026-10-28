@@ -19,7 +19,7 @@ Add-Type -AssemblyName Microsoft.VisualBasic
 try { [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 } catch {}
 
 # ---------------------------------------------------------------- cấu hình chung
-$Script:AppVersion   = '0.2.0'
+$Script:AppVersion   = '0.3.0'
 $Script:RepoSlug     = 'kenhgt247/don-dep-may-tinh'
 $Script:AppTitle     = 'Dọn Dẹp Máy Tính ' + $Script:AppVersion
 $Script:AppDir       = $PSScriptRoot
@@ -1201,6 +1201,207 @@ function Start-MapScan {
     Set-Status 'Bấm đúp vào thư mục để xem bên trong. Chọn mục rồi bấm "Thêm vào danh sách chuyển đi" nếu muốn chuyển nó đi.'
 }
 
+# ---------------------------------------------------------------- nhận biết file / thư mục (để cảnh báo trước khi xóa)
+$Script:LevelMeta = @{
+    cam     = @{ Label = '⛔ KHÔNG ĐƯỢC XÓA';   Short = 'Không được xóa'; Color = [Drawing.Color]::Firebrick }
+    rac     = @{ Label = '✅ RÁC — xóa an toàn'; Short = 'Rác';            Color = [Drawing.Color]::ForestGreen }
+    antoan  = @{ Label = '🟢 Thường xóa được';   Short = 'Xóa được';       Color = [Drawing.Color]::SeaGreen }
+    canhan  = @{ Label = '🔵 Dữ liệu cá nhân';   Short = 'Cá nhân';        Color = [Drawing.Color]::RoyalBlue }
+    canthan = @{ Label = '⚠️ CẨN THẬN';          Short = 'Cẩn thận';       Color = [Drawing.Color]::DarkOrange }
+    khongro = @{ Label = '❔ Chưa rõ là gì';     Short = 'Chưa rõ';        Color = [Drawing.Color]::DimGray }
+}
+
+$Script:PathRules = @(
+    @('^[a-z]:\\?$', 'cam', 'Cả ổ đĩa', 'Đây là gốc của ổ đĩa. Không xóa — hãy bấm đúp để vào bên trong.'),
+    @('^[a-z]:\\Windows\\SoftwareDistribution\\Download(\\|$)', 'rac', 'Gói cập nhật Windows đã tải', 'Windows tải bản cập nhật về đây; cài xong thì xóa được. Cần bấm "Quyền admin". Cách dễ hơn: tab Dọn dẹp → Rác hệ thống.'),
+    @('^[a-z]:\\Windows\\Temp(\\|$)', 'rac', 'File tạm của Windows', 'File tạm do Windows và trình cài đặt tạo ra. Xóa an toàn (file đang dùng sẽ tự được bỏ qua).'),
+    @('^[a-z]:\\Windows\.old(\\|$)', 'cam', 'Bản Windows cũ (Windows.old)', 'Bản Windows trước lần nâng cấp, thường 10–30 GB. Không xóa được bằng cách thông thường. Cách xóa đúng: bấm Start, gõ "Disk Cleanup" → chọn ổ C → "Clean up system files" → tích "Previous Windows installation(s)" → OK.'),
+    @('\\\$Recycle\.Bin(\\|$)', 'cam', 'Thùng rác', 'Đừng xóa trực tiếp ở đây. Hãy dọn bằng mục "Thùng rác" trong tab Dọn dẹp, hoặc chuột phải Thùng rác trên Desktop → Empty Recycle Bin.'),
+    @('^[a-z]:\\hiberfil\.sys$', 'cam', 'File ngủ đông (Hibernate)', 'Windows dùng file này khi máy "ngủ đông". Không xóa trực tiếp được. Nếu bạn không dùng ngủ đông: bấm "Quyền admin", quét lại ở tab Dọn dẹp rồi chọn "Tắt chế độ ngủ đông".'),
+    @('^[a-z]:\\(pagefile|swapfile)\.sys$', 'cam', 'Bộ nhớ ảo của Windows', 'Windows dùng file này như RAM phụ. Không được xóa — máy sẽ chậm hoặc treo.'),
+    @('^[a-z]:\\(System Volume Information|Recovery|Boot|EFI|\$WinREAgent|\$Windows\.~BT|\$Windows\.~WS|Config\.Msi|MSOCache)(\\|$)', 'cam', 'Dữ liệu hệ thống / khôi phục', 'Windows dùng để khởi động và khôi phục máy. Không được xóa.'),
+    @('\\AppData\\Local\\Temp(\\|$)', 'rac', 'File tạm', 'Các phần mềm để file tạm ở đây. Xóa an toàn (file đang dùng sẽ tự được bỏ qua).'),
+    @('\\AppData\\.*\\(Cache|Code Cache|GPUCache|cache2|CacheStorage|ShaderCache|DawnCache|GrShaderCache|CrashDumps|npm-cache)(\\|$)', 'rac', 'Bộ nhớ đệm', 'Bản lưu tạm giúp phần mềm chạy nhanh hơn; xóa thì phần mềm tự tạo lại. Nên tắt phần mềm đó trước khi xóa.'),
+    @('\\Zalo ?Data\\(media\\)?update(\\|$)', 'rac', 'Gói cập nhật Zalo đã tải', 'Zalo tải bản cập nhật về đây; cài xong thì xóa được.'),
+    @('\\Zalo ?Data\\(Cache|Code Cache|GPUCache|Partitions\\zalo\\(Cache|Code Cache|GPUCache))(\\|$)', 'rac', 'Bộ nhớ đệm Zalo', 'Bản lưu tạm của Zalo; xóa thì Zalo tự tải lại. Nên tắt Zalo trước.'),
+    @('\\Zalo ?Data\\message(\\|$)', 'cam', 'Tin nhắn Zalo', 'Toàn bộ lịch sử tin nhắn Zalo trên máy này. Xóa là mất tin nhắn.'),
+    @('\\Zalo ?Data$', 'cam', 'Dữ liệu Zalo', 'Thư mục gốc chứa tin nhắn và ảnh Zalo. Không xóa cả thư mục — hãy vào bên trong (media → ... → ZaloDownloads) để chọn ảnh, video.'),
+    @('\\Zalo ?Data\\media(\\|$)', 'canthan', 'Ảnh, video, file Zalo', 'File nhận qua Zalo. Xóa thì Zalo không mở lại được các file đó trong cuộc trò chuyện. Nên dùng tab Dọn dẹp → "Ảnh / video / file Zalo cũ" để chuyển lên Drive thay vì xóa.'),
+    @('^[a-z]:\\Windows(\\|$)', 'cam', 'Thư mục Windows', 'Hệ điều hành Windows. Xóa bất cứ thứ gì ở đây có thể làm máy không khởi động được.'),
+    @('^[a-z]:\\Program Files', 'cam', 'Phần mềm đã cài', 'Các phần mềm đã cài. Đừng xóa thư mục — muốn bỏ phần mềm thì vào Settings → Apps → Installed apps → Uninstall.'),
+    @('^[a-z]:\\ProgramData(\\|$)', 'cam', 'Dữ liệu chung của phần mềm', 'Windows và các phần mềm lưu dữ liệu dùng chung ở đây. Xóa có thể làm phần mềm lỗi.'),
+    @('\\AppData\\Local\\Programs(\\|$)', 'cam', 'Phần mềm đã cài (cho riêng bạn)', 'Phần mềm cài cho tài khoản này (ví dụ Zalo, VS Code). Muốn bỏ thì Settings → Apps → Uninstall, đừng xóa thư mục.'),
+    @('\\AppData\\Local\\Packages(\\|$)', 'cam', 'Ứng dụng Microsoft Store', 'Dữ liệu của các ứng dụng cài từ Microsoft Store. Muốn bỏ thì gỡ ứng dụng trong Settings → Apps.'),
+    @('\\AppData$|\\AppData\\(Local|Roaming|LocalLow)$', 'cam', 'Dữ liệu ứng dụng', 'Nơi mọi phần mềm lưu cài đặt và dữ liệu. Không xóa cả thư mục — hãy vào bên trong để xem từng phần mềm.'),
+    @('\\AppData\\', 'canthan', 'Dữ liệu của một phần mềm', 'Cài đặt và dữ liệu của phần mềm (có thể gồm tin nhắn, mật khẩu đã lưu, lịch sử). Xóa có thể làm phần mềm mất dữ liệu hoặc bị lỗi. Chỉ nên xóa nếu bạn đã gỡ phần mềm này.'),
+    @('^[a-z]:\\Users$', 'cam', 'Tài khoản người dùng', 'Chứa dữ liệu của mọi tài khoản trên máy. Không xóa — hãy vào bên trong.'),
+    @('^[a-z]:\\Users\\(Default|Public|All Users|Default User)$', 'cam', 'Tài khoản hệ thống', 'Windows dùng thư mục này. Không xóa.'),
+    @('^[a-z]:\\Users\\[^\\]+$', 'cam', 'Thư mục tài khoản của bạn', 'Chứa toàn bộ dữ liệu và cài đặt của tài khoản. Không xóa cả thư mục — hãy vào bên trong.'),
+    @('\\node_modules(\\|$)', 'antoan', 'Thư viện lập trình (node_modules)', 'Thư viện tải về cho dự án lập trình; xóa được, khi cần chạy "npm install" để tải lại.'),
+    @('\\(\.Ld\d*VirtualBox|LDPlayer\d*|BlueStacks[^\\]*|Nox[^\\]*|VirtualBox VMs|MEmu[^\\]*)(\\|$)', 'canthan', 'Máy ảo / giả lập Android', 'Dữ liệu của phần mềm giả lập (LDPlayer, BlueStacks, Nox...) hoặc máy ảo. Xóa là mất game, ứng dụng và dữ liệu trong máy ảo đó. Muốn bỏ hẳn thì gỡ phần mềm giả lập trong Settings → Apps.'),
+    @('\\(steamapps|SteamLibrary|Epic Games|Riot Games|Garena|XboxGames)(\\|$)', 'canthan', 'Game', 'Game đã cài. Muốn bỏ thì gỡ trong Steam / Epic / Garena hoặc Settings → Apps, đừng xóa thư mục.')
+)
+
+function Get-PathInfo([string]$path, [bool]$isDir) {
+    $p = $path
+    if ($p.Length -gt 3) { $p = $p.TrimEnd('\') }
+    foreach ($r in $Script:PathRules) {
+        if ($p -match $r[0]) { return [pscustomobject]@{ Level = $r[1]; Title = $r[2]; Text = $r[3] } }
+    }
+    $docs = [Environment]::GetFolderPath('MyDocuments')
+    $dl = Get-DownloadsPath
+    if (-not $isDir) {
+        $ext = [IO.Path]::GetExtension($p).ToLower()
+        $inDl = [bool]($dl -and $p.StartsWith($dl, [StringComparison]::OrdinalIgnoreCase))
+        if ($ext -in @('.vhd', '.vhdx', '.vdi', '.vmdk', '.qcow2')) { return [pscustomobject]@{ Level = 'canthan'; Title = 'Ổ đĩa ảo'; Text = 'Ổ cứng của một máy ảo hoặc phần mềm giả lập (LDPlayer, BlueStacks, VirtualBox...). Xóa là mất toàn bộ máy ảo đó.' } }
+        if ($ext -in @('.pst', '.ost')) { return [pscustomobject]@{ Level = 'canthan'; Title = 'Hộp thư Outlook'; Text = 'Email lưu trên máy của Outlook. Xóa là có thể mất email cũ.' } }
+        if ($ext -in @('.exe', '.msi', '.msix', '.appx') -and ($inDl -or $p -match '(?i)setup|install')) { return [pscustomobject]@{ Level = 'antoan'; Title = 'File cài đặt phần mềm'; Text = 'Dùng để cài phần mềm. Nếu đã cài xong thì xóa được (cần thì tải lại).' } }
+        if ($ext -in @('.exe', '.dll', '.sys')) { return [pscustomobject]@{ Level = 'canthan'; Title = 'Chương trình'; Text = 'File chạy của một phần mềm. Xóa sẽ làm phần mềm đó không chạy được.' } }
+        if ($ext -in @('.iso', '.img')) { return [pscustomobject]@{ Level = 'antoan'; Title = 'File ảnh đĩa (ISO)'; Text = 'Thường là bộ cài Windows hoặc phần mềm. Không cần nữa thì xóa được.' } }
+        if ($ext -in @('.tmp', '.dmp', '.log', '.old', '.bak', '.crdownload', '.part')) { return [pscustomobject]@{ Level = 'antoan'; Title = 'File tạm / nhật ký / bản sao cũ'; Text = 'Thường không còn cần nữa. Xóa được.' } }
+        if ($inDl -and $ext -in @('.zip', '.rar', '.7z')) { return [pscustomobject]@{ Level = 'canhan'; Title = 'File nén đã tải về'; Text = 'Nếu đã giải nén và dùng xong thì xóa được. Không chắc thì chuyển lên Drive.' } }
+    }
+    $personal = @()
+    foreach ($k in @('Desktop', 'MyDocuments', 'MyPictures', 'MyVideos', 'MyMusic')) { $personal += [Environment]::GetFolderPath($k) }
+    $personal += $dl
+    $personal += ($env:USERPROFILE + '\OneDrive')
+    foreach ($pp in $personal) {
+        if ($pp -and $p.StartsWith($pp, [StringComparison]::OrdinalIgnoreCase)) {
+            return [pscustomobject]@{ Level = 'canhan'; Title = 'Dữ liệu cá nhân của bạn'; Text = 'Ảnh, video, tài liệu... của bạn. Xóa vĩnh viễn là mất hẳn. Nếu còn cần, hãy dùng "Chuyển lên Drive / ổ ngoài" thay vì xóa.' }
+        }
+    }
+    if ($p -notmatch '^(?i)c:') {
+        return [pscustomobject]@{ Level = 'canhan'; Title = 'Dữ liệu trên ổ phụ'; Text = 'Thường là dữ liệu bạn tự lưu (ảnh, video, tài liệu, bộ cài...). Kiểm tra kỹ trước khi xóa; nếu còn cần thì chuyển lên Drive / ổ ngoài.' }
+    }
+    return [pscustomobject]@{ Level = 'khongro'; Title = 'Chưa rõ là gì'; Text = 'App chưa nhận ra mục này. Nếu bạn không chắc chắn, đừng xóa — hoặc chỉ xóa vào Thùng rác để còn khôi phục được. Có thể tìm tên thư mục trên Google để biết của phần mềm nào.' }
+}
+
+function Show-MapInfo {
+    $lv = $Script:mapList
+    if ($lv.SelectedItems.Count -eq 0) { return }
+    $r = $lv.SelectedItems[0].Tag
+    $info = $r.Info
+    $meta = $Script:LevelMeta[$info.Level]
+    $Script:lblInfoLevel.Text = $meta.Label
+    $Script:lblInfoLevel.ForeColor = $meta.Color
+    $Script:lblInfoTitle.Text = $info.Title
+    $kind = 'File'
+    if ($r.IsDir) { $kind = 'Thư mục' }
+    $Script:lblInfoText.Text = $info.Text + [Environment]::NewLine + [Environment]::NewLine + $kind + ': ' + $r.Name + [Environment]::NewLine + 'Dung lượng: ' + (Format-Size $r.Size) + [Environment]::NewLine + $r.Path
+    if ($lv.SelectedItems.Count -gt 1) {
+        $sum = [long]0; foreach ($it in $lv.SelectedItems) { $sum += $it.Tag.Size }
+        $Script:lblInfoText.Text += [Environment]::NewLine + [Environment]::NewLine + '(Đang chọn ' + $lv.SelectedItems.Count + ' mục, tổng ' + (Format-Size $sum) + ')'
+    }
+    $canDel = $info.Level -ne 'cam'
+    $Script:btnInfoRecycle.Enabled = $canDel
+    $Script:btnInfoDelete.Enabled = $canDel
+    $Script:btnInfoMove.Enabled = -not (Test-ProtectedPath $r.Path)
+}
+
+function Update-MapTree($r, [long]$remaining) {
+    $delta = $r.Size - $remaining
+    if ($delta -le 0) { return }
+    $parent = Split-Path -Parent $r.Path
+    $p = $parent
+    while ($p -and $Script:MapSize.ContainsKey($p)) {
+        $Script:MapSize[$p] -= $delta
+        if ($p -eq $Script:MapRoot) { break }
+        $next = Split-Path -Parent $p
+        if (-not $next -or $next -eq $p) { break }
+        $p = $next
+    }
+    if ($r.IsDir) {
+        if ($remaining -le 0) {
+            if ($Script:MapKids.ContainsKey($parent)) { [void]$Script:MapKids[$parent].Remove($r.Path) }
+            [void]$Script:MapSize.Remove($r.Path)
+        } else { $Script:MapSize[$r.Path] = $remaining }
+    } elseif ($remaining -le 0 -and $Script:MapFiles.ContainsKey($parent)) {
+        $lst = $Script:MapFiles[$parent]
+        for ($i = $lst.Count - 1; $i -ge 0; $i--) { if ($lst[$i].FullName -eq $r.Path) { $lst.RemoveAt($i) } }
+    }
+}
+
+function Remove-MapItems([bool]$permanent) {
+    $sel = @($Script:mapList.SelectedItems | ForEach-Object { $_.Tag })
+    if ($sel.Count -eq 0) { Show-Msg 'Hãy chọn thư mục / file muốn xóa trước.'; return }
+    $blocked = @($sel | Where-Object { $_.Info.Level -eq 'cam' })
+    if ($blocked.Count -gt 0) {
+        $txt = 'Những mục sau KHÔNG ĐƯỢC XÓA:' + "`n"
+        foreach ($b in $blocked) { $txt += "`n⛔ " + $b.Name + ' — ' + $b.Info.Title + "`n    " + $b.Info.Text + "`n" }
+        Show-Msg $txt 'Stop'
+        $sel = @($sel | Where-Object { $_.Info.Level -ne 'cam' })
+        if ($sel.Count -eq 0) { return }
+    }
+    $sum = [long]0; foreach ($s in $sel) { $sum += $s.Size }
+    $risky = @($sel | Where-Object { $_.Info.Level -in @('canthan', 'khongro') })
+    $msg = ''
+    if ($permanent) { $msg = 'XÓA VĨNH VIỄN — không khôi phục được:' + "`n" }
+    else { $msg = 'Chuyển vào Thùng rác (còn khôi phục được):' + "`n" }
+    $i = 0
+    foreach ($s in $sel) {
+        $i++
+        if ($i -gt 10) { $msg += "`n   ... và " + ($sel.Count - 10) + ' mục khác'; break }
+        $msg += "`n• " + $s.Name + '  (' + (Format-Size $s.Size) + ')  —  ' + $Script:LevelMeta[$s.Info.Level].Short + ': ' + $s.Info.Title
+    }
+    $msg += "`n`nTổng: " + (Format-Size $sum)
+    if ($risky.Count -gt 0) {
+        $msg += "`n`n⚠️ CHÚ Ý:"
+        foreach ($s in $risky) { $msg += "`n" + $s.Name + ': ' + $s.Info.Text }
+    }
+    if (-not $permanent) { $msg += "`n`nLưu ý: ổ đĩa chỉ trống thêm sau khi dọn Thùng rác. File quá lớn có thể bị Windows hỏi xóa hẳn." }
+    $msg += "`n`nTiếp tục?"
+    if (-not (Confirm-Action $msg)) { return }
+    if ($risky.Count -gt 0 -or ($permanent -and $sum -gt 1GB)) {
+        $again = 'Bạn chắc chắn chứ?' + "`n`n"
+        if ($risky.Count -gt 0) { $again += 'Có ' + $risky.Count + ' mục cần cẩn thận / chưa rõ là gì. ' }
+        if ($permanent) { $again += 'Xóa vĩnh viễn ' + (Format-Size $sum) + ' — không lấy lại được.' } else { $again += 'Các mục sẽ vào Thùng rác.' }
+        if (-not (Confirm-Action $again)) { return }
+    }
+    Set-Busy $true
+    $freeBefore = Get-FreeMap
+    $okCount = 0; $partial = 0
+    foreach ($s in $sel) {
+        Set-Status ('Đang xóa: ' + $s.Path)
+        try {
+            if ($s.IsDir) {
+                if ($permanent) { Remove-TreeSafe $s.Path ([datetime]::MaxValue) }
+                else { [Microsoft.VisualBasic.FileIO.FileSystem]::DeleteDirectory($s.Path, [Microsoft.VisualBasic.FileIO.UIOption]::OnlyErrorDialogs, [Microsoft.VisualBasic.FileIO.RecycleOption]::SendToRecycleBin) }
+            } else {
+                if ($permanent) { $fi = New-Object IO.FileInfo($s.Path); $fi.Attributes = 'Normal'; $fi.Delete() }
+                else { [Microsoft.VisualBasic.FileIO.FileSystem]::DeleteFile($s.Path, [Microsoft.VisualBasic.FileIO.UIOption]::OnlyErrorDialogs, [Microsoft.VisualBasic.FileIO.RecycleOption]::SendToRecycleBin) }
+            }
+        } catch { Write-Log ('Không xóa hết được ' + $s.Path + ': ' + $_.Exception.Message) }
+        $remaining = [long]0
+        if (Test-Path -LiteralPath $s.Path) {
+            if ($s.IsDir) { $remaining = Get-FolderSize $s.Path } else { $remaining = (New-Object IO.FileInfo($s.Path)).Length }
+        }
+        if ($remaining -le 0) { $okCount++ } elseif ($remaining -lt $s.Size) { $partial++ }
+        $how = 'vào Thùng rác'
+        if ($permanent) { $how = 'vĩnh viễn' }
+        Write-Log ('Đã xóa ' + $how + ': ' + $s.Path + ' (' + (Format-Size ($s.Size - $remaining)) + ')')
+        Update-MapTree $s $remaining
+    }
+    Show-MapDir $Script:MapCurrent
+    Update-Drives
+    Set-Busy $false
+    $freeAfter = Get-FreeMap
+    $report = ''
+    foreach ($k in ($freeAfter.Keys | Sort-Object)) {
+        if ($freeBefore.ContainsKey($k)) {
+            $diff = $freeAfter[$k] - $freeBefore[$k]
+            if ($diff -gt 10MB) { $report += "`n    " + $k + '  +' + (Format-Size $diff) + '  (nay còn trống ' + (Format-Size $freeAfter[$k]) + ')' }
+        }
+    }
+    $done = 'Đã xóa xong ' + $okCount + '/' + $sel.Count + ' mục.'
+    if ($partial -gt 0 -or $okCount -lt $sel.Count) { $done += "`n`nMột số file đang được dùng nên chưa xóa được. Hãy tắt phần mềm đang dùng chúng rồi thử lại." }
+    if ($report) { $done += "`n`nĐã giải phóng:" + $report }
+    elseif (-not $permanent) { $done += "`n`nCác mục đang nằm trong Thùng rác. Dọn Thùng rác (tab Dọn dẹp) để thật sự lấy lại dung lượng." }
+    Set-Status 'Đã xóa xong.'
+    Show-MsgDone $done
+}
+
+function Show-MsgDone([string]$t) { Show-Msg $t }
+
 function Show-MapDir([string]$dir) {
     if (-not $Script:MapSize -or -not $Script:MapSize.ContainsKey($dir)) { return }
     $Script:MapCurrent = $dir
@@ -1214,10 +1415,10 @@ function Show-MapDir([string]$dir) {
     if ($denom -le 0) { $denom = [double][Math]::Max(1, $total) }
     $rows = New-Object System.Collections.ArrayList
     foreach ($k in $Script:MapKids[$dir]) {
-        [void]$rows.Add([pscustomobject]@{ Path = $k; Name = (Split-Path -Leaf $k); Size = $Script:MapSize[$k]; Count = $Script:MapCount[$k]; IsDir = $true })
+        [void]$rows.Add([pscustomobject]@{ Path = $k; Name = (Split-Path -Leaf $k); Size = $Script:MapSize[$k]; Count = $Script:MapCount[$k]; IsDir = $true; Info = (Get-PathInfo $k $true) })
     }
     foreach ($f in $Script:MapFiles[$dir]) {
-        [void]$rows.Add([pscustomobject]@{ Path = $f.FullName; Name = $f.Name; Size = $f.Length; Count = 1; IsDir = $false })
+        [void]$rows.Add([pscustomobject]@{ Path = $f.FullName; Name = $f.Name; Size = $f.Length; Count = 1; IsDir = $false; Info = (Get-PathInfo $f.FullName $false) })
     }
     foreach ($r in ($rows | Sort-Object -Property Size -Descending)) {
         $pct = 100.0 * $r.Size / $denom
@@ -1230,7 +1431,11 @@ function Show-MapDir([string]$dir) {
         [void]$it.SubItems.Add((Format-Size $r.Size))
         [void]$it.SubItems.Add(('{0,5:N1}% ' -f $pct) + ('█' * $barLen))
         [void]$it.SubItems.Add(('{0:N0}' -f $r.Count))
-        if (Test-ProtectedPath $r.Path) { $it.ForeColor = [Drawing.Color]::Gray }
+        $meta = $Script:LevelMeta[$r.Info.Level]
+        [void]$it.SubItems.Add($meta.Short + ' — ' + $r.Info.Title)
+        $it.UseItemStyleForSubItems = $false
+        $it.SubItems[4].ForeColor = $meta.Color
+        if ($r.Info.Level -eq 'cam') { $it.ForeColor = [Drawing.Color]::Gray }
         $it.Tag = $r
         [void]$lv.Items.Add($it)
     }
@@ -1748,18 +1953,56 @@ $Script:btnMapScan.Font = New-Object Drawing.Font('Segoe UI', 9.5, [Drawing.Font
 $Script:btnMapUp   = New-Btn '⬆ Lên trên' 318 6 110 32
 $Script:btnMapOpen = New-Btn 'Mở trong Explorer' 434 6 150 32
 $Script:btnMapAdd  = New-Btn 'Thêm vào danh sách chuyển đi' 590 6 250 32
-$mapTop.Controls.Add((New-Lbl 'Mục màu xám là của Windows / chương trình — không chuyển được. Ổ C thường mất vài phút.' 848 4 320 42))
+$mapTop.Controls.Add((New-Lbl 'Bấm vào một mục để biết đó là gì. Chuột phải để xóa hoặc chuyển đi. Ổ C thường mất vài phút.' 848 4 320 42))
 $Script:lblMapPath = New-Lbl 'Chọn ổ rồi bấm "Phân tích ổ đĩa" để xem thư mục nào chiếm nhiều chỗ nhất.' 8 50 1150 24
 $Script:lblMapPath.Font = New-Object Drawing.Font('Segoe UI', 10, [Drawing.FontStyle]::Bold)
 $mapTop.Controls.AddRange(@($Script:cboMapDrive, $Script:btnMapScan, $Script:btnMapUp, $Script:btnMapOpen, $Script:btnMapAdd, $Script:lblMapPath))
 $Script:mapList = New-Object Windows.Forms.ListView
 $Script:mapList.View = 'Details'; $Script:mapList.FullRowSelect = $true; $Script:mapList.Dock = 'Fill'; $Script:mapList.HideSelection = $false
-[void]$Script:mapList.Columns.Add('Tên', 470)
-[void]$Script:mapList.Columns.Add('Dung lượng', 110, 'Right')
-[void]$Script:mapList.Columns.Add('% ổ đĩa', 260)
-[void]$Script:mapList.Columns.Add('Số file', 100, 'Right')
+$Script:mapList.MultiSelect = $true
+[void]$Script:mapList.Columns.Add('Tên', 330)
+[void]$Script:mapList.Columns.Add('Dung lượng', 95, 'Right')
+[void]$Script:mapList.Columns.Add('% ổ đĩa', 170)
+[void]$Script:mapList.Columns.Add('Số file', 80, 'Right')
+[void]$Script:mapList.Columns.Add('Đây là gì', 250)
 $Script:mapList.Font = New-Object Drawing.Font('Segoe UI', 10)
+
+# khung giải thích bên phải
+$mapInfo = New-Object Windows.Forms.Panel
+$mapInfo.Dock = 'Right'; $mapInfo.Width = 300; $mapInfo.Padding = New-Object Windows.Forms.Padding(8)
+$Script:lblInfoLevel = New-Object Windows.Forms.Label
+$Script:lblInfoLevel.Dock = 'Top'; $Script:lblInfoLevel.Height = 30; $Script:lblInfoLevel.Font = New-Object Drawing.Font('Segoe UI', 12, [Drawing.FontStyle]::Bold)
+$Script:lblInfoLevel.Text = 'Chọn một mục'
+$Script:lblInfoTitle = New-Object Windows.Forms.Label
+$Script:lblInfoTitle.Dock = 'Top'; $Script:lblInfoTitle.Height = 26; $Script:lblInfoTitle.Font = New-Object Drawing.Font('Segoe UI', 10, [Drawing.FontStyle]::Bold)
+$Script:lblInfoText = New-Object Windows.Forms.Label
+$Script:lblInfoText.Dock = 'Fill'; $Script:lblInfoText.Font = New-Object Drawing.Font('Segoe UI', 9.5)
+$Script:lblInfoText.Text = 'Bấm vào một thư mục hoặc file trong danh sách, app sẽ cho biết đó là gì và có xóa được không.'
+$infoBtns = New-Object Windows.Forms.Panel
+$infoBtns.Dock = 'Bottom'; $infoBtns.Height = 122
+$Script:btnInfoRecycle = New-Btn 'Xóa (vào Thùng rác)' 0 0 284 36
+$Script:btnInfoDelete  = New-Btn 'Xóa vĩnh viễn' 0 40 284 36
+$Script:btnInfoMove    = New-Btn 'Chuyển lên Drive / ổ ngoài' 0 80 284 36
+$Script:btnInfoRecycle.Enabled = $false; $Script:btnInfoDelete.Enabled = $false; $Script:btnInfoMove.Enabled = $false
+$infoBtns.Controls.AddRange(@($Script:btnInfoRecycle, $Script:btnInfoDelete, $Script:btnInfoMove))
+$mapInfo.Controls.Add($Script:lblInfoText)
+$mapInfo.Controls.Add($infoBtns)
+$mapInfo.Controls.Add($Script:lblInfoTitle)
+$mapInfo.Controls.Add($Script:lblInfoLevel)
+
+# menu chuột phải
+$Script:mapMenu = New-Object Windows.Forms.ContextMenuStrip
+$Script:miMapWhat    = $Script:mapMenu.Items.Add('Đây là gì?')
+[void]$Script:mapMenu.Items.Add('-')
+$Script:miMapRecycle = $Script:mapMenu.Items.Add('Xóa (vào Thùng rác)')
+$Script:miMapDelete  = $Script:mapMenu.Items.Add('Xóa vĩnh viễn')
+[void]$Script:mapMenu.Items.Add('-')
+$Script:miMapMove    = $Script:mapMenu.Items.Add('Chuyển lên Drive / ổ ngoài')
+$Script:miMapOpen    = $Script:mapMenu.Items.Add('Mở trong Explorer')
+$Script:mapList.ContextMenuStrip = $Script:mapMenu
+
 $tabMap.Controls.Add($Script:mapList)
+$tabMap.Controls.Add($mapInfo)
 $tabMap.Controls.Add($mapTop)
 
 # ---------------------------------------------------------------- TAB 3: File trùng
@@ -1859,7 +2102,7 @@ $form.Controls.Add($tabs)
 $form.Controls.Add($status)
 
 $Script:BusyControls = @($Script:btnScan, $Script:btnClean, $Script:btnConnect, $Script:btnBrowse, $Script:btnAll, $Script:btnNone, $Script:btnZalo,
-    $Script:btnMapScan, $Script:btnMapUp, $Script:btnMapAdd, $Script:btnDupScan, $Script:btnDupDel, $Script:btnDupAdd, $Script:btnDupRemove,
+    $Script:btnMapScan, $Script:btnMapUp, $Script:btnMapAdd, $Script:btnInfoRecycle, $Script:btnInfoDelete, $Script:btnInfoMove, $Script:btnDupScan, $Script:btnDupDel, $Script:btnDupAdd, $Script:btnDupRemove,
     $Script:btnRestore, $Script:btnMovedReload)
 
 # ---------------------------------------------------------------- sự kiện
@@ -1938,6 +2181,30 @@ $Script:btnMapOpen.Add_Click({
     elseif ($Script:MapCurrent) { Open-InExplorer $Script:MapCurrent }
 })
 $Script:btnMapAdd.Add_Click({ Invoke-Safe { Add-MapToMoveList } })
+$Script:mapList.Add_SelectedIndexChanged({ Show-MapInfo })
+$Script:mapList.Add_KeyDown({ if ($_.KeyCode -eq [Windows.Forms.Keys]::Delete) { Invoke-Safe { Remove-MapItems ([bool]$_.Shift) } } })
+$Script:btnInfoRecycle.Add_Click({ Invoke-Safe { Remove-MapItems $false } })
+$Script:btnInfoDelete.Add_Click({ Invoke-Safe { Remove-MapItems $true } })
+$Script:btnInfoMove.Add_Click({ Invoke-Safe { Add-MapToMoveList } })
+$Script:mapMenu.Add_Opening({
+    $sel = @($Script:mapList.SelectedItems | ForEach-Object { $_.Tag })
+    if ($sel.Count -eq 0) { $_.Cancel = $true; return }
+    $allCam = @($sel | Where-Object { $_.Info.Level -ne 'cam' }).Count -eq 0
+    $Script:miMapRecycle.Enabled = -not $allCam
+    $Script:miMapDelete.Enabled = -not $allCam
+    $Script:miMapMove.Enabled = @($sel | Where-Object { -not (Test-ProtectedPath $_.Path) }).Count -gt 0
+    $Script:miMapWhat.Text = 'Đây là gì?  —  ' + $Script:LevelMeta[$sel[0].Info.Level].Short
+})
+$Script:miMapWhat.Add_Click({
+    if ($Script:mapList.SelectedItems.Count -gt 0) {
+        $r = $Script:mapList.SelectedItems[0].Tag
+        Show-Msg ($Script:LevelMeta[$r.Info.Level].Label + "`n`n" + $r.Info.Title + "`n`n" + $r.Info.Text + "`n`n" + $r.Path + "`n" + (Format-Size $r.Size))
+    }
+})
+$Script:miMapRecycle.Add_Click({ Invoke-Safe { Remove-MapItems $false } })
+$Script:miMapDelete.Add_Click({ Invoke-Safe { Remove-MapItems $true } })
+$Script:miMapMove.Add_Click({ Invoke-Safe { Add-MapToMoveList } })
+$Script:miMapOpen.Add_Click({ if ($Script:mapList.SelectedItems.Count -gt 0) { Open-InExplorer $Script:mapList.SelectedItems[0].Tag.Path } })
 
 # file trùng
 $Script:btnDupAdd.Add_Click({

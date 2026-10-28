@@ -42,6 +42,6 @@ Gặp lỗi hoặc muốn thêm tính năng? Vào mục **[Issues](https://githu
 ## Dành cho người phát triển
 
 - Mã nguồn: `app/DonDep.ps1` (PowerShell 5.1 + Windows Forms), `app/Launcher.cs` (file .exe khởi động).
-- Phát hành bản mới: sửa `$Script:AppVersion` trong `app/DonDep.ps1`, rồi đẩy thẻ cùng số, ví dụ `git tag v0.3.0 && git push origin v0.3.0`. GitHub Actions tự tạo `.exe`, đóng gói `.zip` và đăng lên trang Releases.
+- Phát hành bản mới: sửa `$Script:AppVersion` trong `app/DonDep.ps1`, rồi vào tab **Actions** → **Đóng gói và phát hành** → **Run workflow**. GitHub tự tạo `.exe`, đóng gói `.zip` và đăng lên trang Releases với thẻ `v<số phiên bản>`.
 
 Giấy phép: [MIT](LICENSE).

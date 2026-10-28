@@ -1,10 +1,17 @@
 name: Đóng gói và phát hành
 
-# Chạy khi đẩy một thẻ phiên bản (ví dụ v0.2.0), hoặc bấm tay trong tab Actions để thử đóng gói.
+# Phát hành: tab Actions → "Đóng gói và phát hành" → Run workflow.
+# Số phiên bản lấy từ $Script:AppVersion trong app/DonDep.ps1 (thẻ v<số> được tạo tự động).
+# Đẩy thẻ v* bằng git cũng chạy được.
 on:
   push:
     tags: ['v*']
   workflow_dispatch:
+    inputs:
+      phat_hanh:
+        description: 'Đăng lên trang Releases (bỏ chọn nếu chỉ muốn thử đóng gói)'
+        type: boolean
+        default: true
 
 permissions:
   contents: write
@@ -23,14 +30,17 @@ jobs:
           if ($errors.Count -gt 0) { $errors | ForEach-Object { Write-Host $_.Extent.StartLineNumber $_.Message }; exit 1 }
           Write-Host 'Không có lỗi cú pháp.'
 
-      - name: Kiểm tra phiên bản khớp với thẻ
-        if: startsWith(github.ref, 'refs/tags/')
+      - name: Đọc số phiên bản
+        id: ver
         shell: powershell
         run: |
-          $tag = '${{ github.ref_name }}'.TrimStart('v')
           $line = Select-String -Path app\DonDep.ps1 -Pattern "AppVersion\s*=\s*'([^']+)'" | Select-Object -First 1
           $ver = $line.Matches[0].Groups[1].Value
-          if ($ver -ne $tag) { Write-Host "Phiên bản trong DonDep.ps1 ($ver) khác thẻ ($tag)."; exit 1 }
+          if ('${{ github.ref_type }}' -eq 'tag' -and '${{ github.ref_name }}'.TrimStart('v') -ne $ver) {
+            Write-Host "Phiên bản trong DonDep.ps1 ($ver) khác thẻ (${{ github.ref_name }})."; exit 1
+          }
+          "tag=v$ver" | Out-File -Append -Encoding utf8 $env:GITHUB_OUTPUT
+          Write-Host "Phiên bản: $ver"
 
       - name: Tạo file .exe
         shell: powershell
@@ -54,11 +64,16 @@ jobs:
           path: out/DonDepMayTinh.zip
 
       - name: Tạo trang phát hành
-        if: startsWith(github.ref, 'refs/tags/')
+        if: github.ref_type == 'tag' || inputs.phat_hanh
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.ver.outputs.tag }}
         run: |
-          gh release create "${{ github.ref_name }}" out/DonDepMayTinh.zip \
-            --title "Dọn Dẹp Máy Tính ${{ github.ref_name }}" \
-            --notes-file .github/release-notes.md
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "Bản $TAG đã có — chỉ cập nhật file .zip."
+            gh release upload "$TAG" out/DonDepMayTinh.zip --clobber
+          else
+            gh release create "$TAG" out/DonDepMayTinh.zip --target "$GITHUB_SHA" \
+              --title "Dọn Dẹp Máy Tính $TAG" --notes-file .github/release-notes.md
+          fi

@@ -28,7 +28,7 @@ jobs:
           $errors = $null; $tokens = $null
           [void][System.Management.Automation.Language.Parser]::ParseFile("$PWD\app\DonDep.ps1", [ref]$tokens, [ref]$errors)
           if ($errors.Count -gt 0) { $errors | ForEach-Object { Write-Host $_.Extent.StartLineNumber $_.Message }; exit 1 }
-          Write-Host 'Không có lỗi cú pháp.'
+          Write-Host 'Syntax OK'
 
       - name: Đọc số phiên bản
         id: ver
@@ -37,17 +37,17 @@ jobs:
           $line = Select-String -Path app\DonDep.ps1 -Pattern "AppVersion\s*=\s*'([^']+)'" | Select-Object -First 1
           $ver = $line.Matches[0].Groups[1].Value
           if ('${{ github.ref_type }}' -eq 'tag' -and '${{ github.ref_name }}'.TrimStart('v') -ne $ver) {
-            Write-Host "Phiên bản trong DonDep.ps1 ($ver) khác thẻ (${{ github.ref_name }})."; exit 1
+            Write-Host "Version in DonDep.ps1 ($ver) differs from tag (${{ github.ref_name }})"; exit 1
           }
           [IO.File]::AppendAllText($env:GITHUB_OUTPUT, "tag=v$ver`n", (New-Object Text.UTF8Encoding($false)))
-          Write-Host "Phiên bản: $ver"
+          Write-Host "Version: $ver"
 
       - name: Tạo file .exe
         shell: powershell
         run: |
           $csc = "$env:WINDIR\Microsoft.NET\Framework64\v4.0.30319\csc.exe"
           $sma = [PSObject].Assembly.Location
-          Write-Host "Thư viện PowerShell: $sma"
+          Write-Host "SMA: $sma"
           New-Item -ItemType Directory -Force -Path out\DonDepMayTinh | Out-Null
           & $csc /nologo /target:winexe /optimize /win32icon:app\DonDep.ico /out:"out\DonDepMayTinh\Don Dep May Tinh.exe" /r:System.dll /r:System.Windows.Forms.dll /r:"$sma" app\Launcher.cs
           if ($LASTEXITCODE -ne 0) { exit 1 }
@@ -58,7 +58,7 @@ jobs:
           Copy-Item app\DonDep.ps1, app\DonDep.ico, 'app\HUONG DAN.txt' out\DonDepMayTinh\
           $p = Start-Process -FilePath 'out\DonDepMayTinh\Don Dep May Tinh.exe' -ArgumentList '--selftest' -Wait -PassThru
           $r = Get-Content out\DonDepMayTinh\selftest.txt -Raw -ErrorAction SilentlyContinue
-          Write-Host "Mã thoát: $($p.ExitCode) — kết quả: $r"
+          Write-Host "exit=$($p.ExitCode) result=$r"
           Remove-Item out\DonDepMayTinh\selftest.txt -ErrorAction SilentlyContinue
           $log = Get-Content "$([Environment]::GetFolderPath('MyDocuments'))\DonDepMayTinh\loi_khoi_dong.txt" -Raw -ErrorAction SilentlyContinue
           if ($p.ExitCode -ne 0 -or $r -notmatch '^ok .* loi=0 ') {

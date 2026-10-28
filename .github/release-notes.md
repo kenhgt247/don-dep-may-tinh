@@ -9,8 +9,10 @@ Hướng dẫn chi tiết nằm trong file `HUONG DAN.txt` bên trong thư mục
 
 ## Có gì trong bản này
 
-- **Dọn dẹp:** quét rác hệ thống, ảnh/video Zalo cũ, Downloads, file lớn — luôn hỏi trước khi làm. **Mới ở 0.4.0:** với mỗi file cá nhân, chọn *chuyển lên Drive / ổ ngoài* hay *xóa vĩnh viễn* (chuột phải vào file; app gợi ý sẵn và hỏi lại trước khi dọn).
-- **Bản đồ ổ đĩa:** xem thư mục nào đang chiếm nhiều chỗ nhất. **Mới ở 0.3.0:** bấm vào là biết file/thư mục đó là gì, có xóa được không; chuột phải để xóa hoặc chuyển đi; file hệ thống bị chặn không cho xóa.
+**Bản 1.0.0 được viết lại hoàn toàn bằng C#**: chỉ còn một file `.exe`, chạy nhanh hơn nhiều, ít bị phần mềm diệt virus báo nhầm. Thiết lập và danh sách file đã chuyển của bản cũ vẫn dùng tiếp được.
+
+- **Dọn dẹp:** quét rác hệ thống, ảnh/video Zalo cũ, Downloads, file lớn — luôn hỏi trước khi làm. Với mỗi file cá nhân, chọn *chuyển lên Drive / ổ ngoài* hay *xóa vĩnh viễn*.
+- **Bản đồ ổ đĩa:** xem thư mục nào chiếm nhiều chỗ nhất; bấm vào là biết đó là gì, có xóa được không; chuột phải để xóa hoặc chuyển đi; file hệ thống bị chặn.
 - **File trùng:** tìm và dọn các file giống hệt nhau.
 - **Đã chuyển đi:** lấy lại file đã chuyển về đúng chỗ cũ.
 - **Tự động:** chạy ngầm, báo khi ổ sắp đầy, tự dọn rác theo lịch.

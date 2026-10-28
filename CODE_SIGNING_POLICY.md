@@ -15,8 +15,7 @@ Until approval and integration are complete, release artifacts may be unsigned.
 
 ## What is signed
 
-- `Don Dep May Tinh.exe` — the launcher executable inside `DonDepMayTinh.zip`.
-- `DonDep.ps1` — the main PowerShell script (Authenticode signature), once supported by the signing setup.
+- `Don Dep May Tinh.exe` — the application executable (C#, .NET Framework 4.8) inside `DonDepMayTinh.zip`.
 
 Only artifacts built from this repository by the GitHub Actions workflow
 [`.github/workflows/release.yml`](.github/workflows/release.yml) are submitted for signing.

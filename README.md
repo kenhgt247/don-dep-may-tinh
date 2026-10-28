@@ -10,7 +10,7 @@ Phần mềm **miễn phí** giúp máy tính Windows hết cảnh "ổ C đầy
 2. Bấm đúp **Don Dep May Tinh.exe**.
 3. Nếu Windows hiện cảnh báo màu xanh *"Windows protected your PC"*: bấm **More info → Run anyway**.
 
-Chạy trên Windows 10 / 11. Không cần cài đặt thêm gì.
+Chạy trên Windows 10 / 11. Chỉ một file `.exe`, không cần cài đặt thêm gì.
 
 Phần mềm hoàn toàn miễn phí. Ký số miễn phí bởi [SignPath.io](https://about.signpath.io), chứng chỉ của [SignPath Foundation](https://signpath.org) (đang chờ duyệt — xem [Chính sách ký số](CODE_SIGNING_POLICY.md)). [Chính sách quyền riêng tư](PRIVACY.md).
 
@@ -43,8 +43,10 @@ Gặp lỗi hoặc muốn thêm tính năng? Vào mục **[Issues](https://githu
 
 ## Dành cho người phát triển
 
-- Mã nguồn: `app/DonDep.ps1` (PowerShell 5.1 + Windows Forms), `app/Launcher.cs` (file .exe khởi động).
-- Phát hành bản mới: sửa `$Script:AppVersion` trong `app/DonDep.ps1`, rồi vào tab **Actions** → **Đóng gói và phát hành** → **Run workflow**. GitHub tự tạo `.exe`, đóng gói `.zip` và đăng lên trang Releases với thẻ `v<số phiên bản>`.
+- Viết bằng C# (Windows Forms, .NET Framework 4.8 — có sẵn trên Windows 10/11). Mã nguồn trong [`src/`](src/).
+- Biên dịch: `dotnet build src/DonDepMayTinh.csproj -c Release`.
+- Phát hành bản mới: sửa `Version` trong `src/Core.cs` và `src/DonDepMayTinh.csproj`, rồi vào tab **Actions** → **Đóng gói và phát hành** → **Run workflow**. GitHub tự biên dịch, chạy thử (`--selftest`), đóng gói `.zip` và đăng lên trang Releases.
+- Bản 0.x cũ viết bằng PowerShell vẫn còn trong lịch sử Git.
 
 Giấy phép: [MIT](LICENSE) · [Code signing policy](CODE_SIGNING_POLICY.md) · [Privacy policy](PRIVACY.md)
 

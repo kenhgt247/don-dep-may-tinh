@@ -61,11 +61,13 @@ namespace DonDep
             var tabMap = NewTab("Bản đồ ổ đĩa");
             var tabDup = NewTab("File trùng");
             var tabMoved = NewTab("Đã chuyển đi");
+            var tabBrowser = NewTab("Trình duyệt");
             var tabAuto = NewTab("Tự động");
             BuildCleanTab(tabClean);
             BuildMapTab(tabMap);
             BuildDupTab(tabDup);
             BuildMovedTab(tabMoved);
+            BuildBrowserTab(tabBrowser);
             BuildAutoTab(tabAuto);
 
             var strip = new StatusStrip();

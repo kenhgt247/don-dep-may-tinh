@@ -24,6 +24,7 @@ Phần mềm hoàn toàn miễn phí, mã nguồn mở. File `.exe` hiện **ch�
 | **Bản đồ ổ đĩa** | Xem thư mục nào chiếm nhiều chỗ nhất, đi sâu từng cấp. Bấm vào một mục để biết **đó là gì và có xóa được không** (rác / dữ liệu cá nhân / cẩn thận / không được xóa). Chuột phải để xóa (vào Thùng rác hoặc vĩnh viễn) hoặc chuyển lên Drive. Thư mục hệ thống bị chặn, không xóa nhầm được. |
 | **File trùng** | Tìm các file giống hệt nhau, giữ lại 1 bản, bản thừa vào Thùng rác. |
 | **Đã chuyển đi** | Danh sách file đã chuyển; lấy về đúng chỗ cũ bất cứ lúc nào. |
+| **Trình duyệt** | Xem Chrome, Edge, Cốc Cốc, Brave, Opera, Firefox chiếm bao nhiêu chỗ theo từng tài khoản. Dọn **bộ nhớ đệm** (an toàn, chọn sẵn), **lịch sử** và **cookie** (tự chọn; xóa cookie sẽ bị đăng xuất — app cảnh báo 2 lần). Không bao giờ đụng mật khẩu đã lưu, dấu trang, tiện ích. |
 | **Tự động** | Chạy ngầm cùng Windows, báo khi ổ sắp đầy, tự dọn rác hệ thống theo lịch. |
 
 ## An toàn
@@ -33,7 +34,7 @@ Phần mềm hoàn toàn miễn phí, mã nguồn mở. File `.exe` hiện **ch�
 - File chỉ bị xóa khỏi máy **sau khi** đã chép xong và kiểm tra đúng.
 - Không bao giờ đụng tới dữ liệu tin nhắn Zalo, thư mục Windows và chương trình.
 - Với Google Drive, app chỉ thấy được những file do chính nó tải lên (dùng công cụ mã nguồn mở [rclone](https://rclone.org)).
-- Toàn bộ mã nguồn công khai trong thư mục [`app/`](app/) — ai cũng kiểm tra được.
+- Toàn bộ mã nguồn công khai trong thư mục [`src/`](src/) — ai cũng kiểm tra được.
 
 ## Câu chuyện
 

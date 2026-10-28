@@ -1,4 +1,4 @@
-﻿DỌN DẸP MÁY TÍNH — phiên bản 1.0.0
+﻿DỌN DẸP MÁY TÍNH — phiên bản 1.1.0
 ================================
 
 CÁCH MỞ
@@ -10,7 +10,7 @@ CÁCH MỞ
      → bấm "Tạo biểu tượng".
   4. App tự báo khi có bản mới. Trang chủ: github.com/kenhgt247/don-dep-may-tinh
 
-5 TAB CỦA APP
+6 TAB CỦA APP
   1. Dọn dẹp
      - "Quét máy" (chỉ xem, chưa xóa gì) → bỏ chọn những gì muốn giữ → "Dọn dẹp ngay".
      - Rác hệ thống: file tạm, bộ nhớ đệm trình duyệt / Zalo / Teams, thùng rác,
@@ -28,7 +28,14 @@ CÁCH MỞ
   4. Đã chuyển đi
      - Danh sách mọi file đã từng chuyển lên Drive / ổ ngoài.
      - Đánh dấu rồi bấm "Lấy về chỗ cũ" để tải file về đúng vị trí ban đầu.
-  5. Tự động
+  5. Trình duyệt
+     - "Quét trình duyệt" → thấy Chrome, Edge, Cốc Cốc, Brave, Opera, Firefox
+       chiếm bao nhiêu chỗ, tách theo từng tài khoản (profile).
+     - Bộ nhớ đệm: chọn sẵn, xóa an toàn. Lịch sử: tự chọn nếu muốn.
+     - Cookie: xóa sẽ bị ĐĂNG XUẤT khỏi Facebook, Gmail, Zalo web... (hỏi 2 lần).
+     - Không bao giờ đụng mật khẩu đã lưu, dấu trang, tiện ích mở rộng.
+     - Nên tắt trình duyệt trước khi dọn (app sẽ nhắc).
+  6. Tự động
      - Chạy ngầm cùng Windows: biểu tượng nhỏ ở góc phải thanh Taskbar,
        báo ngay khi một ổ còn trống dưới mức bạn đặt (mặc định 5 GB).
      - Tự dọn RÁC HỆ THỐNG theo lịch (không bao giờ tự đụng file cá nhân).

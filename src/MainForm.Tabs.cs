@@ -645,6 +645,10 @@ namespace DonDep
             list.Items.Add(NewRow(personal[0], false));
             UpdateGroupHeaders(); UpdateSummary();
             list.Items.Clear();
+            var br = Browsers.Detect();
+            FillBrowserList(br);
+            UpdateBrowserSummary();
+            sb.Append(" browsers=").Append(br.Select(x => x.Browser).Distinct().Count()).Append("/").Append(br.Count);
             sb.Append(" UI_OK");
             return sb.ToString();
         }

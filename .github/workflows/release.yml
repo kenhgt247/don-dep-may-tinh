@@ -46,14 +46,25 @@ jobs:
         shell: powershell
         run: |
           $csc = "$env:WINDIR\Microsoft.NET\Framework64\v4.0.30319\csc.exe"
+          $sma = [PSObject].Assembly.Location
+          Write-Host "Thư viện PowerShell: $sma"
           New-Item -ItemType Directory -Force -Path out\DonDepMayTinh | Out-Null
-          & $csc /nologo /target:winexe /optimize /win32icon:app\DonDep.ico /out:"out\DonDepMayTinh\Don Dep May Tinh.exe" /r:System.dll /r:System.Windows.Forms.dll app\Launcher.cs
+          & $csc /nologo /target:winexe /optimize /win32icon:app\DonDep.ico /out:"out\DonDepMayTinh\Don Dep May Tinh.exe" /r:System.dll /r:System.Windows.Forms.dll /r:"$sma" app\Launcher.cs
           if ($LASTEXITCODE -ne 0) { exit 1 }
+
+      - name: Chạy thử file .exe
+        shell: powershell
+        run: |
+          Copy-Item app\DonDep.ps1, app\DonDep.ico, 'app\HUONG DAN.txt' out\DonDepMayTinh\
+          $p = Start-Process -FilePath 'out\DonDepMayTinh\Don Dep May Tinh.exe' -ArgumentList '--selftest' -Wait -PassThru
+          $r = Get-Content out\DonDepMayTinh\selftest.txt -Raw -ErrorAction SilentlyContinue
+          Write-Host "Mã thoát: $($p.ExitCode) — kết quả: $r"
+          Remove-Item out\DonDepMayTinh\selftest.txt -ErrorAction SilentlyContinue
+          if ($p.ExitCode -ne 0 -or $r -notmatch '^ok .* loi=0 ') { Write-Host 'File .exe không chạy được mã chính.'; exit 1 }
 
       - name: Đóng gói .zip
         shell: powershell
         run: |
-          Copy-Item app\DonDep.ps1, app\DonDep.ico, 'app\HUONG DAN.txt', 'app\Mo app Don Dep.bat' out\DonDepMayTinh\
           Compress-Archive -Path out\DonDepMayTinh -DestinationPath out\DonDepMayTinh.zip -Force
           Get-ChildItem out\DonDepMayTinh
 

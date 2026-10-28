@@ -1,19 +1,81 @@
+// Dọn Dẹp Máy Tính — file khởi động.
+// Chạy DonDep.ps1 (nằm cạnh file .exe) ngay bên trong chương trình này bằng thư viện PowerShell của Windows.
+// Không mở cửa sổ powershell.exe ẩn và không đổi chính sách bảo mật của máy.
 using System;
-using System.Diagnostics;
 using System.IO;
+using System.Management.Automation;
+using System.Management.Automation.Runspaces;
+using System.Text;
+using System.Threading;
 using System.Windows.Forms;
-static class DonDepLauncher {
+
+static class DonDepLauncher
+{
     [STAThread]
-    static void Main(string[] args) {
-        string dir = AppDomain.CurrentDomain.BaseDirectory;
-        string script = Path.Combine(dir, "DonDep.ps1");
-        if (!File.Exists(script)) { MessageBox.Show("Khong tim thay DonDep.ps1 ben canh file .exe.", "Don Dep May Tinh"); return; }
-        string ps = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.System), @"WindowsPowerShell\v1.0\powershell.exe");
-        string extra = string.Join(" ", args);
-        var psi = new ProcessStartInfo(ps, "-NoProfile -ExecutionPolicy Bypass -STA -WindowStyle Hidden -File \"" + script + "\" " + extra);
-        psi.UseShellExecute = false;
-        psi.CreateNoWindow = true;
-        psi.WorkingDirectory = dir;
-        Process.Start(psi);
+    static int Main(string[] args)
+    {
+        string dir = AppDomain.CurrentDomain.BaseDirectory.TrimEnd('\\');
+        string scriptPath = Path.Combine(dir, "DonDep.ps1");
+        bool selfTest = Array.Exists(args, a => a.Equals("--selftest", StringComparison.OrdinalIgnoreCase));
+        bool tray = Array.Exists(args, a => a.Equals("-Tray", StringComparison.OrdinalIgnoreCase));
+
+        if (!File.Exists(scriptPath))
+        {
+            if (!selfTest) MessageBox.Show("Không tìm thấy file DonDep.ps1 bên cạnh file .exe.\nHãy giải nén đầy đủ thư mục DonDepMayTinh rồi chạy lại.", "Dọn Dẹp Máy Tính");
+            return 2;
+        }
+
+        try
+        {
+            string code = File.ReadAllText(scriptPath, Encoding.UTF8);
+            using (Runspace rs = RunspaceFactory.CreateRunspace(InitialSessionState.CreateDefault()))
+            {
+                rs.ApartmentState = ApartmentState.STA;
+                rs.ThreadOptions = PSThreadOptions.UseCurrentThread;
+                rs.Open();
+                rs.SessionStateProxy.SetVariable("DonDepAppDir", dir);
+                using (PowerShell ps = PowerShell.Create())
+                {
+                    ps.Runspace = rs;
+                    if (selfTest)
+                    {
+                        // Kiểm tra khi đóng gói: nạp được thư viện giao diện và đọc được mã chính
+                        ps.AddScript(
+                            "Add-Type -AssemblyName System.Windows.Forms; " +
+                            "$t=$null;$e=$null; [void][System.Management.Automation.Language.Parser]::ParseInput($args[0],[ref]$t,[ref]$e); " +
+                            "'ok ' + $PSVersionTable.PSVersion + ' loi=' + $e.Count + ' dir=' + $DonDepAppDir");
+                        ps.AddArgument(code);
+                        var result = ps.Invoke();
+                        File.WriteAllText(Path.Combine(dir, "selftest.txt"), result.Count > 0 ? result[0].ToString() : "khong co ket qua");
+                        return ps.HadErrors ? 1 : 0;
+                    }
+                    ps.AddScript(code);
+                    if (tray) ps.AddParameter("Tray", true);
+                    ps.Invoke();
+                    if (ps.HadErrors && ps.Streams.Error.Count > 0)
+                    {
+                        WriteLog(ps.Streams.Error[0].ToString());
+                    }
+                }
+            }
+            return 0;
+        }
+        catch (Exception ex)
+        {
+            WriteLog(ex.ToString());
+            if (!selfTest) MessageBox.Show("Không mở được Dọn Dẹp Máy Tính:\n\n" + ex.Message, "Dọn Dẹp Máy Tính");
+            return 1;
+        }
+    }
+
+    static void WriteLog(string text)
+    {
+        try
+        {
+            string d = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "DonDepMayTinh");
+            Directory.CreateDirectory(d);
+            File.AppendAllText(Path.Combine(d, "loi_khoi_dong.txt"), DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "  " + text + Environment.NewLine, Encoding.UTF8);
+        }
+        catch { }
     }
 }

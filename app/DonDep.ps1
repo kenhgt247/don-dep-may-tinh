@@ -19,13 +19,15 @@ Add-Type -AssemblyName Microsoft.VisualBasic
 try { [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 } catch {}
 
 # ---------------------------------------------------------------- cấu hình chung
-$Script:AppVersion   = '0.4.0'
+$Script:AppVersion   = '0.4.1'
 $Script:RepoSlug     = 'kenhgt247/don-dep-may-tinh'
 $Script:AppTitle     = 'Dọn Dẹp Máy Tính ' + $Script:AppVersion
+# Khi chạy qua file .exe, thư mục app được truyền vào biến $DonDepAppDir
 $Script:AppDir       = $PSScriptRoot
-$Script:ScriptPath   = $PSCommandPath
-$Script:IconPath     = Join-Path $PSScriptRoot 'DonDep.ico'
-$Script:ExePath      = Join-Path $PSScriptRoot 'Don Dep May Tinh.exe'
+if (-not $Script:AppDir -and $DonDepAppDir) { $Script:AppDir = $DonDepAppDir }
+$Script:ScriptPath   = Join-Path $Script:AppDir 'DonDep.ps1'
+$Script:IconPath     = Join-Path $Script:AppDir 'DonDep.ico'
+$Script:ExePath      = Join-Path $Script:AppDir 'Don Dep May Tinh.exe'
 $Script:DataDir      = Join-Path ([Environment]::GetFolderPath('MyDocuments')) 'DonDepMayTinh'
 $Script:SettingsFile = Join-Path $Script:DataDir 'caidat.json'
 $Script:RestoredFile = Join-Path $Script:DataDir 'da_lay_lai.txt'
@@ -575,11 +577,8 @@ function Update-DriveLabel([bool]$withQuota) {
 function Get-StartupLink { return (Join-Path ([Environment]::GetFolderPath('Startup')) 'Don Dep May Tinh (chay ngam).lnk') }
 
 function Get-LaunchTarget([string]$extraArgs) {
-    if (Test-Path -LiteralPath $Script:ExePath) {
-        return [pscustomobject]@{ File = $Script:ExePath; Args = $extraArgs }
-    }
-    $ps = Join-Path $env:windir 'System32\WindowsPowerShell\v1.0\powershell.exe'
-    return [pscustomobject]@{ File = $ps; Args = ('-NoProfile -ExecutionPolicy Bypass -STA -WindowStyle Hidden -File "' + $Script:ScriptPath + '" ' + $extraArgs).Trim() }
+    # Luôn mở qua file .exe đi kèm (không gọi powershell.exe ẩn)
+    return [pscustomobject]@{ File = $Script:ExePath; Args = $extraArgs }
 }
 
 function New-Shortcut([string]$lnk, [string]$extraArgs, [string]$desc) {
@@ -603,7 +602,7 @@ function Set-Startup([bool]$on) {
 
 function Start-TrayProcess {
     $t = Get-LaunchTarget '-Tray'
-    Start-Process -FilePath $t.File -ArgumentList $t.Args -WindowStyle Hidden
+    Start-Process -FilePath $t.File -ArgumentList $t.Args
 }
 
 function Start-MainProcess {
@@ -1837,49 +1836,8 @@ function Complete-UpdateCheck {
 }
 
 # ---------------------------------------------------------------- tạo file .exe + lối tắt
-function Build-Launcher {
-    if (Test-Path -LiteralPath $Script:ExePath) { return $true }
-    $code = @'
-using System;
-using System.Diagnostics;
-using System.IO;
-using System.Windows.Forms;
-static class DonDepLauncher {
-    [STAThread]
-    static void Main(string[] args) {
-        string dir = AppDomain.CurrentDomain.BaseDirectory;
-        string script = Path.Combine(dir, "DonDep.ps1");
-        if (!File.Exists(script)) { MessageBox.Show("Khong tim thay DonDep.ps1 ben canh file .exe.", "Don Dep May Tinh"); return; }
-        string ps = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.System), @"WindowsPowerShell\v1.0\powershell.exe");
-        string extra = string.Join(" ", args);
-        var psi = new ProcessStartInfo(ps, "-NoProfile -ExecutionPolicy Bypass -STA -WindowStyle Hidden -File \"" + script + "\" " + extra);
-        psi.UseShellExecute = false;
-        psi.CreateNoWindow = true;
-        psi.WorkingDirectory = dir;
-        Process.Start(psi);
-    }
-}
-'@
-    try {
-        $cp = New-Object CodeDom.Compiler.CompilerParameters
-        $cp.GenerateExecutable = $true
-        $cp.OutputAssembly = $Script:ExePath
-        $cp.GenerateInMemory = $false
-        [void]$cp.ReferencedAssemblies.Add('System.dll')
-        [void]$cp.ReferencedAssemblies.Add('System.Windows.Forms.dll')
-        $opts = '/target:winexe /optimize'
-        if (Test-Path -LiteralPath $Script:IconPath) { $opts += ' /win32icon:"' + $Script:IconPath + '"' }
-        $cp.CompilerOptions = $opts
-        Add-Type -TypeDefinition $code -Language CSharp -CompilerParameters $cp -ErrorAction Stop
-        return (Test-Path -LiteralPath $Script:ExePath)
-    } catch {
-        Write-Log ('Không tạo được file .exe: ' + $_.Exception.Message)
-        return (Test-Path -LiteralPath $Script:ExePath)
-    }
-}
-
 function Install-Shortcuts {
-    $built = Build-Launcher
+    $built = Test-Path -LiteralPath $Script:ExePath
     $desk = Join-Path ([Environment]::GetFolderPath('Desktop')) 'Dọn Dẹp Máy Tính.lnk'
     $menu = Join-Path ([Environment]::GetFolderPath('Programs')) 'Dọn Dẹp Máy Tính.lnk'
     try {
@@ -1887,7 +1845,7 @@ function Install-Shortcuts {
         New-Shortcut $menu '' 'Dọn Dẹp Máy Tính'
         if (Test-Path -LiteralPath (Get-StartupLink)) { Set-Startup $true }
         $msg = 'Đã tạo biểu tượng "Dọn Dẹp Máy Tính" trên Desktop và trong menu Start.'
-        if (-not $built) { $msg += "`n`n(Chưa tạo được file .exe nên biểu tượng sẽ mở bằng PowerShell — vẫn dùng bình thường.)" }
+        if (-not $built) { $msg += "`n`n(Không thấy file 'Don Dep May Tinh.exe' trong thư mục app — hãy tải lại bản đầy đủ.)" }
         Write-Log $msg
         Show-Msg $msg
     } catch { Show-Msg ('Không tạo được biểu tượng: ' + $_.Exception.Message) 'Error' }

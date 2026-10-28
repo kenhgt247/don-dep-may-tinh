@@ -1,4 +1,4 @@
-﻿﻿DỌN DẸP MÁY TÍNH — phiên bản 0.2.0
+﻿DỌN DẸP MÁY TÍNH — phiên bản 0.4.1
 ================================
 
 CÁCH MỞ
@@ -6,7 +6,6 @@ CÁCH MỞ
   2. Bấm đúp vào "Don Dep May Tinh.exe".
      Nếu Windows hiện cảnh báo màu xanh "Windows protected your PC":
      bấm "More info" → "Run anyway".
-     (Nếu không mở được file .exe, bấm đúp "Mo app Don Dep.bat" thay thế.)
   3. Muốn có biểu tượng trên Desktop và menu Start: vào tab "Tự động"
      → bấm "Tạo biểu tượng".
   4. App tự báo khi có bản mới. Trang chủ: github.com/kenhgt247/don-dep-may-tinh

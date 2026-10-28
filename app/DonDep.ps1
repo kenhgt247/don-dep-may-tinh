@@ -1,4 +1,4 @@
-﻿﻿#requires -version 5.1
+﻿#requires -version 5.1
 param([switch]$Tray)
 # =====================================================================
 #  Don Dep May Tinh - ban thu nghiem 2

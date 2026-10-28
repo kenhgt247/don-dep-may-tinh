@@ -39,7 +39,7 @@ jobs:
           if ('${{ github.ref_type }}' -eq 'tag' -and '${{ github.ref_name }}'.TrimStart('v') -ne $ver) {
             Write-Host "Phiên bản trong DonDep.ps1 ($ver) khác thẻ (${{ github.ref_name }})."; exit 1
           }
-          "tag=v$ver" | Out-File -Append -Encoding utf8 $env:GITHUB_OUTPUT
+          [IO.File]::AppendAllText($env:GITHUB_OUTPUT, "tag=v$ver`n", (New-Object Text.UTF8Encoding($false)))
           Write-Host "Phiên bản: $ver"
 
       - name: Tạo file .exe

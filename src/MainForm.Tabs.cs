@@ -1,0 +1,652 @@
+// Dọn Dẹp Máy Tính — tab Bản đồ ổ đĩa, File trùng, Đã chuyển đi, Tự động.
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Drawing;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using Microsoft.VisualBasic.FileIO;
+
+namespace DonDep
+{
+    partial class MainForm
+    {
+        // ================================================================= TAB 2: BẢN ĐỒ Ổ ĐĨA
+        ComboBox cboMapDrive;
+        ListView mapList;
+        Label lblMapPath, lblInfoLevel, lblInfoTitle, lblInfoText;
+        Button btnInfoRecycle, btnInfoDelete, btnInfoMove;
+        ContextMenuStrip mapMenu;
+        ToolStripItem miMapWhat, miMapRecycle, miMapDelete, miMapMove;
+        MapNode mapRoot, mapCurrent;
+
+        void BuildMapTab(TabPage tab)
+        {
+            var top = new Panel { Dock = DockStyle.Top, Height = 82 };
+            top.Controls.Add(Lbl("Ổ đĩa:", 8, 14, 50, 22));
+            cboMapDrive = new ComboBox { DropDownStyle = ComboBoxStyle.DropDownList, Location = new Point(60, 10), Size = new Size(80, 24) };
+            foreach (var d in Fs.FixedDrives()) cboMapDrive.Items.Add(d.Name);
+            if (cboMapDrive.Items.Count > 0) cboMapDrive.SelectedIndex = 0;
+            var btnScan = Btn("Phân tích ổ đĩa", 150, 6, 160, 32);
+            btnScan.Font = new Font("Segoe UI", 9.5f, FontStyle.Bold);
+            var btnUp = Btn("⬆ Lên trên", 318, 6, 110, 32);
+            var btnOpen = Btn("Mở trong Explorer", 434, 6, 150, 32, false);
+            var btnAdd = Btn("Thêm vào danh sách chuyển đi", 590, 6, 250, 32);
+            top.Controls.Add(Lbl("Bấm vào một mục để biết đó là gì. Chuột phải để xóa hoặc chuyển đi.", 848, 4, 320, 42));
+            lblMapPath = Lbl("Chọn ổ rồi bấm \"Phân tích ổ đĩa\" để xem thư mục nào chiếm nhiều chỗ nhất.", 8, 50, 1150, 24);
+            lblMapPath.Font = new Font("Segoe UI", 10f, FontStyle.Bold);
+            top.Controls.AddRange(new Control[] { cboMapDrive, btnScan, btnUp, btnOpen, btnAdd, lblMapPath });
+
+            mapList = new ListView { View = View.Details, FullRowSelect = true, Dock = DockStyle.Fill, HideSelection = false, MultiSelect = true, Font = new Font("Segoe UI", 10f) };
+            mapList.Columns.Add("Tên", 330);
+            mapList.Columns.Add("Dung lượng", 95, HorizontalAlignment.Right);
+            mapList.Columns.Add("% ổ đĩa", 170);
+            mapList.Columns.Add("Số file", 80, HorizontalAlignment.Right);
+            mapList.Columns.Add("Đây là gì", 250);
+
+            var info = new Panel { Dock = DockStyle.Right, Width = 300, Padding = new Padding(8) };
+            lblInfoLevel = new Label { Dock = DockStyle.Top, Height = 30, Font = new Font("Segoe UI", 12f, FontStyle.Bold), Text = "Chọn một mục" };
+            lblInfoTitle = new Label { Dock = DockStyle.Top, Height = 26, Font = new Font("Segoe UI", 10f, FontStyle.Bold) };
+            lblInfoText = new Label { Dock = DockStyle.Fill, Text = "Bấm vào một thư mục hoặc file trong danh sách, app sẽ cho biết đó là gì và có xóa được không." };
+            var btns = new Panel { Dock = DockStyle.Bottom, Height = 122 };
+            btnInfoRecycle = Btn("Xóa (vào Thùng rác)", 0, 0, 284, 36);
+            btnInfoDelete = Btn("Xóa vĩnh viễn", 0, 40, 284, 36);
+            btnInfoMove = Btn("Chuyển lên Drive / ổ ngoài", 0, 80, 284, 36);
+            btnInfoRecycle.Enabled = btnInfoDelete.Enabled = btnInfoMove.Enabled = false;
+            btns.Controls.AddRange(new Control[] { btnInfoRecycle, btnInfoDelete, btnInfoMove });
+            info.Controls.Add(lblInfoText); info.Controls.Add(btns); info.Controls.Add(lblInfoTitle); info.Controls.Add(lblInfoLevel);
+
+            mapMenu = new ContextMenuStrip();
+            miMapWhat = mapMenu.Items.Add("Đây là gì?");
+            mapMenu.Items.Add(new ToolStripSeparator());
+            miMapRecycle = mapMenu.Items.Add("Xóa (vào Thùng rác)");
+            miMapDelete = mapMenu.Items.Add("Xóa vĩnh viễn");
+            mapMenu.Items.Add(new ToolStripSeparator());
+            miMapMove = mapMenu.Items.Add("Chuyển lên Drive / ổ ngoài");
+            var miMapOpen = mapMenu.Items.Add("Mở trong Explorer");
+            mapList.ContextMenuStrip = mapMenu;
+
+            tab.Controls.Add(mapList);
+            tab.Controls.Add(info);
+            tab.Controls.Add(top);
+
+            btnScan.Click += async (s, e) => await Guard(MapScanAsync);
+            mapList.DoubleClick += (s, e) =>
+            {
+                if (mapList.SelectedItems.Count == 0) return;
+                var n = (MapNode)mapList.SelectedItems[0].Tag;
+                if (n.IsDir) ShowMapDir(n); else Fs.OpenInExplorer(n.Path);
+            };
+            btnUp.Click += (s, e) => { if (mapCurrent != null && mapCurrent.Parent != null) ShowMapDir(mapCurrent.Parent); };
+            btnOpen.Click += (s, e) =>
+            {
+                if (mapList.SelectedItems.Count > 0) Fs.OpenInExplorer(((MapNode)mapList.SelectedItems[0].Tag).Path);
+                else if (mapCurrent != null) Fs.OpenInExplorer(mapCurrent.Path);
+            };
+            btnAdd.Click += async (s, e) => await Guard(AddMapToMoveList);
+            mapList.SelectedIndexChanged += (s, e) => ShowMapInfo();
+            mapList.KeyDown += async (s, e) => { if (e.KeyCode == Keys.Delete) await Guard(() => RemoveMapItems(e.Shift)); };
+            btnInfoRecycle.Click += async (s, e) => await Guard(() => RemoveMapItems(false));
+            btnInfoDelete.Click += async (s, e) => await Guard(() => RemoveMapItems(true));
+            btnInfoMove.Click += async (s, e) => await Guard(AddMapToMoveList);
+            mapMenu.Opening += (s, e) =>
+            {
+                var sel = SelectedMap();
+                if (sel.Count == 0) { e.Cancel = true; return; }
+                bool allCam = sel.All(n => n.Info.Level == Level.Cam);
+                miMapRecycle.Enabled = miMapDelete.Enabled = !allCam;
+                miMapMove.Enabled = sel.Any(n => !PathRules.IsProtected(n.Path));
+                miMapWhat.Text = "Đây là gì?  —  " + sel[0].Info.Short;
+            };
+            miMapWhat.Click += (s, e) =>
+            {
+                var sel = SelectedMap();
+                if (sel.Count == 0) return;
+                var n = sel[0];
+                Msg(n.Info.Label + "\n\n" + n.Info.Title + "\n\n" + n.Info.Text + "\n\n" + n.Path + "\n" + Fmt.Size(n.Size));
+            };
+            miMapRecycle.Click += async (s, e) => await Guard(() => RemoveMapItems(false));
+            miMapDelete.Click += async (s, e) => await Guard(() => RemoveMapItems(true));
+            miMapMove.Click += async (s, e) => await Guard(AddMapToMoveList);
+            miMapOpen.Click += (s, e) => { var sel = SelectedMap(); if (sel.Count > 0) Fs.OpenInExplorer(sel[0].Path); };
+        }
+
+        List<MapNode> SelectedMap() { return mapList.SelectedItems.Cast<ListViewItem>().Select(i => (MapNode)i.Tag).ToList(); }
+
+        async Task MapScanAsync()
+        {
+            string root = cboMapDrive.SelectedItem as string;
+            if (root == null) return;
+            SetBusy(true);
+            App.Log("Bắt đầu phân tích ổ " + root + "...");
+            mapRoot = await Task.Run(() => DiskMap.Scan(root, status.Report, CancellationToken.None));
+            ShowMapDir(mapRoot);
+            Status("Bấm đúp vào thư mục để xem bên trong. Bấm vào một mục để biết đó là gì; chuột phải để xóa hoặc chuyển đi.");
+        }
+
+        void ShowMapDir(MapNode dir)
+        {
+            mapCurrent = dir;
+            long driveUsed = 0;
+            try { var di = new DriveInfo(mapRoot.Path); driveUsed = di.TotalSize - di.AvailableFreeSpace; } catch { }
+            double denom = driveUsed > 0 ? driveUsed : Math.Max(1, dir.Size);
+            mapList.BeginUpdate();
+            mapList.Items.Clear();
+            foreach (var n in dir.Kids.Concat(dir.BigFiles).OrderByDescending(x => x.Size))
+            {
+                double pct = 100.0 * n.Size / denom;
+                int bar = (int)Math.Round(Math.Min(20, pct / 5));
+                string name = (n.IsDir ? "📁 " : "📄 ") + n.Name + (n.IsDir && n.Denied ? "  (một phần không đọc được)" : "");
+                var it = new ListViewItem(name);
+                it.SubItems.Add(Fmt.Size(n.Size));
+                it.SubItems.Add(pct.ToString("0.0").PadLeft(5) + "% " + new string('█', bar));
+                it.SubItems.Add(n.Count.ToString("N0"));
+                it.SubItems.Add(n.Info.Short + " — " + n.Info.Title);
+                it.UseItemStyleForSubItems = false;
+                it.SubItems[4].ForeColor = n.Info.Color;
+                if (n.Info.Level == Level.Cam) it.ForeColor = Color.Gray;
+                it.Tag = n;
+                mapList.Items.Add(it);
+            }
+            mapList.EndUpdate();
+            string note = "";
+            if (dir == mapRoot && driveUsed - dir.Size > Fmt.GB)
+                note = "   •   " + Fmt.Size(driveUsed - dir.Size) + " thuộc file hệ thống không đọc được" + (App.IsAdmin ? "" : " (thử Quyền admin)");
+            lblMapPath.Text = dir.Path + "   —   " + Fmt.Size(dir.Size) + note;
+            ShowMapInfo();
+        }
+
+        void ShowMapInfo()
+        {
+            var sel = SelectedMap();
+            if (sel.Count == 0)
+            {
+                btnInfoRecycle.Enabled = btnInfoDelete.Enabled = btnInfoMove.Enabled = false;
+                return;
+            }
+            var n = sel[0];
+            lblInfoLevel.Text = n.Info.Label;
+            lblInfoLevel.ForeColor = n.Info.Color;
+            lblInfoTitle.Text = n.Info.Title;
+            var sb = new StringBuilder(n.Info.Text);
+            sb.Append("\n\n").Append(n.IsDir ? "Thư mục: " : "File: ").Append(n.Name).Append("\nDung lượng: ").Append(Fmt.Size(n.Size)).Append("\n").Append(n.Path);
+            if (sel.Count > 1) sb.Append("\n\n(Đang chọn ").Append(sel.Count).Append(" mục, tổng ").Append(Fmt.Size(sel.Sum(x => x.Size))).Append(")");
+            lblInfoText.Text = sb.ToString();
+            btnInfoRecycle.Enabled = btnInfoDelete.Enabled = n.Info.Level != Level.Cam;
+            btnInfoMove.Enabled = !PathRules.IsProtected(n.Path);
+        }
+
+        async Task RemoveMapItems(bool permanent)
+        {
+            var sel = SelectedMap();
+            if (sel.Count == 0) { Msg("Hãy chọn thư mục / file muốn xóa trước."); return; }
+            var blocked = sel.Where(n => n.Info.Level == Level.Cam).ToList();
+            if (blocked.Count > 0)
+            {
+                var t = new StringBuilder("Những mục sau KHÔNG ĐƯỢC XÓA:\n");
+                foreach (var b in blocked) t.Append("\n⛔ ").Append(b.Name).Append(" — ").Append(b.Info.Title).Append("\n    ").Append(b.Info.Text).Append("\n");
+                Msg(t.ToString(), MessageBoxIcon.Stop);
+                sel = sel.Where(n => n.Info.Level != Level.Cam).ToList();
+                if (sel.Count == 0) return;
+            }
+            long sum = sel.Sum(n => n.Size);
+            var risky = sel.Where(n => n.Info.Level == Level.CanThan || n.Info.Level == Level.KhongRo).ToList();
+            var msg = new StringBuilder(permanent ? "XÓA VĨNH VIỄN — không khôi phục được:\n" : "Chuyển vào Thùng rác (còn khôi phục được):\n");
+            foreach (var n in sel.Take(10)) msg.Append("\n• ").Append(n.Name).Append("  (").Append(Fmt.Size(n.Size)).Append(")  —  ").Append(n.Info.Short).Append(": ").Append(n.Info.Title);
+            if (sel.Count > 10) msg.Append("\n   ... và ").Append(sel.Count - 10).Append(" mục khác");
+            msg.Append("\n\nTổng: ").Append(Fmt.Size(sum));
+            if (risky.Count > 0) { msg.Append("\n\n⚠️ CHÚ Ý:"); foreach (var n in risky) msg.Append("\n").Append(n.Name).Append(": ").Append(n.Info.Text); }
+            if (!permanent) msg.Append("\n\nLưu ý: ổ đĩa chỉ trống thêm sau khi dọn Thùng rác. File quá lớn có thể bị Windows hỏi xóa hẳn.");
+            msg.Append("\n\nTiếp tục?");
+            if (!Confirm(msg.ToString())) return;
+            if (risky.Count > 0 || (permanent && sum > Fmt.GB))
+            {
+                string again = "Bạn chắc chắn chứ?\n\n" + (risky.Count > 0 ? "Có " + risky.Count + " mục cần cẩn thận / chưa rõ là gì. " : "") +
+                               (permanent ? "Xóa vĩnh viễn " + Fmt.Size(sum) + " — không lấy lại được." : "Các mục sẽ vào Thùng rác.");
+                if (!Confirm(again)) return;
+            }
+            SetBusy(true);
+            var freeBefore = Fs.FreeMap();
+            int ok = 0, partial = 0;
+            var remainingMap = new Dictionary<MapNode, long>();
+            await RunSta(() =>
+            {
+                foreach (var n in sel)
+                {
+                    status.Report("Đang xóa: " + n.Path);
+                    try
+                    {
+                        if (n.IsDir)
+                        {
+                            if (permanent) Fs.RemoveTreeSafe(n.Path, DateTime.MaxValue);
+                            else FileSystem.DeleteDirectory(n.Path, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin);
+                        }
+                        else
+                        {
+                            if (permanent) { File.SetAttributes(n.Path, FileAttributes.Normal); File.Delete(n.Path); }
+                            else FileSystem.DeleteFile(n.Path, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin);
+                        }
+                    }
+                    catch (Exception ex) { App.Log("Không xóa hết được " + n.Path + ": " + ex.Message); }
+                    long remaining = 0;
+                    if (n.IsDir && Directory.Exists(n.Path)) remaining = Fs.FolderSize(n.Path);
+                    else if (!n.IsDir && File.Exists(n.Path)) { try { remaining = new FileInfo(n.Path).Length; } catch { } }
+                    if (remaining <= 0) ok++; else if (remaining < n.Size) partial++;
+                    remainingMap[n] = remaining;
+                    App.Log("Đã xóa " + (permanent ? "vĩnh viễn" : "vào Thùng rác") + ": " + n.Path + " (" + Fmt.Size(n.Size - remaining) + ")");
+                }
+            });
+            foreach (var kv in remainingMap) DiskMap.AfterDelete(kv.Key, kv.Value);
+            ShowMapDir(mapCurrent);
+            UpdateDrives();
+            var freeAfter = Fs.FreeMap();
+            string report = "";
+            foreach (var k in freeAfter.Keys.OrderBy(x => x)) { long b; if (freeBefore.TryGetValue(k, out b) && freeAfter[k] - b > 10 * Fmt.MB) report += "\n    " + k + "  +" + Fmt.Size(freeAfter[k] - b) + "  (nay còn trống " + Fmt.Size(freeAfter[k]) + ")"; }
+            string done = "Đã xóa xong " + ok + "/" + sel.Count + " mục.";
+            if (partial > 0 || ok < sel.Count) done += "\n\nMột số file đang được dùng nên chưa xóa được. Hãy tắt phần mềm đang dùng chúng rồi thử lại.";
+            if (report.Length > 0) done += "\n\nĐã giải phóng:" + report;
+            else if (!permanent) done += "\n\nCác mục đang nằm trong Thùng rác. Dọn Thùng rác (tab Dọn dẹp) để thật sự lấy lại dung lượng.";
+            Status("Đã xóa xong.");
+            Msg(done);
+        }
+
+        async Task AddMapToMoveList()
+        {
+            var sel = SelectedMap();
+            if (sel.Count == 0) { Msg("Hãy chọn một hoặc nhiều thư mục / file trong danh sách trước."); return; }
+            var blocked = sel.Where(n => PathRules.IsProtected(n.Path)).ToList();
+            if (blocked.Count > 0)
+            {
+                Msg("Không thể chuyển những mục này vì là thư mục hệ thống, chương trình hoặc dữ liệu tin nhắn (chuyển đi sẽ làm hỏng Windows hoặc phần mềm):\n\n" + string.Join("\n", blocked.Select(b => b.Path)), MessageBoxIcon.Warning);
+                sel = sel.Where(n => !PathRules.IsProtected(n.Path)).ToList();
+                if (sel.Count == 0) return;
+            }
+            SetBusy(true);
+            var seen = new HashSet<string>(list.Items.Cast<ListViewItem>().Select(i => ((CleanItem)i.Tag).Path), StringComparer.OrdinalIgnoreCase);
+            var added = await Task.Run(() =>
+            {
+                var r = new List<CleanItem>();
+                foreach (var s in sel)
+                {
+                    string root = Path.GetDirectoryName(s.Path);
+                    var files = s.IsDir ? Fs.Walk(s.Path, null, 0, null, null, status.Report) : new List<FileInfo> { new FileInfo(s.Path) };
+                    foreach (var f in files)
+                    {
+                        if (PathRules.IsProtected(f.FullName) || !seen.Add(f.FullName)) continue;
+                        r.Add(new CleanItem { Category = "tu", Kind = "chuyen", Path = f.FullName, Root = root, Size = f.Length, Name = f.Name, Folder = f.DirectoryName, Date = f.LastWriteTime, Action = "chuyen" });
+                    }
+                }
+                return r;
+            });
+            SetBusy(false);
+            if (added.Count == 0) { Msg("Không có file nào mới để thêm."); return; }
+            long sum = added.Sum(o => o.Size);
+            if (added.Count > 3000 && !Confirm("Sẽ thêm " + added.Count + " file (" + Fmt.Size(sum) + ") vào danh sách. Tiếp tục?")) return;
+            suspendSummary = true;
+            list.BeginUpdate();
+            list.Items.AddRange(added.Select(o => NewRow(o, true)).ToArray());
+            UpdateGroupHeaders();
+            list.EndUpdate();
+            suspendSummary = false;
+            UpdateSummary();
+            App.Log("Đã thêm " + added.Count + " file (" + Fmt.Size(sum) + ") vào nhóm Tự chọn.");
+            tabs.SelectedIndex = 0;
+            Status("Đã thêm vào nhóm \"Tự chọn\". Chọn nơi lưu rồi bấm \"Dọn dẹp ngay\" để chuyển đi.");
+        }
+
+        // ================================================================= TAB 3: FILE TRÙNG
+        ListBox lstDupFolders;
+        NumericUpDown numDupMin;
+        ListView dupList;
+        Label lblDupSum;
+        PictureBox dupPic; Label dupLbl;
+
+        void BuildDupTab(TabPage tab)
+        {
+            var top = new Panel { Dock = DockStyle.Top, Height = 140 };
+            top.Controls.Add(Lbl("Tìm file giống hệt nhau trong các thư mục:", 8, 8, 300, 22));
+            lstDupFolders = new ListBox { Location = new Point(8, 32), Size = new Size(520, 98) };
+            var folders = cfg.DupFolders.Count > 0 ? cfg.DupFolders : DefaultDupFolders();
+            foreach (var f in folders) if (Directory.Exists(f)) lstDupFolders.Items.Add(f);
+            var btnAdd = Btn("Thêm thư mục…", 536, 32, 130, 30);
+            var btnRemove = Btn("Bỏ thư mục", 536, 66, 130, 30);
+            numDupMin = Num(top, "Chỉ xét file từ (MB):", 32, 0, 10000, cfg.DupMinMB, 690, 150);
+            var btnScan = Btn("Tìm file trùng", 690, 66, 230, 40);
+            btnScan.Font = new Font("Segoe UI", 10f, FontStyle.Bold);
+            var btnDel = Btn("Xóa bản trùng đã chọn", 928, 66, 230, 40);
+            btnDel.BackColor = Yellow;
+            lblDupSum = Lbl("", 690, 110, 470, 24);
+            top.Controls.AddRange(new Control[] { lstDupFolders, btnAdd, btnRemove, btnScan, btnDel, lblDupSum });
+
+            dupList = new ListView { View = View.Details, CheckBoxes = true, FullRowSelect = true, Dock = DockStyle.Fill, ShowGroups = true, HideSelection = false };
+            dupList.Columns.Add("Tên", 300);
+            dupList.Columns.Add("Dung lượng", 90, HorizontalAlignment.Right);
+            dupList.Columns.Add("Ngày sửa", 90);
+            dupList.Columns.Add("Thư mục", 340);
+            dupList.Columns.Add("Gợi ý", 80);
+            var prev = NewPreviewPanel(out dupPic, out dupLbl);
+            tab.Controls.Add(dupList);
+            tab.Controls.Add(prev);
+            tab.Controls.Add(top);
+
+            btnAdd.Click += (s, e) =>
+            {
+                using (var dlg = new FolderBrowserDialog { Description = "Chọn thư mục để tìm file trùng" })
+                    if (dlg.ShowDialog(this) == DialogResult.OK && !lstDupFolders.Items.Contains(dlg.SelectedPath)) lstDupFolders.Items.Add(dlg.SelectedPath);
+            };
+            btnRemove.Click += (s, e) => { if (lstDupFolders.SelectedIndex >= 0) lstDupFolders.Items.RemoveAt(lstDupFolders.SelectedIndex); };
+            btnScan.Click += async (s, e) => await Guard(DupScanAsync);
+            btnDel.Click += async (s, e) => await Guard(RemoveDups);
+            dupList.SelectedIndexChanged += (s, e) => { if (dupList.SelectedItems.Count > 0) ShowPreview(dupPic, dupLbl, (string)dupList.SelectedItems[0].Tag); };
+            dupList.DoubleClick += (s, e) => { if (dupList.SelectedItems.Count > 0) Fs.OpenInExplorer((string)dupList.SelectedItems[0].Tag); };
+        }
+
+        static List<string> DefaultDupFolders()
+        {
+            var l = new List<string> { Fs.Downloads };
+            foreach (var f in new[] { Environment.SpecialFolder.DesktopDirectory, Environment.SpecialFolder.MyDocuments, Environment.SpecialFolder.MyPictures, Environment.SpecialFolder.MyVideos })
+                l.Add(Environment.GetFolderPath(f));
+            foreach (var d in Fs.FixedDrives()) if (!d.Name.TrimEnd('\\').Equals(Fs.SystemDrive, StringComparison.OrdinalIgnoreCase)) l.Add(d.RootDirectory.FullName);
+            return l.Where(x => !string.IsNullOrEmpty(x)).ToList();
+        }
+
+        async Task DupScanAsync()
+        {
+            var folders = lstDupFolders.Items.Cast<string>().ToList();
+            if (folders.Count == 0) { Msg("Hãy thêm ít nhất một thư mục để tìm file trùng."); return; }
+            cfg.DupFolders = folders; cfg.DupMinMB = (int)numDupMin.Value; cfg.Save();
+            SetBusy(true);
+            long min = (long)numDupMin.Value * Fmt.MB;
+            var found = await Task.Run(() => DupFinder.Find(folders, min, status.Report, CancellationToken.None));
+            dupList.BeginUpdate();
+            dupList.Items.Clear(); dupList.Groups.Clear();
+            long waste = 0; int gi = 0;
+            foreach (var grp in found)
+            {
+                gi++;
+                var lg = new ListViewGroup("g" + gi, "Nhóm " + gi + ": " + grp.Files.Count + " bản giống hệt nhau, mỗi bản " + Fmt.Size(grp.Files[0].Length));
+                dupList.Groups.Add(lg);
+                bool first = true;
+                foreach (var f in grp.Files)
+                {
+                    var it = new ListViewItem(f.Name);
+                    it.SubItems.Add(Fmt.Size(f.Length));
+                    it.SubItems.Add(f.LastWriteTime.ToString("dd/MM/yyyy"));
+                    it.SubItems.Add(f.DirectoryName);
+                    it.SubItems.Add(first ? "giữ lại" : "bản trùng");
+                    if (!first) waste += f.Length;
+                    it.Checked = !first;
+                    it.Tag = f.FullName;
+                    it.Group = lg;
+                    dupList.Items.Add(it);
+                    first = false;
+                }
+            }
+            dupList.EndUpdate();
+            lblDupSum.Text = "Tìm thấy " + found.Count + " nhóm file trùng — bản thừa chiếm " + Fmt.Size(waste) + ". Mỗi nhóm đã chọn sẵn để giữ lại 1 bản.";
+            App.Log("File trùng: " + found.Count + " nhóm, thừa " + Fmt.Size(waste));
+            Status("Xem lại các bản được chọn rồi bấm \"Xóa bản trùng đã chọn\".");
+        }
+
+        async Task RemoveDups()
+        {
+            var items = dupList.Items.Cast<ListViewItem>().ToList();
+            var chk = items.Where(i => i.Checked).ToList();
+            if (chk.Count == 0) { Msg("Chưa chọn bản trùng nào."); return; }
+            var bad = items.GroupBy(i => i.Group).Where(g => g.All(i => i.Checked)).Select(g => g.Key.Header).ToList();
+            if (bad.Count > 0) { Msg("Các nhóm sau đang bị chọn hết tất cả các bản:\n\n" + string.Join("\n", bad) + "\n\nHãy bỏ chọn ít nhất 1 bản trong mỗi nhóm để giữ lại.", MessageBoxIcon.Warning); return; }
+            long sum = chk.Sum(i => new FileInfo((string)i.Tag).Exists ? new FileInfo((string)i.Tag).Length : 0);
+            if (!Confirm("Chuyển " + chk.Count + " bản trùng (" + Fmt.Size(sum) + ") vào Thùng rác?\n\nMỗi nhóm vẫn còn giữ lại ít nhất 1 bản. Dung lượng chỉ được giải phóng hẳn sau khi dọn Thùng rác (tab Dọn dẹp làm được việc này).")) return;
+            SetBusy(true);
+            var removed = new List<ListViewItem>();
+            var paths = chk.Select(i => (string)i.Tag).ToList();
+            var okPaths = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            await RunSta(() =>
+            {
+                foreach (var p in paths)
+                {
+                    try { FileSystem.DeleteFile(p, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin); okPaths.Add(p); }
+                    catch (Exception ex) { App.Log("Không xóa được " + p + ": " + ex.Message); }
+                }
+            });
+            foreach (var it in chk) if (okPaths.Contains((string)it.Tag)) dupList.Items.Remove(it);
+            App.Log("Đã chuyển " + okPaths.Count + " bản trùng vào Thùng rác.");
+            Msg("Đã chuyển " + okPaths.Count + " bản trùng vào Thùng rác.");
+        }
+
+        // ================================================================= TAB 4: ĐÃ CHUYỂN ĐI
+        ListView movedList;
+        Label lblMovedSum;
+
+        void BuildMovedTab(TabPage tab)
+        {
+            var top = new Panel { Dock = DockStyle.Top, Height = 56 };
+            var btnReload = Btn("Tải lại danh sách", 8, 10, 150, 34);
+            var btnRestore = Btn("Lấy về chỗ cũ", 166, 10, 170, 34);
+            btnRestore.Font = new Font("Segoe UI", 10f, FontStyle.Bold);
+            btnRestore.BackColor = Yellow;
+            lblMovedSum = Lbl("", 350, 18, 800, 24);
+            top.Controls.AddRange(new Control[] { btnReload, btnRestore, lblMovedSum });
+            movedList = new ListView { View = View.Details, CheckBoxes = true, FullRowSelect = true, Dock = DockStyle.Fill };
+            movedList.Columns.Add("Thời gian", 130);
+            movedList.Columns.Add("Loại", 90);
+            movedList.Columns.Add("Tên file", 250);
+            movedList.Columns.Add("Dung lượng", 90, HorizontalAlignment.Right);
+            movedList.Columns.Add("Trạng thái", 120);
+            movedList.Columns.Add("Chỗ cũ trên máy", 280);
+            movedList.Columns.Add("Nơi lưu", 300);
+            tab.Controls.Add(movedList);
+            tab.Controls.Add(top);
+            btnReload.Click += (s, e) => LoadMovedList();
+            btnRestore.Click += async (s, e) => await Guard(RestoreMoved);
+        }
+
+        void LoadMovedList()
+        {
+            var all = MovedStore.LoadAll();
+            movedList.BeginUpdate();
+            movedList.Items.Clear();
+            foreach (var e in all)
+            {
+                var it = new ListViewItem(e.Time);
+                it.SubItems.Add(e.Category);
+                it.SubItems.Add(Path.GetFileName(e.Orig));
+                it.SubItems.Add(e.SizeText);
+                it.SubItems.Add(e.State);
+                it.SubItems.Add(e.Orig);
+                it.SubItems.Add(e.Dest);
+                it.Tag = e;
+                if (e.State != "Đang ở nơi lưu") it.ForeColor = Color.Gray;
+                movedList.Items.Add(it);
+            }
+            movedList.EndUpdate();
+            lblMovedSum.Text = "Tổng cộng " + all.Count + " file đã từng chuyển đi. Đánh dấu file muốn lấy về rồi bấm \"Lấy về chỗ cũ\".";
+        }
+
+        async Task RestoreMoved()
+        {
+            var sel = movedList.CheckedItems.Cast<ListViewItem>().Select(i => (MovedEntry)i.Tag).Where(e => e.State == "Đang ở nơi lưu").ToList();
+            if (sel.Count == 0) { Msg("Hãy đánh dấu những file (đang ở nơi lưu) muốn lấy về."); return; }
+            if (sel.Any(e => e.Code.StartsWith(App.RemoteName + ":")) && !Rclone.Ready) { Msg("Một số file nằm trên Google Drive. Hãy bấm \"Kết nối Google Drive\" ở tab Dọn dẹp trước.", MessageBoxIcon.Warning); return; }
+            var need = new Dictionary<string, long>(StringComparer.OrdinalIgnoreCase);
+            foreach (var e in sel) { string r = Fs.Root(e.Orig); long v; need.TryGetValue(r, out v); need[r] = v + e.Bytes; }
+            string msg = "Lấy " + sel.Count + " file về đúng chỗ cũ trên máy?\n";
+            foreach (var kv in need)
+            {
+                long free = Fs.DriveFree(kv.Key), after = free - kv.Value;
+                if (after < Fmt.GB) { Msg("Ổ " + kv.Key + " không đủ chỗ để lấy về (còn " + Fmt.Size(free) + ", cần " + Fmt.Size(kv.Value) + ", và nên chừa ít nhất 1 GB). Hãy dọn bớt trước.", MessageBoxIcon.Warning); return; }
+                msg += "\n    " + kv.Key + "  còn " + Fmt.Size(free) + "  →  khoảng " + Fmt.Size(after);
+            }
+            msg += "\n\nBản lưu trên Drive / ổ ngoài vẫn được giữ nguyên.";
+            if (!Confirm(msg)) return;
+            SetBusy(true);
+            int ok = await Task.Run(() =>
+            {
+                int n = 0;
+                foreach (var e in sel)
+                {
+                    try
+                    {
+                        status.Report("Đang lấy về: " + Path.GetFileName(e.Orig));
+                        Directory.CreateDirectory(Path.GetDirectoryName(e.Orig));
+                        if (e.Code.StartsWith(App.RemoteName + ":"))
+                        {
+                            var r = Rclone.CopyTo(e.Code, e.Orig);
+                            if (r.Code != 0) throw new Exception("rclone: " + r.Err);
+                        }
+                        else
+                        {
+                            if (!File.Exists(e.Code)) throw new Exception("Không tìm thấy bản lưu (ổ cứng ngoài / USB đã được cắm chưa?).");
+                            File.Copy(e.Code, e.Orig, true);
+                        }
+                        if (!File.Exists(e.Orig)) throw new Exception("File chưa về tới máy.");
+                        MovedStore.MarkRestored(e);
+                        n++;
+                    }
+                    catch (Exception ex) { App.Log("Không lấy về được " + e.Orig + ": " + ex.Message); }
+                }
+                return n;
+            });
+            App.Log("Đã lấy về " + ok + "/" + sel.Count + " file.");
+            LoadMovedList();
+            UpdateDrives();
+            Msg("Đã lấy về " + ok + "/" + sel.Count + " file.");
+        }
+
+        // ================================================================= TAB 5: TỰ ĐỘNG
+        CheckBox chkStartup, chkAutoClean;
+        NumericUpDown numAlert, numAutoDays;
+
+        void BuildAutoTab(TabPage tab)
+        {
+            var grp = new GroupBox { Text = "Chạy ngầm cùng Windows", Location = new Point(16, 16), Size = new Size(720, 250) };
+            chkStartup = new CheckBox { Text = "Bật: tự chạy ngầm khi mở máy (biểu tượng nhỏ ở góc phải thanh Taskbar)", Location = new Point(16, 28), Size = new Size(690, 26), Checked = File.Exists(Shortcut.StartupLink) };
+            numAlert = Num(grp, "Cảnh báo khi một ổ còn trống dưới (GB):", 66, 1, 500, cfg.AlertGB, 36, 300);
+            chkAutoClean = new CheckBox { Text = "Tự động dọn RÁC HỆ THỐNG theo lịch (không bao giờ tự chuyển hay xóa file cá nhân)", Location = new Point(16, 104), Size = new Size(690, 26), Checked = cfg.AutoClean };
+            numAutoDays = Num(grp, "Dọn mỗi (ngày):", 140, 1, 90, cfg.AutoDays, 36, 300);
+            string last = "chưa lần nào";
+            DateTime lt;
+            if (DateTime.TryParse(cfg.LastAutoClean, out lt)) last = lt.ToString("dd/MM/yyyy HH:mm");
+            var lblLast = Lbl("Lần tự dọn gần nhất: " + last, 36, 176, 600, 22);
+            var btnTray = Btn("Lưu và bật chạy ngầm ngay", 36, 204, 260, 34, false);
+            var btnSave = Btn("Lưu thiết lập", 306, 204, 160, 34, false);
+            btnSave.BackColor = Yellow;
+            grp.Controls.AddRange(new Control[] { chkStartup, chkAutoClean, lblLast, btnTray, btnSave });
+
+            var grpShort = new GroupBox { Text = "Biểu tượng", Location = new Point(16, 280), Size = new Size(720, 100) };
+            grpShort.Controls.Add(Lbl("Tạo biểu tượng \"Dọn Dẹp Máy Tính\" trên Desktop và trong menu Start để mở app nhanh.", 16, 28, 690, 22));
+            var btnShortcut = Btn("Tạo biểu tượng", 16, 54, 180, 34, false);
+            grpShort.Controls.Add(btnShortcut);
+
+            var grpUpd = new GroupBox { Text = "Phiên bản", Location = new Point(16, 394), Size = new Size(720, 100) };
+            grpUpd.Controls.Add(Lbl("Bạn đang dùng bản " + App.Version + ". App tự kiểm tra bản mới mỗi lần mở. Trang chủ: github.com/" + App.Repo, 16, 28, 690, 22));
+            var btnUpdate = Btn("Kiểm tra bản mới", 16, 54, 180, 34, false);
+            var btnHome = Btn("Mở trang chủ", 206, 54, 160, 34, false);
+            grpUpd.Controls.AddRange(new Control[] { btnUpdate, btnHome });
+            tab.Controls.AddRange(new Control[] { grp, grpShort, grpUpd });
+
+            btnSave.Click += (s, e) => SaveAutoSettings(false);
+            btnTray.Click += (s, e) =>
+            {
+                SaveAutoSettings(true);
+                Shortcut.StartTray();
+                App.Log("Đã bật chạy ngầm (biểu tượng ở góc phải thanh Taskbar).");
+                Msg("Đã bật chạy ngầm. Biểu tượng của app nằm ở góc phải thanh Taskbar (có thể nằm trong mũi tên ^).");
+            };
+            btnShortcut.Click += (s, e) =>
+            {
+                try
+                {
+                    Shortcut.Create(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "Dọn Dẹp Máy Tính.lnk"), "", App.Name);
+                    Shortcut.Create(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Programs), "Dọn Dẹp Máy Tính.lnk"), "", App.Name);
+                    if (File.Exists(Shortcut.StartupLink)) Shortcut.SetStartup(true);
+                    App.Log("Đã tạo biểu tượng trên Desktop và menu Start.");
+                    Msg("Đã tạo biểu tượng \"Dọn Dẹp Máy Tính\" trên Desktop và trong menu Start.");
+                }
+                catch (Exception ex) { Msg("Không tạo được biểu tượng: " + ex.Message, MessageBoxIcon.Error); }
+            };
+            btnUpdate.Click += async (s, e) => await CheckUpdate(true);
+            btnHome.Click += (s, e) => { try { Process.Start("https://github.com/" + App.Repo); } catch { } };
+        }
+
+        void SaveAutoSettings(bool quiet)
+        {
+            cfg.AlertGB = (int)numAlert.Value;
+            cfg.AutoClean = chkAutoClean.Checked;
+            cfg.AutoDays = (int)numAutoDays.Value;
+            cfg.Save();
+            try { Shortcut.SetStartup(chkStartup.Checked); } catch (Exception ex) { App.Log("Không đặt được chạy cùng Windows: " + ex.Message); }
+            App.Log("Đã lưu thiết lập tự động.");
+            if (quiet) return;
+            string m = "Đã lưu thiết lập.";
+            if (chkStartup.Checked) m += "\n\nTừ lần mở máy sau, app sẽ tự chạy ngầm và báo khi ổ còn dưới " + cfg.AlertGB + " GB.";
+            if (chkAutoClean.Checked)
+            {
+                m += "\n\nRác hệ thống sẽ được tự dọn mỗi " + cfg.AutoDays + " ngày (khi app đang chạy ngầm).";
+                if (!chkStartup.Checked) m += "\nLưu ý: cần bật chạy ngầm thì việc tự dọn mới diễn ra.";
+            }
+            Msg(m);
+        }
+
+        async Task CheckUpdate(bool manual)
+        {
+            if (manual) Status("Đang kiểm tra bản mới...");
+            var info = await Updater.CheckAsync();
+            if (info == null)
+            {
+                if (manual) Msg("Không kiểm tra được bản mới (máy chưa có mạng hoặc chưa có bản phát hành nào).", MessageBoxIcon.Warning);
+            }
+            else if (Updater.IsNewer(info))
+            {
+                App.Log("Có bản mới " + info.Latest + " (bạn đang dùng " + App.Version + ").");
+                if (Confirm("Đã có bản mới " + info.Latest + " (bạn đang dùng " + App.Version + ").\n\nMở trang tải về?")) { try { Process.Start(info.Url); } catch { } }
+            }
+            else if (manual) Msg("Bạn đang dùng bản mới nhất (" + App.Version + ").");
+            if (manual) Status("Sẵn sàng.");
+        }
+
+        // ================================================================= tự kiểm tra khi đóng gói
+        public string SelfTest()
+        {
+            var sb = new StringBuilder();
+            UpdateDrives();
+            sb.Append("tabs=").Append(tabs.TabPages.Count);
+            var sources = Junk.Sources(cfg);
+            sb.Append(" junk=").Append(sources.Count);
+            var zr = Junk.ZaloRoots(cfg);
+            sb.Append(" zaloRoots=").Append(zr.Count);
+            string sys = Fs.SystemDrive + "\\";
+            var checks = new Dictionary<string, Level>
+            {
+                { sys + "Windows", Level.Cam }, { sys + "pagefile.sys", Level.Cam }, { sys + "Program Files", Level.Cam },
+                { Path.Combine(Fs.LocalAppData, "Temp"), Level.Rac }, { @"D:\Zalo Data\message", Level.Cam }
+            };
+            foreach (var kv in checks)
+            {
+                var got = PathRules.Get(kv.Key, !kv.Key.EndsWith(".sys")).Level;
+                if (got != kv.Value) throw new Exception("PathRules sai: " + kv.Key + " = " + got);
+            }
+            if (!PathRules.IsProtected(sys + "Windows\\System32")) throw new Exception("IsProtected sai");
+            var map = DiskMap.Scan(App.AppDir, null, CancellationToken.None);
+            mapRoot = map;
+            ShowMapDir(map);
+            sb.Append(" map=").Append(map.Count);
+            var d = DupFinder.Find(new[] { App.AppDir }, 1, null, CancellationToken.None);
+            sb.Append(" dup=").Append(d.Count);
+            LoadMovedList();
+            sb.Append(" moved=").Append(movedList.Items.Count);
+            var csv = MovedStore.ParseCsv("\"a\",\"b,c\"\r\n\"1\",\"x\"\"y\"\r\n");
+            if (csv.Count != 2 || csv[0][1] != "b,c" || csv[1][1] != "x\"y") throw new Exception("CSV sai");
+            var personal = new List<CleanItem> { new CleanItem { Category = "tu", Kind = "chuyen", Path = App.ExePath, Root = App.AppDir, Name = "x", Folder = App.AppDir, Size = 1 } };
+            list.Items.Add(NewRow(personal[0], false));
+            UpdateGroupHeaders(); UpdateSummary();
+            list.Items.Clear();
+            sb.Append(" UI_OK");
+            return sb.ToString();
+        }
+    }
+}

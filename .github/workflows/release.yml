@@ -1,8 +1,7 @@
 name: Đóng gói và phát hành
 
 # Phát hành: tab Actions → "Đóng gói và phát hành" → Run workflow.
-# Số phiên bản lấy từ $Script:AppVersion trong app/DonDep.ps1 (thẻ v<số> được tạo tự động).
-# Đẩy thẻ v* bằng git cũng chạy được.
+# Số phiên bản lấy từ App.Version trong src/Core.cs (thẻ v<số> được tạo tự động).
 on:
   push:
     tags: ['v*']
@@ -22,50 +21,43 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Kiểm tra cú pháp PowerShell
-        shell: powershell
-        run: |
-          $errors = $null; $tokens = $null
-          [void][System.Management.Automation.Language.Parser]::ParseFile("$PWD\app\DonDep.ps1", [ref]$tokens, [ref]$errors)
-          if ($errors.Count -gt 0) { $errors | ForEach-Object { Write-Host $_.Extent.StartLineNumber $_.Message }; exit 1 }
-          Write-Host 'Syntax OK'
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
 
       - name: Đọc số phiên bản
         id: ver
         shell: powershell
         run: |
-          $line = Select-String -Path app\DonDep.ps1 -Pattern "AppVersion\s*=\s*'([^']+)'" | Select-Object -First 1
-          $ver = $line.Matches[0].Groups[1].Value
+          $m = Select-String -Path src\Core.cs -Pattern 'const string Version = "([^"]+)"' | Select-Object -First 1
+          $ver = $m.Matches[0].Groups[1].Value
           if ('${{ github.ref_type }}' -eq 'tag' -and '${{ github.ref_name }}'.TrimStart('v') -ne $ver) {
-            Write-Host "Version in DonDep.ps1 ($ver) differs from tag (${{ github.ref_name }})"; exit 1
+            Write-Host "Version in Core.cs ($ver) differs from tag (${{ github.ref_name }})"; exit 1
           }
           [IO.File]::AppendAllText($env:GITHUB_OUTPUT, "tag=v$ver`n", (New-Object Text.UTF8Encoding($false)))
           Write-Host "Version: $ver"
 
-      - name: Tạo file .exe
-        shell: powershell
-        run: |
-          $csc = "$env:WINDIR\Microsoft.NET\Framework64\v4.0.30319\csc.exe"
-          $sma = [PSObject].Assembly.Location
-          Write-Host "SMA: $sma"
-          New-Item -ItemType Directory -Force -Path out\DonDepMayTinh | Out-Null
-          & $csc /nologo /target:winexe /optimize /win32icon:app\DonDep.ico /out:"out\DonDepMayTinh\Don Dep May Tinh.exe" /r:System.dll /r:System.Windows.Forms.dll /r:"$sma" app\Launcher.cs
-          if ($LASTEXITCODE -ne 0) { exit 1 }
+      - name: Biên dịch
+        shell: pwsh
+        run: dotnet build src/DonDepMayTinh.csproj -c Release -o build -nologo -clp:NoSummary
 
-      - name: Chạy thử file .exe
+      - name: Chạy thử
         shell: powershell
         run: |
-          Copy-Item app\DonDep.ps1, app\DonDep.ico, 'app\HUONG DAN.txt' out\DonDepMayTinh\
+          New-Item -ItemType Directory -Force -Path out\DonDepMayTinh | Out-Null
+          Copy-Item build\DonDepMayTinh.exe 'out\DonDepMayTinh\Don Dep May Tinh.exe'
+          if (Test-Path build\DonDepMayTinh.exe.config) { Copy-Item build\DonDepMayTinh.exe.config 'out\DonDepMayTinh\Don Dep May Tinh.exe.config' }
+          Copy-Item 'dist\HUONG DAN.txt' out\DonDepMayTinh\
           $p = Start-Process -FilePath 'out\DonDepMayTinh\Don Dep May Tinh.exe' -ArgumentList '--selftest' -Wait -PassThru
           $r = Get-Content out\DonDepMayTinh\selftest.txt -Raw -ErrorAction SilentlyContinue
-          Write-Host "exit=$($p.ExitCode) result=$r"
           Remove-Item out\DonDepMayTinh\selftest.txt -ErrorAction SilentlyContinue
-          $log = Get-Content "$([Environment]::GetFolderPath('MyDocuments'))\DonDepMayTinh\loi_khoi_dong.txt" -Raw -ErrorAction SilentlyContinue
-          if ($p.ExitCode -ne 0 -or $r -notmatch 'UI_OK') {
-            $msg = ("exit=$($p.ExitCode) | ket qua=$r | log=$log") -replace "`r?`n", ' / '
+          Write-Host "exit=$($p.ExitCode) result=$r"
+          if ($p.ExitCode -ne 0 -or $r -notmatch 'UI_OK' -or $r -notmatch 'TRAY_OK') {
+            $msg = ("exit=$($p.ExitCode) | $r") -replace "`r?`n", ' / '
             Write-Host "::error title=Selftest::$msg"
             exit 1
           }
+          Write-Host "::notice title=Selftest::$r"
 
       - name: Đóng gói .zip
         shell: powershell
@@ -87,7 +79,7 @@ jobs:
           TAG: ${{ steps.ver.outputs.tag }}
         run: |
           if gh release view "$TAG" >/dev/null 2>&1; then
-            echo "Bản $TAG đã có — chỉ cập nhật file .zip."
+            echo "Release $TAG exists - updating zip only."
             gh release upload "$TAG" out/DonDepMayTinh.zip --clobber
           else
             gh release create "$TAG" out/DonDepMayTinh.zip --target "$GITHUB_SHA" \

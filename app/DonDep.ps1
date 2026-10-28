@@ -2355,6 +2355,15 @@ $form.Add_Shown({
     Start-UpdateCheck $false
 })
 
+# Kiểm tra khi đóng gói: dựng xong giao diện thì dừng, không hiện cửa sổ
+if ($DonDepSelfTest) {
+    Update-Drives
+    $Script:tabs.SelectedIndex = 3
+    Load-MovedList
+    'UI_OK tabs=' + $Script:tabs.TabPages.Count
+    return
+}
+
 try {
     [void]$form.ShowDialog()
 } catch {

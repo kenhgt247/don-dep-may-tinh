@@ -61,7 +61,7 @@ jobs:
           Write-Host "exit=$($p.ExitCode) result=$r"
           Remove-Item out\DonDepMayTinh\selftest.txt -ErrorAction SilentlyContinue
           $log = Get-Content "$([Environment]::GetFolderPath('MyDocuments'))\DonDepMayTinh\loi_khoi_dong.txt" -Raw -ErrorAction SilentlyContinue
-          if ($p.ExitCode -ne 0 -or $r -notmatch '^ok .* loi=0 ') {
+          if ($p.ExitCode -ne 0 -or $r -notmatch 'UI_OK') {
             $msg = ("exit=$($p.ExitCode) | ket qua=$r | log=$log") -replace "`r?`n", ' / '
             Write-Host "::error title=Selftest::$msg"
             exit 1

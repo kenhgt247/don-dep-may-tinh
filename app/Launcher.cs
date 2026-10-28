@@ -39,15 +39,15 @@ static class DonDepLauncher
                     ps.Runspace = rs;
                     if (selfTest)
                     {
-                        // Kiểm tra khi đóng gói: nạp được thư viện giao diện và đọc được mã chính
-                        ps.AddScript(
-                            "Add-Type -AssemblyName System.Windows.Forms; " +
-                            "$t=$null;$e=$null; [void][System.Management.Automation.Language.Parser]::ParseInput($args[0],[ref]$t,[ref]$e); " +
-                            "'ok ' + $PSVersionTable.PSVersion + ' loi=' + $e.Count + ' dir=' + $DonDepAppDir");
-                        ps.AddArgument(code);
+                        // Kiểm tra khi đóng gói: chạy toàn bộ mã, dựng giao diện rồi dừng (không hiện cửa sổ)
+                        rs.SessionStateProxy.SetVariable("DonDepSelfTest", true);
+                        ps.AddScript(code);
                         var result = ps.Invoke();
-                        File.WriteAllText(Path.Combine(dir, "selftest.txt"), result.Count > 0 ? result[0].ToString() : "khong co ket qua");
-                        return ps.HadErrors ? 1 : 0;
+                        var sb = new StringBuilder();
+                        foreach (var o in result) if (o != null) sb.Append(o.ToString()).Append(" | ");
+                        foreach (var e in ps.Streams.Error) sb.Append("ERR: ").Append(e.ToString()).Append(" @ ").Append(e.InvocationInfo != null ? e.InvocationInfo.PositionMessage : "").Append(" | ");
+                        File.WriteAllText(Path.Combine(dir, "selftest.txt"), sb.ToString());
+                        return sb.ToString().Contains("UI_OK") && ps.Streams.Error.Count == 0 ? 0 : 1;
                     }
                     ps.AddScript(code);
                     if (tray) ps.AddParameter("Tray", true);

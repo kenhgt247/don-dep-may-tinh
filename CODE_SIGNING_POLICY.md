@@ -6,12 +6,11 @@
 
 ## Status
 
-This project has applied to the [SignPath Foundation](https://signpath.org) open-source program.
-Once approved, Windows release artifacts will carry the following attribution:
+Releases are currently **unsigned**. The project applied to the [SignPath Foundation](https://signpath.org) open-source program in October 2026; the application was declined for now because the project was new and had no public adoption yet. The project will re-apply once it has a wider user base.
+
+When signing is approved, Windows release artifacts will carry the following attribution:
 
 > Free code signing provided by [SignPath.io](https://about.signpath.io), certificate by [SignPath Foundation](https://signpath.org)
-
-Until approval and integration are complete, release artifacts may be unsigned.
 
 ## What is signed
 

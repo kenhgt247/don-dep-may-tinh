@@ -12,7 +12,9 @@ Phần mềm **miễn phí** giúp máy tính Windows hết cảnh "ổ C đầy
 
 Chạy trên Windows 10 / 11. Chỉ một file `.exe`, không cần cài đặt thêm gì.
 
-Phần mềm hoàn toàn miễn phí. Ký số miễn phí bởi [SignPath.io](https://about.signpath.io), chứng chỉ của [SignPath Foundation](https://signpath.org) (đang chờ duyệt — xem [Chính sách ký số](CODE_SIGNING_POLICY.md)). [Chính sách quyền riêng tư](PRIVACY.md).
+Phần mềm hoàn toàn miễn phí, mã nguồn mở. File `.exe` hiện **chưa có chữ ký số** (dự án mới, sẽ đăng ký lại khi có nhiều người dùng) nên Windows có thể hiện cảnh báo lần đầu mở — xem [Chính sách ký số](CODE_SIGNING_POLICY.md). [Chính sách quyền riêng tư](PRIVACY.md).
+
+⭐ Thấy hữu ích? Bấm **Star** ở góc trên bên phải trang này để ủng hộ dự án.
 
 ## Tính năng
 
@@ -52,4 +54,4 @@ Giấy phép: [MIT](LICENSE) · [Code signing policy](CODE_SIGNING_POLICY.md) ·
 
 ---
 
-**English:** Free, open-source Windows tool that frees disk space: cleans junk files, shows what is using the disk, finds duplicate files, and moves files to the user's own Google Drive or an external drive — always asking for confirmation first. Free code signing provided by SignPath.io, certificate by SignPath Foundation (application pending).
+**English:** Free, open-source Windows tool that frees disk space: cleans junk files, shows what is using the disk, finds duplicate files, and moves files to the user's own Google Drive or an external drive — always asking for confirmation first. Releases are currently unsigned; the project plans to re-apply to the SignPath Foundation program once it has a wider user base.

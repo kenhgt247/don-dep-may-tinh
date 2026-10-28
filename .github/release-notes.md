@@ -19,4 +19,4 @@ Hướng dẫn chi tiết nằm trong file `HUONG DAN.txt` bên trong thư mục
 
 Phần mềm miễn phí, mã nguồn mở. Chỉ chạy trên Windows 10 / 11.
 
-Ký số miễn phí bởi [SignPath.io](https://about.signpath.io), chứng chỉ của [SignPath Foundation](https://signpath.org) — xem [Chính sách ký số](https://github.com/kenhgt247/don-dep-may-tinh/blob/main/CODE_SIGNING_POLICY.md).
+File `.exe` hiện chưa có chữ ký số nên Windows có thể cảnh báo lần đầu mở — mã nguồn công khai tại trang chủ dự án.

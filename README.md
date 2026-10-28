@@ -12,6 +12,8 @@ Phần mềm **miễn phí** giúp máy tính Windows hết cảnh "ổ C đầy
 
 Chạy trên Windows 10 / 11. Không cần cài đặt thêm gì.
 
+Phần mềm hoàn toàn miễn phí. Ký số miễn phí bởi [SignPath.io](https://about.signpath.io), chứng chỉ của [SignPath Foundation](https://signpath.org) (đang chờ duyệt — xem [Chính sách ký số](CODE_SIGNING_POLICY.md)). [Chính sách quyền riêng tư](PRIVACY.md).
+
 ## Tính năng
 
 | Tab | Làm gì |
@@ -44,4 +46,8 @@ Gặp lỗi hoặc muốn thêm tính năng? Vào mục **[Issues](https://githu
 - Mã nguồn: `app/DonDep.ps1` (PowerShell 5.1 + Windows Forms), `app/Launcher.cs` (file .exe khởi động).
 - Phát hành bản mới: sửa `$Script:AppVersion` trong `app/DonDep.ps1`, rồi vào tab **Actions** → **Đóng gói và phát hành** → **Run workflow**. GitHub tự tạo `.exe`, đóng gói `.zip` và đăng lên trang Releases với thẻ `v<số phiên bản>`.
 
-Giấy phép: [MIT](LICENSE).
+Giấy phép: [MIT](LICENSE) · [Code signing policy](CODE_SIGNING_POLICY.md) · [Privacy policy](PRIVACY.md)
+
+---
+
+**English:** Free, open-source Windows tool that frees disk space: cleans junk files, shows what is using the disk, finds duplicate files, and moves files to the user's own Google Drive or an external drive — always asking for confirmation first. Free code signing provided by SignPath.io, certificate by SignPath Foundation (application pending).

@@ -18,7 +18,7 @@ Phần mềm hoàn toàn miễn phí. Ký số miễn phí bởi [SignPath.io](h
 
 | Tab | Làm gì |
 |---|---|
-| **Dọn dẹp** | Quét rác hệ thống (file tạm, bộ nhớ đệm trình duyệt/Zalo/Teams, thùng rác, gói cập nhật cũ), ảnh/video Zalo cũ, file cũ trong Downloads, file lớn. Xóa rác hoặc chuyển file đi. |
+| **Dọn dẹp** | Quét rác hệ thống (file tạm, bộ nhớ đệm trình duyệt/Zalo/Teams, thùng rác, gói cập nhật cũ), ảnh/video Zalo cũ, file cũ trong Downloads, file lớn. Rác thì xóa; với file cá nhân, **bạn chọn từng file: chuyển lên Drive / ổ ngoài hay xóa vĩnh viễn** (app gợi ý sẵn: file cài đặt → xóa, ảnh/video → chuyển). |
 | **Bản đồ ổ đĩa** | Xem thư mục nào chiếm nhiều chỗ nhất, đi sâu từng cấp. Bấm vào một mục để biết **đó là gì và có xóa được không** (rác / dữ liệu cá nhân / cẩn thận / không được xóa). Chuột phải để xóa (vào Thùng rác hoặc vĩnh viễn) hoặc chuyển lên Drive. Thư mục hệ thống bị chặn, không xóa nhầm được. |
 | **File trùng** | Tìm các file giống hệt nhau, giữ lại 1 bản, bản thừa vào Thùng rác. |
 | **Đã chuyển đi** | Danh sách file đã chuyển; lấy về đúng chỗ cũ bất cứ lúc nào. |

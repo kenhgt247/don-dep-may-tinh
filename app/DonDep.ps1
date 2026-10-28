@@ -19,7 +19,7 @@ Add-Type -AssemblyName Microsoft.VisualBasic
 try { [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 } catch {}
 
 # ---------------------------------------------------------------- cấu hình chung
-$Script:AppVersion   = '0.3.0'
+$Script:AppVersion   = '0.4.0'
 $Script:RepoSlug     = 'kenhgt247/don-dep-may-tinh'
 $Script:AppTitle     = 'Dọn Dẹp Máy Tính ' + $Script:AppVersion
 $Script:AppDir       = $PSScriptRoot
@@ -728,12 +728,12 @@ function Update-Drives {
 
 function Update-Summary {
     if ($Script:Suspend) { return }
-    $n = 0; $del = [long]0; $mov = [long]0
+    $n = 0; $del = [long]0; $mov = [long]0; $perm = [long]0
     foreach ($it in $Script:list.CheckedItems) {
         $o = $it.Tag; $n++
-        if ($o.Kind -eq 'xoa') { $del += $o.Size } else { $mov += $o.Size }
+        if ($o.Kind -eq 'xoa') { $del += $o.Size } elseif ($o.Action -eq 'xoa') { $perm += $o.Size } else { $mov += $o.Size }
     }
-    $Script:lblSum.Text = 'Đã chọn ' + $n + ' mục   •   Xóa rác: ' + (Format-Size $del) + '   •   Chuyển đi: ' + (Format-Size $mov)
+    $Script:lblSum.Text = 'Đã chọn ' + $n + ' mục   •   Xóa rác: ' + (Format-Size $del) + '   •   Xóa vĩnh viễn: ' + (Format-Size $perm) + '   •   Chuyển đi: ' + (Format-Size $mov)
 }
 
 function Set-Busy([bool]$busy) {
@@ -809,6 +809,10 @@ function New-Row($o, [bool]$checked) {
     if ($o.Date) { $dateText = $o.Date.ToString('dd/MM/yyyy') }
     [void]$it.SubItems.Add($dateText)
     [void]$it.SubItems.Add($o.Folder)
+    if ($o.Kind -eq 'chuyen' -and -not $o.PSObject.Properties['Action']) { $o | Add-Member -NotePropertyName Action -NotePropertyValue 'chuyen' }
+    [void]$it.SubItems.Add((Get-ActionText $o))
+    $it.UseItemStyleForSubItems = $false
+    if ($o.Kind -eq 'xoa' -or $o.Action -eq 'xoa') { $it.SubItems[5].ForeColor = [Drawing.Color]::Firebrick } else { $it.SubItems[5].ForeColor = [Drawing.Color]::RoyalBlue }
     $it.Tag = $o
     $it.Checked = $checked
     $it.Group = $Script:Groups[$o.Category]
@@ -848,7 +852,8 @@ function Start-Scan {
         if ($seen.Add($f.FullName)) {
             [void]$rows[$cat].Add([pscustomobject]@{
                 Category = $cat; Kind = 'chuyen'; Path = $f.FullName; Root = $root; Size = $f.Length
-                Name = $f.Name; Folder = $f.DirectoryName; Date = $f.LastWriteTime; Before = $null; Default = $true })
+                Name = $f.Name; Folder = $f.DirectoryName; Date = $f.LastWriteTime; Before = $null; Default = $true
+                Action = (Get-SuggestedAction $f.FullName) })
         }
     }
 
@@ -983,11 +988,85 @@ function Move-ToGoogleDrive($items) {
     return ,$moved
 }
 
+# ---------------------------------------------------------------- cách xử lý từng file: chuyển đi hay xóa vĩnh viễn
+function Get-ActionText($o) {
+    if ($o.Kind -eq 'xoa') { return '🗑 Xóa (rác)' }
+    if ($o.Action -eq 'xoa') { return '🗑 Xóa vĩnh viễn' }
+    return '☁ Chuyển đi'
+}
+
+function Get-SuggestedAction([string]$path) {
+    $info = Get-PathInfo $path $false
+    if ($info.Level -in @('rac', 'antoan')) { return 'xoa' }
+    return 'chuyen'
+}
+
+function Set-ItemsAction($items, [string]$action) {
+    $n = 0
+    foreach ($it in $items) {
+        if ($it.Tag.Kind -ne 'chuyen') { continue }
+        $it.Tag.Action = $action
+        $it.SubItems[5].Text = Get-ActionText $it.Tag
+        if ($action -eq 'xoa') { $it.SubItems[5].ForeColor = [Drawing.Color]::Firebrick } else { $it.SubItems[5].ForeColor = [Drawing.Color]::RoyalBlue }
+        $n++
+    }
+    Update-Summary
+    return $n
+}
+
+# Hỏi người dùng: chuyển lên Drive / ổ ngoài hay xóa vĩnh viễn
+function Ask-PersonalAction($items) {
+    $nMove = 0; $nDel = 0; $bMove = [long]0; $bDel = [long]0
+    foreach ($o in $items) { if ($o.Action -eq 'xoa') { $nDel++; $bDel += $o.Size } else { $nMove++; $bMove += $o.Size } }
+    $total = $bMove + $bDel
+    $f = New-Object Windows.Forms.Form
+    $f.Text = 'Chuyển đi hay xóa vĩnh viễn?'
+    $f.Icon = $Script:form.Icon
+    $f.FormBorderStyle = 'FixedDialog'; $f.MaximizeBox = $false; $f.MinimizeBox = $false
+    $f.StartPosition = 'CenterParent'; $f.Font = $Script:form.Font
+    $f.ClientSize = New-Object Drawing.Size(620, 330)
+    $head = New-Lbl ('Bạn đang chọn ' + $items.Count + ' file cá nhân (' + (Format-Size $total) + ').') 16 12 590 26
+    $head.Font = New-Object Drawing.Font('Segoe UI', 11, [Drawing.FontStyle]::Bold)
+    $body = New-Lbl ("• File còn cần dùng (ảnh, video, tài liệu quan trọng) → nên CHUYỂN lên Drive / ổ ngoài, lấy lại được bất cứ lúc nào." + "`n" +
+        "• File không cần nữa (file cài đặt, phim đã xem, file nén đã giải nén...) → XÓA VĨNH VIỄN cho nhanh, không tốn chỗ trên Drive." + "`n`n" +
+        'Hiện đang đặt:  ☁ chuyển đi ' + $nMove + ' file (' + (Format-Size $bMove) + ')   •   🗑 xóa vĩnh viễn ' + $nDel + ' file (' + (Format-Size $bDel) + ')' + "`n" +
+        'Muốn chọn riêng từng file: bấm Quay lại, rồi chuột phải vào file trong danh sách.') 16 44 590 120
+    $f.Controls.AddRange(@($head, $body))
+    $Script:AskResult = $null
+    $mk = {
+        param($text, $y, $val, $color)
+        $b = New-Btn $text 16 $y 588 36
+        if ($color) { $b.BackColor = $color }
+        $b.Tag = $val
+        $b.Add_Click({ $Script:AskResult = $this.Tag; $this.FindForm().Close() })
+        $f.Controls.Add($b)
+    }
+    $y = 170
+    if ($nMove -gt 0 -and $nDel -gt 0) { & $mk ('Giữ như đã đặt (chuyển ' + $nMove + ', xóa ' + $nDel + ')') $y 'keep' ([Drawing.Color]::FromArgb(255, 222, 89)); $y += 40 }
+    & $mk ('☁  Chuyển TẤT CẢ lên Drive / ổ ngoài (' + (Format-Size $total) + ')') $y 'move' $null; $y += 40
+    & $mk ('🗑  XÓA VĨNH VIỄN tất cả (' + (Format-Size $total) + ') — không lấy lại được') $y 'delete' $null; $y += 40
+    & $mk 'Quay lại' $y $null $null; $y += 40
+    $f.ClientSize = New-Object Drawing.Size(620, ($y + 8))
+    [void]$f.ShowDialog($Script:form)
+    $f.Dispose()
+    return $Script:AskResult
+}
+
 function Start-Clean {
     $checked = @($Script:list.CheckedItems | ForEach-Object { $_.Tag })
     if ($checked.Count -eq 0) { Show-Msg 'Bạn chưa chọn mục nào. Hãy bấm "Quét máy" rồi đánh dấu những gì muốn dọn.'; return }
     $junk = @($checked | Where-Object { $_.Kind -eq 'xoa' })
-    $moves = @($checked | Where-Object { $_.Kind -eq 'chuyen' })
+    $personal = @($checked | Where-Object { $_.Kind -eq 'chuyen' })
+    if ($personal.Count -gt 0) {
+        $ans = Ask-PersonalAction $personal
+        if (-not $ans) { Set-Status 'Đã hủy. Chuột phải vào file để chọn chuyển đi hay xóa vĩnh viễn.'; return }
+        $checkedItems = @($Script:list.CheckedItems)
+        if ($ans -eq 'move') { [void](Set-ItemsAction $checkedItems 'chuyen') }
+        if ($ans -eq 'delete') { [void](Set-ItemsAction $checkedItems 'xoa') }
+    }
+    $moves = @($personal | Where-Object { $_.Action -ne 'xoa' })
+    $perms = @($personal | Where-Object { $_.Action -eq 'xoa' })
+    $permBytes = [long]0; foreach ($o in $perms) { $permBytes += $o.Size }
     $delBytes = [long]0; foreach ($o in $junk) { $delBytes += $o.Size }
     $movBytes = [long]0; foreach ($o in $moves) { $movBytes += $o.Size }
     $keep = [long]$Script:numKeep.Value * 1GB
@@ -1051,6 +1130,11 @@ function Start-Clean {
     $msg = "Bạn sắp:`n"
     if ($junk.Count -gt 0) { $msg += "`n•  XÓA VĨNH VIỄN " + (Format-Size $delBytes) + ' rác (' + $junk.Count + ' mục)' }
     if (@($junk | Where-Object { $_.Path -eq 'NGU_DONG' }).Count -gt 0) { $msg += "`n•  TẮT chế độ ngủ đông (Hibernate) của Windows" }
+    if ($perms.Count -gt 0) {
+        $msg += "`n•  XÓA VĨNH VIỄN " + $perms.Count + ' file cá nhân (' + (Format-Size $permBytes) + ') — KHÔNG lấy lại được:'
+        $i = 0
+        foreach ($o in ($perms | Sort-Object Size -Descending)) { $i++; if ($i -gt 6) { $msg += "`n      ... và " + ($perms.Count - 6) + ' file khác'; break }; $msg += "`n      " + $o.Name + ' (' + (Format-Size $o.Size) + ')' }
+    }
     if ($moves.Count -gt 0) {
         $msg += "`n•  CHUYỂN " + $moves.Count + ' file (' + (Format-Size $movBytes) + ') tới:' + "`n    " + $destText
         $msg += "`n    File chỉ bị xóa khỏi máy sau khi đã chép xong và kiểm tra đúng. Có thể lấy lại ở tab ""Đã chuyển đi""."
@@ -1061,8 +1145,9 @@ function Start-Clean {
     }
     $msg += "`n`nTiếp tục?"
     if (-not (Confirm-Action $msg)) { Set-Status 'Đã hủy.'; return }
+    if ($perms.Count -gt 0 -and -not (Confirm-Action ('Xác nhận lần nữa: XÓA VĨNH VIỄN ' + $perms.Count + ' file cá nhân (' + (Format-Size $permBytes) + ')?' + "`n`nCác file này sẽ không vào Thùng rác và không lấy lại được."))) { Set-Status 'Đã hủy.'; return }
 
-    if (@($moves | Where-Object { $_.Category -eq 'zalo' }).Count -gt 0) {
+    if (@($personal | Where-Object { $_.Category -eq 'zalo' }).Count -gt 0) {
         while (Get-Process -Name 'Zalo' -ErrorAction SilentlyContinue) {
             $a = [System.Windows.Forms.MessageBox]::Show($Script:form,
                 "Zalo đang mở. Hãy tắt hẳn Zalo (kể cả biểu tượng nhỏ ở góc phải thanh Taskbar) rồi bấm Retry.",
@@ -1081,6 +1166,19 @@ function Start-Clean {
         Remove-JunkItem $o
     }
     if ($junk.Count -gt 0) { Write-Log ('Đã dọn ' + $junk.Count + ' mục rác.') }
+
+    $deletedSet = New-Object 'System.Collections.Generic.HashSet[string]' ([StringComparer]::OrdinalIgnoreCase)
+    foreach ($o in $perms) {
+        Set-Status ('Đang xóa: ' + $o.Name)
+        try {
+            if (Test-ProtectedPath $o.Path) { throw 'Thư mục được bảo vệ.' }
+            $fi = New-Object IO.FileInfo($o.Path)
+            if ($fi.Exists) { $fi.Attributes = 'Normal'; $fi.Delete() }
+            [void]$deletedSet.Add($o.Path)
+            Write-Log ('Đã xóa vĩnh viễn: ' + $o.Path + ' (' + (Format-Size $o.Size) + ')')
+        } catch { Write-Log ('Không xóa được ' + $o.Path + ': ' + $_.Exception.Message) }
+    }
+    if ($perms.Count -gt 0) { Write-Log ('Đã xóa vĩnh viễn ' + $deletedSet.Count + '/' + $perms.Count + ' file cá nhân.') }
 
     $moved = New-Object System.Collections.ArrayList
     if ($moves.Count -gt 0) {
@@ -1111,7 +1209,7 @@ function Start-Clean {
     $Script:Suspend = $true
     $Script:list.BeginUpdate()
     foreach ($it in @($Script:list.CheckedItems)) {
-        if ($it.Tag.Kind -eq 'xoa' -or $movedSet.Contains($it.Tag.Path)) { $Script:list.Items.Remove($it) }
+        if ($it.Tag.Kind -eq 'xoa' -or $movedSet.Contains($it.Tag.Path) -or $deletedSet.Contains($it.Tag.Path)) { $Script:list.Items.Remove($it) }
     }
     Update-GroupHeaders
     $Script:list.EndUpdate()
@@ -1249,7 +1347,8 @@ function Get-PathInfo([string]$path, [bool]$isDir) {
         if ($p -match $r[0]) { return [pscustomobject]@{ Level = $r[1]; Title = $r[2]; Text = $r[3] } }
     }
     $docs = [Environment]::GetFolderPath('MyDocuments')
-    $dl = Get-DownloadsPath
+    if (-not $Script:DlCache) { $Script:DlCache = Get-DownloadsPath }
+    $dl = $Script:DlCache
     if (-not $isDir) {
         $ext = [IO.Path]::GetExtension($p).ToLower()
         $inDl = [bool]($dl -and $p.StartsWith($dl, [StringComparison]::OrdinalIgnoreCase))
@@ -1261,11 +1360,14 @@ function Get-PathInfo([string]$path, [bool]$isDir) {
         if ($ext -in @('.tmp', '.dmp', '.log', '.old', '.bak', '.crdownload', '.part')) { return [pscustomobject]@{ Level = 'antoan'; Title = 'File tạm / nhật ký / bản sao cũ'; Text = 'Thường không còn cần nữa. Xóa được.' } }
         if ($inDl -and $ext -in @('.zip', '.rar', '.7z')) { return [pscustomobject]@{ Level = 'canhan'; Title = 'File nén đã tải về'; Text = 'Nếu đã giải nén và dùng xong thì xóa được. Không chắc thì chuyển lên Drive.' } }
     }
-    $personal = @()
-    foreach ($k in @('Desktop', 'MyDocuments', 'MyPictures', 'MyVideos', 'MyMusic')) { $personal += [Environment]::GetFolderPath($k) }
-    $personal += $dl
-    $personal += ($env:USERPROFILE + '\OneDrive')
-    foreach ($pp in $personal) {
+    if (-not $Script:PersonalCache) {
+        $personal = @()
+        foreach ($k in @('Desktop', 'MyDocuments', 'MyPictures', 'MyVideos', 'MyMusic')) { $personal += [Environment]::GetFolderPath($k) }
+        $personal += $dl
+        $personal += ($env:USERPROFILE + '\OneDrive')
+        $Script:PersonalCache = @($personal | Where-Object { $_ })
+    }
+    foreach ($pp in $Script:PersonalCache) {
         if ($pp -and $p.StartsWith($pp, [StringComparison]::OrdinalIgnoreCase)) {
             return [pscustomobject]@{ Level = 'canhan'; Title = 'Dữ liệu cá nhân của bạn'; Text = 'Ảnh, video, tài liệu... của bạn. Xóa vĩnh viễn là mất hẳn. Nếu còn cần, hãy dùng "Chuyển lên Drive / ổ ngoài" thay vì xóa.' }
         }
@@ -1472,7 +1574,7 @@ function Add-MapToMoveList {
             if (Test-ProtectedPath $f.FullName) { continue }
             if (-not $seen.Add($f.FullName)) { continue }
             [void]$new.Add([pscustomobject]@{ Category = 'tu'; Kind = 'chuyen'; Path = $f.FullName; Root = $root; Size = $f.Length
-                Name = $f.Name; Folder = $f.DirectoryName; Date = $f.LastWriteTime; Before = $null; Default = $true })
+                Name = $f.Name; Folder = $f.DirectoryName; Date = $f.LastWriteTime; Before = $null; Default = $true; Action = 'chuyen' })
         }
     }
     $sum = [long]0; foreach ($o in $new) { $sum += $o.Size }
@@ -1886,7 +1988,15 @@ $list.Dock = 'Fill'; $list.ShowGroups = $true; $list.HideSelection = $false
 [void]$list.Columns.Add('Tên', 300)
 [void]$list.Columns.Add('Dung lượng', 90, 'Right')
 [void]$list.Columns.Add('Ngày sửa', 90)
-[void]$list.Columns.Add('Thư mục', 340)
+[void]$list.Columns.Add('Thư mục', 230)
+[void]$list.Columns.Add('Xử lý', 130)
+
+$Script:cleanMenu = New-Object Windows.Forms.ContextMenuStrip
+$Script:miSetMove = $Script:cleanMenu.Items.Add('☁  Chuyển lên Drive / ổ ngoài')
+$Script:miSetDel  = $Script:cleanMenu.Items.Add('🗑  Xóa vĩnh viễn')
+[void]$Script:cleanMenu.Items.Add('-')
+$Script:miCleanOpen = $Script:cleanMenu.Items.Add('Mở thư mục chứa file')
+$list.ContextMenuStrip = $Script:cleanMenu
 $Script:Groups = @{}
 foreach ($cat in $Script:CatOrder) {
     $g = New-Object Windows.Forms.ListViewGroup($cat, $Script:CatLabel[$cat])
@@ -2125,6 +2235,15 @@ $list.Add_SelectedIndexChanged({
         else { Show-Preview $Script:prevClean.Pic $Script:prevClean.Label $null; $Script:prevClean.Label.Text = $o.Name + [Environment]::NewLine + (Format-Size $o.Size) }
     }
 })
+$Script:cleanMenu.Add_Opening({
+    $sel = @($Script:list.SelectedItems | Where-Object { $_.Tag.Kind -eq 'chuyen' })
+    $Script:miSetMove.Enabled = $sel.Count -gt 0
+    $Script:miSetDel.Enabled = $sel.Count -gt 0
+    if ($Script:list.SelectedItems.Count -eq 0) { $_.Cancel = $true }
+})
+$Script:miSetMove.Add_Click({ $n = Set-ItemsAction @($Script:list.SelectedItems) 'chuyen'; Set-Status ('Đã đặt ' + $n + ' file: chuyển lên Drive / ổ ngoài.') })
+$Script:miSetDel.Add_Click({ $n = Set-ItemsAction @($Script:list.SelectedItems) 'xoa'; Set-Status ('Đã đặt ' + $n + ' file: xóa vĩnh viễn.') })
+$Script:miCleanOpen.Add_Click({ if ($Script:list.SelectedItems.Count -gt 0) { $o = $Script:list.SelectedItems[0].Tag; if ($o.Path -ne 'THUNG_RAC' -and $o.Path -ne 'NGU_DONG') { Open-InExplorer $o.Path } } })
 $list.Add_DoubleClick({
     if ($Script:list.SelectedItems.Count -gt 0) {
         $o = $Script:list.SelectedItems[0].Tag

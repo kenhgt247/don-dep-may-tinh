@@ -108,10 +108,12 @@ namespace DonDep
             int tabIndex = tabs.SelectedIndex;
             SaveCleanSettings();
             cfg.DupFolders = lstDupFolders.Items.Cast<string>().ToList();
-            // Preserve other on-screen settings without silently changing Windows startup.
-            cfg.AlertGB = (int)numAlert.Value;
-            cfg.AutoDays = (int)numAutoDays.Value;
-            cfg.AutoClean = chkAutoClean.Checked;
+            // Keep unsaved settings visible across a language change. Only the
+            // language itself is persisted; Windows startup and automation are untouched.
+            int pendingAlert = (int)numAlert.Value;
+            int pendingDays = (int)numAutoDays.Value;
+            bool pendingAuto = chkAutoClean.Checked;
+            bool pendingStartup = chkStartup.Checked;
             cfg.Language = language;
             cfg.Save();
             UiLanguage.Code = language;
@@ -121,6 +123,10 @@ namespace DonDep
                 control.Dispose();
             }
             BuildInterface();
+            numAlert.Value = pendingAlert;
+            numAutoDays.Value = pendingDays;
+            chkAutoClean.Checked = pendingAuto;
+            chkStartup.Checked = pendingStartup;
             tabs.SelectedIndex = Math.Max(0, Math.Min(tabs.TabPages.Count - 1, tabIndex));
             UpdateDrives();
             UpdateDriveLabel(false);

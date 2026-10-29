@@ -562,15 +562,46 @@ namespace DonDep
             };
             btnShortcut.Click += (s, e) =>
             {
-                try
+                var created = new List<string>();
+                var failed = new List<string>();
+                Action<Environment.SpecialFolder, string> createAt = (location, label) =>
                 {
-                    Shortcut.Create(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "Dọn Dẹp Máy Tính.lnk"), "", App.Name);
-                    Shortcut.Create(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Programs), "Dọn Dẹp Máy Tính.lnk"), "", App.Name);
-                    if (File.Exists(Shortcut.StartupLink)) Shortcut.SetStartup(true);
-                    App.Log("Đã tạo biểu tượng trên Desktop và menu Start.");
-                    Msg("Đã tạo biểu tượng \"Dọn Dẹp Máy Tính\" trên Desktop và trong menu Start.");
+                    try
+                    {
+                        string directory = Environment.GetFolderPath(location);
+                        if (string.IsNullOrWhiteSpace(directory))
+                            throw new DirectoryNotFoundException("Windows could not locate the " + label + " folder.");
+                        string name = "Dọn Dẹp Máy Tính.lnk";
+                        Shortcut.Create(Path.Combine(directory, name), "", App.Name);
+                        created.Add(label);
+                        App.Log("Đã tạo shortcut tại: " + Path.Combine(directory, name));
+                    }
+                    catch (Exception ex)
+                    {
+                        App.Log("LỖI TẠO SHORTCUT (" + label + "): " + ex);
+                        failed.Add(label + ": " + ex.GetBaseException().Message);
+                    }
+                };
+                createAt(Environment.SpecialFolder.DesktopDirectory, "Desktop");
+                createAt(Environment.SpecialFolder.Programs, "Start Menu");
+                // Refresh the already-enabled startup shortcut only; do not change its setting.
+                if (File.Exists(Shortcut.StartupLink))
+                {
+                    try { Shortcut.SetStartup(true); }
+                    catch (Exception ex)
+                    {
+                        App.Log("LỖI CẬP NHẬT SHORTCUT STARTUP: " + ex);
+                        failed.Add("Startup: " + ex.GetBaseException().Message);
+                    }
                 }
-                catch (Exception ex) { Msg("Không tạo được biểu tượng: " + ex.Message, MessageBoxIcon.Error); }
+                if (UiLanguage.English)
+                    Msg((created.Count > 0 ? "Shortcut created: " + string.Join(", ", created) + "." : "Could not create a shortcut.") +
+                        (failed.Count > 0 ? "\n\nDetails:\n" + string.Join("\n", failed) : ""),
+                        failed.Count > 0 ? MessageBoxIcon.Warning : MessageBoxIcon.Information);
+                else
+                    Msg((created.Count > 0 ? "Đã tạo biểu tượng tại: " + string.Join(", ", created) + "." : "Chưa tạo được biểu tượng.") +
+                        (failed.Count > 0 ? "\n\nChi tiết lỗi:\n" + string.Join("\n", failed) : ""),
+                        failed.Count > 0 ? MessageBoxIcon.Warning : MessageBoxIcon.Information);
             };
             btnUpdate.Click += async (s, e) => await CheckUpdate(true);
             btnHome.Click += (s, e) => { try { Process.Start("https://github.com/" + App.Repo); } catch { } };
@@ -622,6 +653,8 @@ namespace DonDep
             if (tabs.TabPages[0].Text != expectedFirstTab) throw new Exception("Language tab mismatch: " + tabs.TabPages[0].Text);
             if (UiLanguage.English && UiLanguage.T("Xóa vĩnh viễn") != "Delete permanently") throw new Exception("Safety translation mismatch");
             sb.Append(" language=").Append(UiLanguage.Code);
+            NativeShortcut.SelfTest();
+            sb.Append(" shortcut=OK");
             var sources = Junk.Sources(cfg);
             sb.Append(" junk=").Append(sources.Count);
             var zr = Junk.ZaloRoots(cfg);

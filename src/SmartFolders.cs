@@ -377,11 +377,11 @@ namespace DonDep
                 File.WriteAllText(Path.Combine(root, "photo2.jpg"), "identical-picture-data");
 
                 // Validate volume root handling even when the CI runner has no D:.
-                if (!IsDriveRoot(@"D:\\") || IsDriveRoot(@"D:\\MyFiles") ||
-                    !Cmp.Equals(Full(@"D:\\"), @"D:\\") ||
-                    !Inside(@"D:\\", @"D:\\Documents\\hello.pdf") ||
-                    !Cmp.Equals(Path.Combine(Full(@"D:\\"), SortedFolder),
-                        @"D:\\" + SortedFolder))
+                if (!IsDriveRoot(@"D:\") || IsDriveRoot(@"D:\MyFiles") ||
+                    !Cmp.Equals(Full(@"D:\"), @"D:\") ||
+                    !Inside(@"D:\", @"D:\Documents\hello.pdf") ||
+                    !Cmp.Equals(Path.Combine(Full(@"D:\"), SortedFolder),
+                        @"D:\" + SortedFolder))
                     throw new Exception("Smart Folder drive-root path regression.");
                 // The Windows system volume itself must remain blocked.
                 bool rejectedSystemDrive = false;

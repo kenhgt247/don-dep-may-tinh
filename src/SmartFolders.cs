@@ -83,7 +83,6 @@ namespace DonDep
             if (!Directory.Exists(root)) throw new DirectoryNotFoundException("Không thấy thư mục: " + root);
             if (Cmp.Equals(root, Full(Path.GetPathRoot(root)))) throw new IOException("Không được sắp xếp cả ổ đĩa.");
             if (ForbiddenPath(root) || PathRules.IsProtected(root) || LinkedDirectory(root) ||
-                Inside(root, App.DataDir) || Inside(root, App.AppDir) ||
                 Inside(App.DataDir, root) || Inside(App.AppDir, root))
                 throw new IOException("Thư mục hệ thống, Zalo, ứng dụng và đồng bộ đám mây không được hỗ trợ.");
         }
@@ -92,7 +91,9 @@ namespace DonDep
             var a = f.Attributes;
             return (a & (FileAttributes.Hidden | FileAttributes.System | FileAttributes.ReparsePoint | FileAttributes.Offline)) == 0 &&
                 !ForbiddenPath(f.FullName) && !PathRules.IsProtected(f.FullName) &&
-                !Cmp.Equals(Full(f.FullName), Full(App.ExePath)) && !LinkedDirectory(f.DirectoryName);
+                !Cmp.Equals(Full(f.FullName), Full(App.ExePath)) &&
+                !Inside(App.AppDir, f.FullName) && !Inside(App.DataDir, f.FullName) &&
+                !LinkedDirectory(f.DirectoryName);
         }
         static string Fold(string s)
         {
@@ -193,7 +194,8 @@ namespace DonDep
                     foreach (var sub in Directory.EnumerateDirectories(dir))
                         try {
                             if (ForbiddenPath(sub) || PathRules.IsProtected(sub) || LinkedDirectory(sub) ||
-                                Cmp.Equals(sub, outputBase)) result.Protected++;
+                                Cmp.Equals(sub, outputBase) || Cmp.Equals(Full(sub), Full(App.AppDir)) ||
+                                Cmp.Equals(Full(sub), Full(App.DataDir))) result.Protected++;
                             else stack.Push(sub);
                         } catch { result.Protected++; }
                 }

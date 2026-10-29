@@ -62,18 +62,18 @@ Phần mềm hướng đến sự **rõ ràng và an toàn**: bạn xem danh sá
 | **⏱️ Tự động** | Tùy chọn chạy cùng Windows, cảnh báo ổ gần đầy, và **chỉ dọn rác hệ thống** theo lịch khi bạn bật tính năng này. |
 | **📁 Smart Folder** | Sắp xếp **file cá nhân** theo loại và **tài liệu công việc** theo từ khóa tên hoặc nội dung Word/Excel/PowerPoint/TXT/CSV; xem trước đường dẫn mới, phát hiện bản trùng SHA-256, áp dụng sau xác nhận và **hoàn tác** qua nhật ký. Không dùng AI, không kết nối API. |
 
-### 📁 Smart Folder v1.3.0 — Sắp xếp thông minh không cần AI
+### 📁 Smart Folder v1.3.1 — Sắp xếp thông minh không cần AI
 
 **Hoạt động 100% trên máy Windows, không gửi tài liệu lên máy chủ nào.**
 
-1. Vào tab **Smart Folder**, chọn thư mục cá nhân hoặc công việc.
+1. Vào tab **Smart Folder**, chọn thư mục cá nhân hoặc công việc. Từ **v1.3.1** có thể chọn trực tiếp ổ dữ liệu như `D:\\` hoặc ổ USB. Ổ chứa Windows (thường là `C:\\`) vẫn bị chặn.
 2. Chọn **Cá nhân** để phân loại theo ảnh, video, âm thanh, tài liệu, bảng tính, trình chiếu, file nén và bộ cài.
 3. Hoặc chọn **Công việc** để nhận diện công văn, quyết định, kế hoạch, báo cáo, hợp đồng, chứng từ, hồ sơ qua tên file và, nếu bật, nội dung TXT/CSV/RTF/DOCX/XLSX/PPTX.
 4. Tùy chọn chia theo năm/tháng và tìm file trùng bằng SHA-256. File trùng hoặc **chưa đủ căn cứ phân loại được giữ nguyên**.
 5. Bấm **Quét & đề xuất**, xem cột **File nguồn → Đường dẫn mới**, bỏ dấu chọn mục không muốn chuyển, sau đó bấm **Áp dụng file đã chọn** để xác nhận.
 6. Bấm **Hoàn tác lần gần nhất** để phục hồi file còn nguyên vẹn về vị trí cũ. Nhật ký được giữ khi mở lại ứng dụng.
 
-File được chuyển vào thư mục con `PC Cleaner - Da sap xep` trong thư mục nguồn bạn chọn. **Không xóa file, không ghi đè tên trùng**, bỏ qua liên kết symbolic/junction, thư mục hệ thống, dữ liệu Zalo và đường dẫn đồng bộ OneDrive/Google Drive. Nếu file bị chỉnh sửa/đổi tên sau khi chuyển, phần mềm sẽ không tự ghi đè khi hoàn tác.
+Khi quét **toàn bộ ổ dữ liệu**, phần mềm yêu cầu xác nhận trước khi quét và **không đánh dấu sẵn bất kỳ file nào**. Bạn tự chọn từng file hoặc chọn các đề xuất sau khi xem kỹ. Giới hạn quét 20.000 file mỗi lượt; phần mềm cảnh báo nếu danh sách chưa đầy đủ. Để tránh làm máy chậm khi quét cả ổ, phát hiện bản trùng SHA-256 chỉ kiểm tra file tối đa 64 MB, với tổng dữ liệu băm tối đa 512 MB.\n\nFile được chuyển vào thư mục con `PC Cleaner - Da sap xep` trong thư mục nguồn bạn chọn. **Không xóa file, không ghi đè tên trùng**, bỏ qua liên kết symbolic/junction, thư mục hệ thống, dữ liệu Zalo và đường dẫn đồng bộ OneDrive/Google Drive. Nếu file bị chỉnh sửa/đổi tên sau khi chuyển, phần mềm sẽ không tự ghi đè khi hoàn tác.
 
 **Giới hạn phiên bản này:** PDF, DOC, XLS dạng cũ hoặc file ảnh quét chỉ được nhận diện qua **tên file**, chưa có OCR. File chưa rõ được để lại tại chỗ. Quy tắc phân loại có thể bổ sung ở các phiên bản sau.
 

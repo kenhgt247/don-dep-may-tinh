@@ -7,6 +7,7 @@ using System.Net;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
+using MessageBox = DonDep.LocalizedMessageBox;
 
 namespace DonDep
 {
@@ -16,6 +17,7 @@ namespace DonDep
         static int Main(string[] args)
         {
             try { ServicePointManager.SecurityProtocol |= SecurityProtocolType.Tls12; } catch { }
+            UiLanguage.Code = Settings.Load().Language;
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             bool selfTest = args.Any(a => a.Equals("--selftest", StringComparison.OrdinalIgnoreCase));
@@ -74,12 +76,12 @@ namespace DonDep
 
         public TrayContext(bool test)
         {
-            icon = new NotifyIcon { Icon = App.AppIcon, Text = "Dọn Dẹp Máy Tính — đang theo dõi ổ đĩa", Visible = !test };
+            icon = new NotifyIcon { Icon = App.AppIcon, Text = UiLanguage.T("Dọn Dẹp Máy Tính — đang theo dõi ổ đĩa"), Visible = !test };
             var menu = new ContextMenuStrip();
-            menu.Items.Add("Mở Dọn Dẹp Máy Tính", null, (s, e) => Shortcut.StartMain());
-            menu.Items.Add("Dọn rác hệ thống ngay", null, (s, e) => CleanNow());
+            menu.Items.Add(UiLanguage.T("Mở Dọn Dẹp Máy Tính"), null, (s, e) => Shortcut.StartMain());
+            menu.Items.Add(UiLanguage.T("Dọn rác hệ thống ngay"), null, (s, e) => CleanNow());
             menu.Items.Add(new ToolStripSeparator());
-            menu.Items.Add("Tắt chạy ngầm", null, (s, e) => { icon.Visible = false; ExitThread(); });
+            menu.Items.Add(UiLanguage.T("Tắt chạy ngầm"), null, (s, e) => { icon.Visible = false; ExitThread(); });
             icon.ContextMenuStrip = menu;
             icon.DoubleClick += (s, e) => Shortcut.StartMain();
             icon.BalloonTipClicked += (s, e) => Shortcut.StartMain();
@@ -94,12 +96,12 @@ namespace DonDep
         {
             if (busy) return;
             busy = true;
-            icon.ShowBalloonTip(3000, App.Name, "Đang dọn rác hệ thống...", ToolTipIcon.Info);
+            icon.ShowBalloonTip(3000, UiLanguage.T(App.Name), UiLanguage.T("Đang dọn rác hệ thống..."), ToolTipIcon.Info);
             var cfg = Settings.Load();
             var t = new Thread(() =>
             {
                 long f = AutoClean.Run(cfg);
-                try { icon.ShowBalloonTip(8000, App.Name, "Đã dọn xong, giải phóng khoảng " + Fmt.Size(f) + ".", ToolTipIcon.Info); } catch { }
+                try { icon.ShowBalloonTip(8000, UiLanguage.T(App.Name), UiLanguage.T("Đã dọn xong, giải phóng khoảng " + Fmt.Size(f) + "."), ToolTipIcon.Info); } catch { }
                 busy = false;
             }) { IsBackground = true };
             t.Start();
@@ -118,7 +120,7 @@ namespace DonDep
                     var t = new Thread(() =>
                     {
                         long f = AutoClean.Run(cfg);
-                        if (f > 50 * Fmt.MB) { try { icon.ShowBalloonTip(8000, App.Name, "Đã tự dọn rác theo lịch, giải phóng khoảng " + Fmt.Size(f) + ".", ToolTipIcon.Info); } catch { } }
+                        if (f > 50 * Fmt.MB) { try { icon.ShowBalloonTip(8000, UiLanguage.T(App.Name), UiLanguage.T("Đã tự dọn rác theo lịch, giải phóng khoảng " + Fmt.Size(f) + "."), ToolTipIcon.Info); } catch { } }
                         busy = false;
                     }) { IsBackground = true };
                     t.Start();
@@ -133,7 +135,7 @@ namespace DonDep
                     DateTime prev;
                     if (lastAlert.TryGetValue(d.Name, out prev) && (DateTime.Now - prev).TotalHours < 6) continue;
                     lastAlert[d.Name] = DateTime.Now;
-                    icon.ShowBalloonTip(15000, "Ổ " + d.Name.TrimEnd('\\') + " sắp đầy!", "Chỉ còn " + Fmt.Size(d.AvailableFreeSpace) + " trống. Bấm vào đây để mở Dọn Dẹp Máy Tính.", ToolTipIcon.Warning);
+                    icon.ShowBalloonTip(15000, UiLanguage.T("Ổ " + d.Name.TrimEnd('\\') + " sắp đầy!"), UiLanguage.T("Chỉ còn " + Fmt.Size(d.AvailableFreeSpace) + " trống. Bấm vào đây để mở Dọn Dẹp Máy Tính."), ToolTipIcon.Warning);
                     break;
                 }
                 catch { }

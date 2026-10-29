@@ -17,7 +17,7 @@ namespace DonDep
 {
     static class App
     {
-        public const string Version = "1.1.0";
+        public const string Version = "1.2.0";
         public const string Repo = "kenhgt247/don-dep-may-tinh";
         public const string Name = "Dọn Dẹp Máy Tính";
         public static string Title => UiLanguage.T(Name) + " " + Version + (IsAdmin ? UiLanguage.T("  —  quyền quản trị") : "");

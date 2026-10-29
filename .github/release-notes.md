@@ -1,29 +1,21 @@
-# PC Cleaner v1.2.1 — Sửa lỗi tạo biểu tượng Windows
+# PC Cleaner v1.2.2 — Biểu tượng mới / New application icon
 
-**Bản sửa lỗi từ v1.2.0** · Windows 10/11 · Tiếng Việt / English
+**Giao diện hiện đại, không còn icon vàng cũ.** Bản 1.2.2 thay biểu tượng ứng dụng bằng thiết kế gốc màu xanh dương–cyan hình ổ đĩa và chổi dọn dẹp.
 
-## 🛠️ Đã sửa / Fixed
+## ✨ Điểm mới / What's new
 
-- **Sửa lỗi “Exception has been thrown by the target of an invocation”** khi nhấn **Tạo biểu tượng**.
-- Thay phương pháp tạo shortcut dùng **WScript.Shell + Reflection** bằng **Windows Shell Link API** gốc, hỗ trợ đường dẫn Unicode và thư mục Desktop chuyển hướng qua OneDrive.
-- Tạo shortcut riêng tại **Desktop** và **Start Menu**: nếu một vị trí bị từ chối quyền, vẫn tạo ở vị trí còn lại và hiển thị thông báo cụ thể.
-- Sửa chung cơ chế tạo shortcut của tùy chọn **chạy ngầm cùng Windows**.
-- Bổ sung tự kiểm tra tạo file **.lnk** thật trong thư mục tạm trên Windows và xác thực header định dạng shortcut.
+- Thay `src/DonDep.ico` để icon trên file EXE, cửa sổ ứng dụng và shortcut Windows sử dụng biểu tượng mới.
+- Thay logo đầu trang README bằng `docs/pc-cleaner-icon.png`, cùng thiết kế với ứng dụng.
+- Thiết kế biểu tượng mới được tạo riêng cho dự án, không sao chép biểu tượng của sản phẩm khác.
+- Giữ nguyên các chức năng v1.2.1: sửa lỗi tạo shortcut Windows, chuyển ngôn ngữ Tiếng Việt / English, dọn rác, bản đồ ổ đĩa, file trùng, Drive, trình duyệt, chạy nền.
 
-## ✅ Giữ nguyên các tính năng 1.2.0
+## ⬇️ Tải và cài / Download
 
-- Chuyển **🇻🇳 Tiếng Việt / 🇬🇧 English** và ghi nhớ ngôn ngữ.
-- Dọn rác, phân tích ổ đĩa, file trùng, chuyển và khôi phục file, dọn dữ liệu trình duyệt và cảnh báo ổ gần đầy.
-- Không thay đổi cơ chế bảo vệ file cá nhân, tin nhắn Zalo và xác nhận trước khi xóa.
+1. Tải `DonDepMayTinh.zip` bên dưới, giải nén.
+2. Chạy `Don Dep May Tinh.exe` trên Windows 10/11.
+3. Vào **Tự động → Tạo biểu tượng** để tạo lại shortcut trên Desktop và Start Menu bằng icon mới.
+4. Nếu vẫn thấy icon cũ do Windows lưu cache, nhấn F5 để làm mới Desktop, hoặc xóa shortcut cũ rồi tạo lại. Giữ file EXE tại vị trí cố định.
 
-## ⬇️ Cách cài / Install
+**English:** Version 1.2.2 includes an original blue-and-cyan disk-cleaner icon for the Windows executable, shortcuts, and README. All 1.2.1 features remain available. Download the ZIP under Assets, extract and launch the EXE.
 
-1. Tải **`DonDepMayTinh.zip`** trong phần **Assets** bên dưới.
-2. Giải nén file ZIP rồi chạy **`Don Dep May Tinh.exe`** (Windows 10/11).
-3. Mở tab **Tự động → Tạo biểu tượng** để tạo shortcut trên Desktop và trong Start Menu.
-
-**English:** Fixes the shortcut creation error by using Windows native Shell Link API. Supports Unicode paths and OneDrive-redirected Desktop; reports Desktop and Start Menu results separately. Download the ZIP, extract and run the EXE.
-
-**Lưu ý:** File EXE chưa có chữ ký số; Windows SmartScreen có thể cảnh báo. Hãy chỉ tải từ trang GitHub chính thức của dự án.
-
-Nguồn: https://github.com/kenhgt247/don-dep-may-tinh
+**Lưu ý:** Ứng dụng chưa được ký số; Windows SmartScreen có thể cảnh báo. Chỉ tải từ [trang GitHub chính thức](https://github.com/kenhgt247/don-dep-may-tinh).

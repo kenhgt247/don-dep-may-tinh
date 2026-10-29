@@ -59,7 +59,7 @@ Phần mềm hướng đến sự **rõ ràng và an toàn**: bạn xem danh sá
 | **🧩 File trùng** | Tìm các bản sao giống hệt nhau, giữ ít nhất một bản và đưa bản dư vào Thùng rác. |
 | **☁️ Đã chuyển đi** | Theo dõi các file đã chuyển và khôi phục về đúng vị trí cũ khi cần. |
 | **🌍 Trình duyệt** | Xem dữ liệu Chrome, Edge, Cốc Cốc, Brave, Opera, Firefox theo hồ sơ; có thể dọn cache, lịch sử, cookie theo lựa chọn. **Không đụng mật khẩu, dấu trang hay tiện ích mở rộng.** |
-| **⏱️ Tự động** | Tùy chọn chạy cùng Windows, cảnh báo ổ gần đầy, và **chỉ dọn rác hệ thống** theo lịch khi bạn bật tính năng này. |
+| **⚙️ Cài đặt (tab cuối)** | Chọn **Tiếng Việt / English**, bật chạy ngầm cùng Windows, cảnh báo ổ gần đầy, hẹn lịch dọn rác hệ thống, tạo shortcut và kiểm tra cập nhật. |
 | **📁 Smart Folder** | Sắp xếp **file cá nhân** theo loại và **tài liệu công việc** theo từ khóa tên hoặc nội dung Word/Excel/PowerPoint/TXT/CSV; xem trước đường dẫn mới, phát hiện bản trùng SHA-256, áp dụng sau xác nhận và **hoàn tác** qua nhật ký. Không dùng AI, không kết nối API. |
 
 ### 📁 Smart Folder v1.3.1 — Sắp xếp thông minh không cần AI
@@ -87,7 +87,7 @@ File được chuyển vào thư mục con `PC Cleaner - Da sap xep` trong thư 
 
 </div>
 
-Ở góc phải thanh trạng thái của phần mềm, nhấn **🇬🇧 English** để chuyển sang tiếng Anh, hoặc nhấn **🇻🇳 Tiếng Việt** để quay lại. Lựa chọn được lưu vào `Documents\DonDepMayTinh\caidat.json` (mục `Language`).
+**Từ v1.4.0:** Mở **⚙ Cài đặt** ở cuối thanh menu → chọn **🇻🇳 Tiếng Việt** hoặc **🇬🇧 English** trong khu vực **Ngôn ngữ giao diện**. Nút đang sử dụng được đánh dấu màu xanh. Lựa chọn được áp dụng ngay và tự lưu trong `Documents\DonDepMayTinh\caidat.json` (mục `Language`).
 
 Đổi ngôn ngữ sẽ **tải lại giao diện** nhưng **không xóa hay di chuyển dữ liệu**. Nếu đang có danh sách quét chưa xử lý, hãy quét lại sau khi chuyển. Nút chuyển ngôn ngữ bị khóa khi có tác vụ đang chạy.
 
@@ -141,11 +141,11 @@ Nếu phần mềm hữu ích, hãy **⭐ Star** repository để ủng hộ. Đ
 | 🧩 **Duplicates** | Find identical copies, keep at least one and send extra copies to the Recycle Bin. |
 | ☁️ **Moved files** | Track relocated files and restore them to their original location. |
 | 🌍 **Browsers** | Clean selected cache, history or cookies by browser profile. Saved passwords, bookmarks and extensions are not targeted. |
-| ⏱️ **Automation** | Optional tray monitoring, low-space warnings and scheduled **system-junk-only** cleanup. |
+| ⚙️ **Settings** | Always the last tab; language selection, optional tray monitoring, low-space warnings, scheduled **system-junk-only** cleanup, shortcuts and update checks. |
 
 **Smart Folder:** An entirely offline, rule-based organizer for personal files (by extension) and work documents (by filename and selected text content). Preview every proposed move, exclude duplicates and unknown files, confirm before moving, and undo from a persistent log. No AI, API key, remote upload or automatic deletion.
 
-**Languages:** Select **🇬🇧 English / 🇻🇳 Tiếng Việt** from the bottom-right status bar. Your choice is saved for the next launch. Switching refreshes the user interface; it does not move or delete any files.
+**Languages:** Open the **⚙ Settings** tab (always last in the navigation) and select **🇬🇧 English** or **🇻🇳 Tiếng Việt**. The active language is highlighted and saved. Switching refreshes the interface without moving or deleting files.
 
 **Download:** Go to [Latest Release](https://github.com/kenhgt247/don-dep-may-tinh/releases/latest), download **`DonDepMayTinh.zip`**, extract it and launch **`Don Dep May Tinh.exe`** on Windows 10/11. The latest published release may lag behind the current source version.
 

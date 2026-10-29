@@ -5,6 +5,10 @@ name: Đóng gói và phát hành
 on:
   push:
     tags: ['v*']
+    branches: ['main']
+    paths:
+      # Trigger once to publish v1.2.0. Remove this temporary path after release.
+      - '.github/release-v1.2.0.trigger'
   workflow_dispatch:
     inputs:
       phat_hanh:
@@ -49,16 +53,17 @@ jobs:
           if (Test-Path build\DonDepMayTinh.exe.config) { Copy-Item build\DonDepMayTinh.exe.config 'out\DonDepMayTinh\Don Dep May Tinh.exe.config' }
           Copy-Item 'dist\HUONG DAN.txt' out\DonDepMayTinh\
           Copy-Item 'dist\HUONG DAN.txt' out\DonDepMayTinh\dup_a.txt; Copy-Item 'dist\HUONG DAN.txt' out\DonDepMayTinh\dup_b.txt
-          $p = Start-Process -FilePath 'out\DonDepMayTinh\Don Dep May Tinh.exe' -ArgumentList '--selftest' -Wait -PassThru
-          $r = Get-Content out\DonDepMayTinh\selftest.txt -Raw -ErrorAction SilentlyContinue
-          Remove-Item out\DonDepMayTinh\selftest.txt, out\DonDepMayTinh\dup_a.txt, out\DonDepMayTinh\dup_b.txt -ErrorAction SilentlyContinue
-          Write-Host "exit=$($p.ExitCode) result=$r"
-          if ($p.ExitCode -ne 0 -or $r -notmatch 'UI_OK' -or $r -notmatch 'TRAY_OK' -or $r -notmatch 'dup=[1-9]') {
-            $msg = ("exit=$($p.ExitCode) | $r") -replace "`r?`n", ' / '
-            Write-Host "::error title=Selftest::$msg"
-            exit 1
+          foreach ($mode in @('--selftest', '--selftest-en')) {
+            $p = Start-Process -FilePath 'out\DonDepMayTinh\Don Dep May Tinh.exe' -ArgumentList $mode -Wait -PassThru
+            $r = Get-Content out\DonDepMayTinh\selftest.txt -Raw -ErrorAction SilentlyContinue
+            Write-Host "$mode exit=$($p.ExitCode) result=$r"
+            if ($p.ExitCode -ne 0 -or $r -notmatch 'UI_OK' -or $r -notmatch 'TRAY_OK' -or $r -notmatch 'dup=[1-9]') {
+              $msg = ("$mode exit=$($p.ExitCode) | $r") -replace "`r?`n", ' / '
+              Write-Host "::error title=Selftest::$msg"
+              exit 1
+            }
           }
-          Write-Host "::notice title=Selftest::$r"
+          Remove-Item out\DonDepMayTinh\selftest.txt, out\DonDepMayTinh\dup_a.txt, out\DonDepMayTinh\dup_b.txt -ErrorAction SilentlyContinue
 
       - name: Đóng gói .zip
         shell: powershell
@@ -73,7 +78,7 @@ jobs:
           path: out/DonDepMayTinh.zip
 
       - name: Tạo trang phát hành
-        if: github.ref_type == 'tag' || inputs.phat_hanh
+        if: github.ref_type == 'tag' || (github.event_name == 'push' && github.ref_name == 'main') || inputs.phat_hanh
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}

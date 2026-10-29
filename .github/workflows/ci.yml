@@ -1,0 +1,44 @@
+name: Build and test (VI + EN)
+
+on:
+  pull_request:
+  push:
+    branches: [feature/vi-en-language-switch]
+
+permissions:
+  contents: read
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Build .NET Framework 4.8 app
+        shell: pwsh
+        run: dotnet build src/DonDepMayTinh.csproj -c Release -o build -nologo
+      - name: Test Vietnamese and English interfaces
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path out/DonDepMayTinh | Out-Null
+          Copy-Item build/DonDepMayTinh.exe 'out/DonDepMayTinh/Don Dep May Tinh.exe'
+          if (Test-Path build/DonDepMayTinh.exe.config) { Copy-Item build/DonDepMayTinh.exe.config 'out/DonDepMayTinh/Don Dep May Tinh.exe.config' }
+          Copy-Item 'dist/HUONG DAN.txt' out/DonDepMayTinh/
+          Copy-Item 'dist/HUONG DAN.txt' out/DonDepMayTinh/dup_a.txt
+          Copy-Item 'dist/HUONG DAN.txt' out/DonDepMayTinh/dup_b.txt
+          foreach ($flag in @('--selftest', '--selftest-en')) {
+            $p = Start-Process -FilePath 'out/DonDepMayTinh/Don Dep May Tinh.exe' -ArgumentList $flag -Wait -PassThru
+            $report = Get-Content out/DonDepMayTinh/selftest.txt -Raw -ErrorAction SilentlyContinue
+            Write-Host "$flag exit=$($p.ExitCode) result=$report"
+            if ($p.ExitCode -ne 0 -or $report -notmatch 'UI_OK' -or $report -notmatch 'TRAY_OK' -or $report -notmatch 'dup=[1-9]') { throw "Selftest failed: $flag $report" }
+          }
+          Remove-Item out/DonDepMayTinh/selftest.txt, out/DonDepMayTinh/dup_a.txt, out/DonDepMayTinh/dup_b.txt -ErrorAction SilentlyContinue
+      - name: Package preview
+        shell: pwsh
+        run: Compress-Archive -Path out/DonDepMayTinh -DestinationPath out/DonDepMayTinh-bilingual-preview.zip -Force
+      - uses: actions/upload-artifact@v4
+        with:
+          name: DonDepMayTinh-bilingual-preview
+          path: out/DonDepMayTinh-bilingual-preview.zip

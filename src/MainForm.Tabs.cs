@@ -100,7 +100,7 @@ namespace DonDep
                 bool allCam = sel.All(n => n.Info.Level == Level.Cam);
                 miMapRecycle.Enabled = miMapDelete.Enabled = !allCam;
                 miMapMove.Enabled = sel.Any(n => !PathRules.IsProtected(n.Path));
-                miMapWhat.Text = "Đây là gì?  —  " + sel[0].Info.Short;
+                miMapWhat.Text = UiLanguage.T("Đây là gì?  —  " + sel[0].Info.Short);
             };
             miMapWhat.Click += (s, e) =>
             {
@@ -153,6 +153,7 @@ namespace DonDep
                 mapList.Items.Add(it);
             }
             mapList.EndUpdate();
+            UiLanguage.TranslateRows(mapList, 4);
             string note = "";
             if (dir == mapRoot && driveUsed - dir.Size > Fmt.GB)
                 note = "   •   " + Fmt.Size(driveUsed - dir.Size) + " thuộc file hệ thống không đọc được" + (App.IsAdmin ? "" : " (thử Quyền admin)");
@@ -387,6 +388,7 @@ namespace DonDep
                 }
             }
             dupList.EndUpdate();
+            UiLanguage.TranslateRows(dupList, 4);
             lblDupSum.Text = "Tìm thấy " + found.Count + " nhóm file trùng — bản thừa chiếm " + Fmt.Size(waste) + ". Mỗi nhóm đã chọn sẵn để giữ lại 1 bản.";
             App.Log("File trùng: " + found.Count + " nhóm, thừa " + Fmt.Size(waste));
             Status("Xem lại các bản được chọn rồi bấm \"Xóa bản trùng đã chọn\".");
@@ -464,6 +466,7 @@ namespace DonDep
                 movedList.Items.Add(it);
             }
             movedList.EndUpdate();
+            UiLanguage.TranslateRows(movedList, 1, 4);
             lblMovedSum.Text = "Tổng cộng " + all.Count + " file đã từng chuyển đi. Đánh dấu file muốn lấy về rồi bấm \"Lấy về chỗ cũ\".";
         }
 
@@ -615,6 +618,10 @@ namespace DonDep
             var sb = new StringBuilder();
             UpdateDrives();
             sb.Append("tabs=").Append(tabs.TabPages.Count);
+            string expectedFirstTab = UiLanguage.English ? "Cleanup" : "Dọn dẹp";
+            if (tabs.TabPages[0].Text != expectedFirstTab) throw new Exception("Language tab mismatch: " + tabs.TabPages[0].Text);
+            if (UiLanguage.English && UiLanguage.T("Xóa vĩnh viễn") != "Delete permanently") throw new Exception("Safety translation mismatch");
+            sb.Append(" language=").Append(UiLanguage.Code);
             var sources = Junk.Sources(cfg);
             sb.Append(" junk=").Append(sources.Count);
             var zr = Junk.ZaloRoots(cfg);

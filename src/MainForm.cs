@@ -9,6 +9,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using MessageBox = DonDep.LocalizedMessageBox;
 
 namespace DonDep
 {
@@ -46,16 +47,33 @@ namespace DonDep
         ToolStripStatusLabel lblStatus;
         IProgress<string> status;
 
-        public MainForm()
+        bool isBusy;
+        ToolStripButton btnLanguage;
+
+        public MainForm(string languageOverride = null)
         {
-            Text = App.Title;
+            UiLanguage.Code = languageOverride == "en" ? "en" : cfg.Language;
             Icon = App.AppIcon;
             AutoScaleMode = AutoScaleMode.None;
             Font = new Font("Segoe UI", 9.5f);
             ClientSize = new Size(1180, 780);
             MinimumSize = new Size(1100, 660);
             StartPosition = FormStartPosition.CenterScreen;
+            BuildInterface();
 
+            App.LogSink = line =>
+            {
+                if (IsDisposed || !IsHandleCreated) return;
+                try { BeginInvoke((Action)(() => txtLog.AppendText(line + Environment.NewLine))); } catch { }
+            };
+            Shown += OnShownAsync;
+            FormClosing += (s, e) => { SaveCleanSettings(); cfg.DupFolders = lstDupFolders.Items.Cast<string>().ToList(); cfg.Save(); App.LogSink = null; };
+        }
+
+        void BuildInterface()
+        {
+            Text = App.Title;
+            busyControls.Clear();
             tabs = new TabControl { Dock = DockStyle.Fill, Padding = new Point(14, 5) };
             var tabClean = NewTab("Dọn dẹp");
             var tabMap = NewTab("Bản đồ ổ đĩa");
@@ -71,20 +89,42 @@ namespace DonDep
             BuildAutoTab(tabAuto);
 
             var strip = new StatusStrip();
-            lblStatus = new ToolStripStatusLabel("Sẵn sàng.") { Spring = true, TextAlign = ContentAlignment.MiddleLeft };
+            lblStatus = new ToolStripStatusLabel(UiLanguage.T("Sẵn sàng.")) { Spring = true, TextAlign = ContentAlignment.MiddleLeft };
+            btnLanguage = new ToolStripButton
+            {
+                Text = UiLanguage.English ? "🇻🇳 Tiếng Việt" : "🇬🇧 English",
+                ToolTipText = UiLanguage.English ? "Switch to Vietnamese" : "Chuyển sang tiếng Anh",
+                Alignment = ToolStripItemAlignment.Right,
+                DisplayStyle = ToolStripItemDisplayStyle.Text
+            };
+            btnLanguage.Click += (s, e) => SwitchLanguage();
             strip.Items.Add(lblStatus);
+            strip.Items.Add(btnLanguage);
             Controls.Add(tabs);
             Controls.Add(strip);
-            status = new Progress<string>(s => { if (s.Length > 160) s = s.Substring(0, 157) + "..."; lblStatus.Text = s; });
-
-            App.LogSink = line =>
-            {
-                if (IsDisposed || !IsHandleCreated) return;
-                try { BeginInvoke((Action)(() => txtLog.AppendText(line + Environment.NewLine))); } catch { }
-            };
+            UiLanguage.Attach(tabs);
+            status = new Progress<string>(s => { if (s.Length > 160) s = s.Substring(0, 157) + "..."; lblStatus.Text = UiLanguage.T(s); });
             tabs.SelectedIndexChanged += (s, e) => { if (tabs.SelectedIndex == 3) LoadMovedList(); };
-            Shown += OnShownAsync;
-            FormClosing += (s, e) => { SaveCleanSettings(); cfg.DupFolders = lstDupFolders.Items.Cast<string>().ToList(); cfg.Save(); App.LogSink = null; };
+        }
+
+        void SwitchLanguage()
+        {
+            if (isBusy) return; // Do not rebuild UI while a delete/move/scan is in progress.
+            int tabIndex = tabs.SelectedIndex;
+            SaveCleanSettings();
+            cfg.DupFolders = lstDupFolders.Items.Cast<string>().ToList();
+            cfg.Language = UiLanguage.English ? "vi" : "en";
+            cfg.Save();
+            UiLanguage.Code = cfg.Language;
+            foreach (Control control in Controls.Cast<Control>().ToArray())
+            {
+                Controls.Remove(control);
+                control.Dispose();
+            }
+            BuildInterface();
+            tabs.SelectedIndex = Math.Max(0, Math.Min(tabs.TabPages.Count - 1, tabIndex));
+            UpdateDrives();
+            UpdateDriveLabel(false);
         }
 
         TabPage NewTab(string t)
@@ -123,6 +163,8 @@ namespace DonDep
         }
         void SetBusy(bool busy)
         {
+            isBusy = busy;
+            if (btnLanguage != null) btnLanguage.Enabled = !busy;
             foreach (var c in busyControls) c.Enabled = !busy;
             Cursor = busy ? Cursors.WaitCursor : Cursors.Default;
         }
@@ -357,12 +399,12 @@ namespace DonDep
 
         ListViewItem NewRow(CleanItem o, bool check)
         {
-            var it = new ListViewItem(CatLabel[o.Category]);
-            it.SubItems.Add(o.Name);
+            var it = new ListViewItem(UiLanguage.T(CatLabel[o.Category]));
+            it.SubItems.Add(o.Kind == "xoa" ? UiLanguage.T(o.Name) : o.Name);
             it.SubItems.Add(Fmt.Size(o.Size));
             it.SubItems.Add(o.Date.HasValue ? o.Date.Value.ToString("dd/MM/yyyy") : "");
             it.SubItems.Add(o.Folder);
-            it.SubItems.Add(ActionText(o));
+            it.SubItems.Add(UiLanguage.T(ActionText(o)));
             it.UseItemStyleForSubItems = false;
             it.SubItems[5].ForeColor = (o.Kind == "xoa" || o.Action == "xoa") ? Color.Firebrick : Color.RoyalBlue;
             it.Tag = o;
@@ -379,7 +421,7 @@ namespace DonDep
                 var o = (CleanItem)it.Tag;
                 if (o.Kind != "chuyen") continue;
                 o.Action = action;
-                it.SubItems[5].Text = ActionText(o);
+                it.SubItems[5].Text = UiLanguage.T(ActionText(o));
                 it.SubItems[5].ForeColor = action == "xoa" ? Color.Firebrick : Color.RoyalBlue;
                 n++;
             }
@@ -394,7 +436,7 @@ namespace DonDep
                 int n = 0; long sum = 0;
                 foreach (ListViewItem it in groups[c].Items) { n++; sum += ((CleanItem)it.Tag).Size; }
                 string hint = c == "lon" ? "  — chưa chọn sẵn, hãy tự đánh dấu file muốn chuyển" : c == "tu" ? "  — thêm từ tab Bản đồ ổ đĩa" : "";
-                groups[c].Header = CatLabel[c] + ": " + n + " mục, " + Fmt.Size(sum) + hint;
+                groups[c].Header = UiLanguage.T(CatLabel[c] + ": " + n + " mục, " + Fmt.Size(sum) + hint);
             }
         }
 

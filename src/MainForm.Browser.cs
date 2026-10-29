@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using MessageBox = DonDep.LocalizedMessageBox;
 
 namespace DonDep
 {
@@ -92,6 +93,7 @@ namespace DonDep
                 }
             }
             brList.EndUpdate();
+            UiLanguage.TranslateRows(brList, 0, 3);
             suspendSummary = false;
             UpdateBrowserSummary();
             if (items.Count > 0)

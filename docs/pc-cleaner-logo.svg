@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256" role="img" aria-labelledby="title desc">
+  <title id="title">PC Cleaner logo</title>
+  <desc id="desc">A blue rounded-square icon showing a white hard drive and a turquoise clean sweep</desc>
+  <defs>
+    <linearGradient id="surface" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0b9bff"/>
+      <stop offset=".52" stop-color="#236cfc"/>
+      <stop offset="1" stop-color="#1842bd"/>
+    </linearGradient>
+    <linearGradient id="glow" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#7efce2"/>
+      <stop offset="1" stop-color="#18d5b7"/>
+    </linearGradient>
+  </defs>
+  <rect x="5" y="5" width="246" height="246" rx="56" fill="url(#surface)"/>
+  <path d="M5 183c43-21 66-27 106-13 51 19 84 2 140-39v64c0 31-25 56-56 56H61C30 251 5 226 5 195z" fill="#102d8c" opacity=".18"/>
+  <rect x="49" y="65" width="160" height="116" rx="24" fill="white" opacity=".98"/>
+  <rect x="64" y="80" width="130" height="77" rx="14" fill="#1667e7"/>
+  <circle cx="105" cy="118" r="24" fill="#def7ff"/>
+  <circle cx="105" cy="118" r="13" fill="#2896fa"/>
+  <path d="M146 112l8 8 16-22" fill="none" stroke="url(#glow)" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="80" cy="170" r="6" fill="#2273f4"/>
+  <circle cx="102" cy="170" r="6" fill="#21cbbd"/>
+  <path d="M150 172h35" stroke="#2875f5" stroke-width="8" stroke-linecap="round"/>
+  <path d="M42 211c34-18 88-17 129-2 20 7 34 6 48-1" stroke="#9bffeb" stroke-width="10" stroke-linecap="round" fill="none"/>
+  <path d="M196 38v17m-8-9h17" stroke="#baffea" stroke-width="6" stroke-linecap="round"/>
+</svg>

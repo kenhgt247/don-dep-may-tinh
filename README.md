@@ -1,58 +1,162 @@
-# Dọn Dẹp Máy Tính
+<div align="center">
 
-Phần mềm **miễn phí** giúp máy tính Windows hết cảnh "ổ C đầy": dọn rác, tìm thứ đang chiếm chỗ, và chuyển bớt file lên **Google Drive** hoặc **ổ cứng ngoài** — luôn hỏi bạn trước khi làm.
+<img src="docs/pc-cleaner-logo.svg" width="152" height="152" alt="PC Cleaner — Dọn Dẹp Máy Tính" />
 
-## ⬇️ Tải về
+# PC CLEANER
+### DỌN DẸP MÁY TÍNH
 
-👉 **[Tải bản mới nhất tại đây](https://github.com/kenhgt247/don-dep-may-tinh/releases/latest)** → bấm vào file `DonDepMayTinh.zip`.
+**Bộ công cụ dọn dẹp, phân tích ổ cứng & quản lý dữ liệu dành cho Windows**
 
-1. Giải nén ra (ví dụ ra Desktop).
-2. Bấm đúp **Don Dep May Tinh.exe**.
-3. Nếu Windows hiện cảnh báo màu xanh *"Windows protected your PC"*: bấm **More info → Run anyway**.
+*Free, open-source disk cleanup and storage management for Windows.*
 
-Chạy trên Windows 10 / 11. Chỉ một file `.exe`, không cần cài đặt thêm gì.
+<p>
+  <a href="https://github.com/kenhgt247/don-dep-may-tinh/releases"><img alt="Total downloads" src="https://img.shields.io/github/downloads/kenhgt247/don-dep-may-tinh/total?style=for-the-badge&logo=github&label=DOWNLOADS&color=475569"></a>
+  <a href="https://github.com/kenhgt247/don-dep-may-tinh/releases/latest"><img alt="Latest released version" src="https://img.shields.io/github/v/release/kenhgt247/don-dep-may-tinh?style=for-the-badge&label=RELEASE&color=10b981"></a>
+</p>
+<p>
+  <img alt="Supported platforms: Windows 10 and 11" src="https://img.shields.io/badge/PLATFORM-WINDOWS%2010%20%7C%2011-1674d1?style=for-the-badge&logo=windows">
+  <img alt="Languages: Vietnamese and English" src="https://img.shields.io/badge/LANGUAGE-TI%E1%BA%BENG%20VI%E1%BB%86T%20%7C%20ENGLISH-f59e0b?style=for-the-badge">
+</p>
+<p>
+  <a href="https://github.com/kenhgt247/don-dep-may-tinh/releases/latest"><img alt="Download the latest release" src="https://img.shields.io/badge/%E2%AC%87%20T%E1%BA%A2I%20B%E1%BA%A2N%20M%E1%BB%9AI%20NH%E1%BA%A4T%20%2F%20DOWNLOAD-LATEST%20RELEASE-2563eb?style=for-the-badge"></a>
+</p>
 
-Phần mềm hoàn toàn miễn phí, mã nguồn mở. File `.exe` hiện **chưa có chữ ký số** (dự án mới, sẽ đăng ký lại khi có nhiều người dùng) nên Windows có thể hiện cảnh báo lần đầu mở — xem [Chính sách ký số](CODE_SIGNING_POLICY.md). [Chính sách quyền riêng tư](PRIVACY.md).
+[🇻🇳 Giới thiệu](#-giới-thiệu-tổng-quan) ·
+[✨ Tính năng](#-các-tính-năng) ·
+[⬇️ Cài đặt](#%EF%B8%8F-tải-về--cài-đặt) ·
+[🛡️ An toàn](#%EF%B8%8F-an-toàn-dữ-liệu) ·
+[🇬🇧 English](#-english-overview)
 
-⭐ Thấy hữu ích? Bấm **Star** ở góc trên bên phải trang này để ủng hộ dự án.
-
-## Tính năng
-
-| Tab | Làm gì |
-|---|---|
-| **Dọn dẹp** | Quét rác hệ thống (file tạm, bộ nhớ đệm trình duyệt/Zalo/Teams, thùng rác, gói cập nhật cũ), ảnh/video Zalo cũ, file cũ trong Downloads, file lớn. Rác thì xóa; với file cá nhân, **bạn chọn từng file: chuyển lên Drive / ổ ngoài hay xóa vĩnh viễn** (app gợi ý sẵn: file cài đặt → xóa, ảnh/video → chuyển). |
-| **Bản đồ ổ đĩa** | Xem thư mục nào chiếm nhiều chỗ nhất, đi sâu từng cấp. Bấm vào một mục để biết **đó là gì và có xóa được không** (rác / dữ liệu cá nhân / cẩn thận / không được xóa). Chuột phải để xóa (vào Thùng rác hoặc vĩnh viễn) hoặc chuyển lên Drive. Thư mục hệ thống bị chặn, không xóa nhầm được. |
-| **File trùng** | Tìm các file giống hệt nhau, giữ lại 1 bản, bản thừa vào Thùng rác. |
-| **Đã chuyển đi** | Danh sách file đã chuyển; lấy về đúng chỗ cũ bất cứ lúc nào. |
-| **Trình duyệt** | Xem Chrome, Edge, Cốc Cốc, Brave, Opera, Firefox chiếm bao nhiêu chỗ theo từng tài khoản. Dọn **bộ nhớ đệm** (an toàn, chọn sẵn), **lịch sử** và **cookie** (tự chọn; xóa cookie sẽ bị đăng xuất — app cảnh báo 2 lần). Không bao giờ đụng mật khẩu đã lưu, dấu trang, tiện ích. |
-| **Tự động** | Chạy ngầm cùng Windows, báo khi ổ sắp đầy, tự dọn rác hệ thống theo lịch. |
-
-## An toàn
-
-- Không làm gì khi bạn chưa bấm **Yes** ở bảng xác nhận (bảng này cho biết sẽ xóa gì, chuyển gì, ổ còn trống bao nhiêu sau khi dọn).
-- Không cho chuyển nếu nơi nhận không đủ chỗ.
-- File chỉ bị xóa khỏi máy **sau khi** đã chép xong và kiểm tra đúng.
-- Không bao giờ đụng tới dữ liệu tin nhắn Zalo, thư mục Windows và chương trình.
-- Với Google Drive, app chỉ thấy được những file do chính nó tải lên (dùng công cụ mã nguồn mở [rclone](https://rclone.org)).
-- Toàn bộ mã nguồn công khai trong thư mục [`src/`](src/) — ai cũng kiểm tra được.
-
-## Câu chuyện
-
-Tôi quá khó chịu vì ổ cứng lúc nào cũng đầy — máy chậm, Zalo không mở được, lưu file thì báo hết chỗ. Mấy phần mềm dọn rác ngoài kia thì xóa lung tung hoặc bắt trả tiền. Nên tôi tự làm công cụ này, và chia sẻ miễn phí cho ai cũng gặp chuyện giống mình.
-
-## Góp ý
-
-Gặp lỗi hoặc muốn thêm tính năng? Vào mục **[Issues](https://github.com/kenhgt247/don-dep-may-tinh/issues)** → **New issue**, kèm ảnh chụp màn hình nếu được.
-
-## Dành cho người phát triển
-
-- Viết bằng C# (Windows Forms, .NET Framework 4.8 — có sẵn trên Windows 10/11). Mã nguồn trong [`src/`](src/).
-- Biên dịch: `dotnet build src/DonDepMayTinh.csproj -c Release`.
-- Phát hành bản mới: sửa `Version` trong `src/Core.cs` và `src/DonDepMayTinh.csproj`, rồi vào tab **Actions** → **Đóng gói và phát hành** → **Run workflow**. GitHub tự biên dịch, chạy thử (`--selftest`), đóng gói `.zip` và đăng lên trang Releases.
-- Bản 0.x cũ viết bằng PowerShell vẫn còn trong lịch sử Git.
-
-Giấy phép: [MIT](LICENSE) · [Code signing policy](CODE_SIGNING_POLICY.md) · [Privacy policy](PRIVACY.md)
+</div>
 
 ---
 
-**English:** Free, open-source Windows tool that frees disk space: cleans junk files, shows what is using the disk, finds duplicate files, and moves files to the user's own Google Drive or an external drive — always asking for confirmation first. Releases are currently unsigned; the project plans to re-apply to the SignPath Foundation program once it has a wider user base.
+## 🇻🇳 Giới thiệu tổng quan
+
+**PC Cleaner (Dọn Dẹp Máy Tính)** là phần mềm **miễn phí và mã nguồn mở**, giúp máy tính Windows bớt đầy ổ C: quét rác hệ thống, tìm thư mục chiếm dung lượng, phát hiện file trùng và chuyển những file cần giữ lên **Google Drive** hoặc **ổ cứng ngoài/USB**.
+
+Phần mềm hướng đến sự **rõ ràng và an toàn**: bạn xem danh sách trước, chọn việc cần làm và được cảnh báo khi có nguy cơ mất dữ liệu. Không bán gói VIP, không yêu cầu tài khoản riêng để dọn rác trên máy.
+
+> **Phiên bản mã nguồn 1.2.0:** bổ sung **Tiếng Việt / English** và nút đổi ngôn ngữ ngay trong ứng dụng. Huy hiệu **RELEASE** và nút tải ở trên luôn dẫn tới **bản phát hành chính thức mới nhất**, có thể chưa phải 1.2.0 cho đến khi bản này được phát hành.
+
+### 🌟 Vì sao nên dùng?
+
+| | Lợi ích |
+|:--:|---|
+| 🧹 | **Dọn đúng thứ cần dọn** — xem trước rác và dữ liệu trước khi thực hiện |
+| 🗺️ | **Biết ổ cứng đầy vì đâu** — phân tích và đi sâu từng thư mục |
+| ☁️ | **Giữ file quan trọng** — chuyển lên Drive/USB thay vì xóa vĩnh viễn |
+| 🛡️ | **Bảo vệ dữ liệu hệ thống và Zalo** — chặn thao tác nguy hiểm, cảnh báo mất dữ liệu |
+| 🌐 | **Hai ngôn ngữ** — Việt/Anh, ghi nhớ lựa chọn |
+| 💚 | **Miễn phí, nguồn mở** — mã nguồn C# công khai tại [`src/`](src/) |
+
+## ✨ Các tính năng
+
+| Chức năng | Mô tả |
+|---|---|
+| **🧹 Dọn dẹp** | Quét file tạm, cache, gói cập nhật cũ, thùng rác; kiểm tra ảnh/video Zalo cũ, Downloads và file lớn. File cá nhân được chọn **chuyển đi hoặc xóa** theo từng mục. |
+| **🗺️ Bản đồ ổ đĩa** | Xác định thư mục/file nào đang chiếm nhiều dung lượng; xem nhận diện mức độ an toàn, mở thư mục, hoặc đưa mục được phép vào danh sách xử lý. |
+| **🧩 File trùng** | Tìm các bản sao giống hệt nhau, giữ ít nhất một bản và đưa bản dư vào Thùng rác. |
+| **☁️ Đã chuyển đi** | Theo dõi các file đã chuyển và khôi phục về đúng vị trí cũ khi cần. |
+| **🌍 Trình duyệt** | Xem dữ liệu Chrome, Edge, Cốc Cốc, Brave, Opera, Firefox theo hồ sơ; có thể dọn cache, lịch sử, cookie theo lựa chọn. **Không đụng mật khẩu, dấu trang hay tiện ích mở rộng.** |
+| **⏱️ Tự động** | Tùy chọn chạy cùng Windows, cảnh báo ổ gần đầy, và **chỉ dọn rác hệ thống** theo lịch khi bạn bật tính năng này. |
+
+### 🌐 Chuyển đổi Tiếng Việt / English
+
+<div align="center">
+
+**🇻🇳 Tiếng Việt** ⇄ **🇬🇧 English**
+
+</div>
+
+Ở góc phải thanh trạng thái của phần mềm, nhấn **🇬🇧 English** để chuyển sang tiếng Anh, hoặc nhấn **🇻🇳 Tiếng Việt** để quay lại. Lựa chọn được lưu vào `Documents\DonDepMayTinh\caidat.json` (mục `Language`).
+
+Đổi ngôn ngữ sẽ **tải lại giao diện** nhưng **không xóa hay di chuyển dữ liệu**. Nếu đang có danh sách quét chưa xử lý, hãy quét lại sau khi chuyển. Nút chuyển ngôn ngữ bị khóa khi có tác vụ đang chạy.
+
+## ⬇️ Tải về & cài đặt
+
+<div align="center">
+
+### [⬇️ TẢI BẢN PHÁT HÀNH MỚI NHẤT · DOWNLOAD LATEST RELEASE](https://github.com/kenhgt247/don-dep-may-tinh/releases/latest)
+
+</div>
+
+1. Mở trang **[Releases](https://github.com/kenhgt247/don-dep-may-tinh/releases/latest)** và tải file **`DonDepMayTinh.zip`** trong **Assets**.
+2. **Giải nén** vào một thư mục, chẳng hạn Desktop.
+3. Mở **`Don Dep May Tinh.exe`**. Phần mềm dành cho **Windows 10/11**, dùng **.NET Framework 4.8**.
+4. Chọn các mục muốn quét, xem lại kết quả, chọn nơi chuyển file nếu cần, rồi xác nhận trước khi xóa/chuyển.
+
+**Lưu ý về Windows SmartScreen:** Tệp thực thi hiện **chưa được ký số** nên Windows có thể hiển thị cảnh báo về nhà phát hành không xác định. Chỉ tải từ trang Releases chính thức và kiểm tra nguồn trước khi chạy. Xem thêm [chính sách ký số](CODE_SIGNING_POLICY.md).
+
+**Google Drive:** Khi dùng lần đầu, ứng dụng có thể đề nghị tải công cụ mã nguồn mở [rclone](https://rclone.org/) rồi yêu cầu bạn đăng nhập Google trong trình duyệt. Dữ liệu được tải lên **tài khoản Drive do bạn chọn**, không phải máy chủ của dự án.
+
+## 🛡️ An toàn dữ liệu
+
+- **Thao tác thủ công** cho phép xem trước và yêu cầu xác nhận. Không coi tất cả file lớn hoặc file cũ là rác.
+- Thư mục **Windows, dữ liệu ứng dụng và cơ sở dữ liệu tin nhắn Zalo** thuộc nhóm bảo vệ: không được coi là file rác có thể tùy tiện di chuyển/xóa.
+- Với ảnh/video/file đã chuyển ra khỏi máy, **Zalo có thể không mở lại được tệp đó từ hội thoại** cho đến khi bạn khôi phục tệp. Hãy kiểm tra kỹ trước khi quyết định.
+- Nếu chọn **xóa vĩnh viễn**, việc khôi phục có thể không thực hiện được. Nếu còn phân vân, hãy giữ lại hoặc chuyển sang nơi lưu an toàn.
+- **Cookie** có thể khiến bạn đăng xuất khỏi website; phần mềm có cảnh báo bổ sung trước khi dọn.
+- **Tự dọn theo lịch** chỉ hoạt động khi bạn chủ động bật chế độ này và chỉ áp dụng với rác hệ thống; không tự ý chuyển/xóa file cá nhân.
+- File được chuyển khỏi máy **sau khi bản sao đã được chép và kiểm tra**. Không xóa dữ liệu nguồn khi quá trình chuyển thất bại.
+
+Đọc thêm: [🔒 Chính sách quyền riêng tư](PRIVACY.md) · [📜 Giấy phép MIT](LICENSE) · [🔏 Chính sách ký số](CODE_SIGNING_POLICY.md).
+
+## 💬 Câu chuyện dự án
+
+> Tôi quá khó chịu vì ổ cứng lúc nào cũng đầy — máy chậm, Zalo không mở được, lưu file lại báo hết chỗ. Nhiều công cụ dọn rác xóa quá khó kiểm soát hoặc phải trả phí. Vì vậy, tôi tự xây dựng một công cụ dễ hiểu, cho phép **xem trước và tự quyết định** rồi chia sẻ miễn phí với mọi người.
+
+Nếu phần mềm hữu ích, hãy **⭐ Star** repository để ủng hộ. Để báo lỗi hoặc đề xuất tính năng, mở [Issues](https://github.com/kenhgt247/don-dep-may-tinh/issues) và mô tả hệ điều hành, phiên bản, các bước tái hiện lỗi (không đăng tải dữ liệu cá nhân nhạy cảm).
+
+---
+
+## 🇬🇧 English overview
+
+**PC Cleaner** is a **free, open-source Windows disk cleanup and storage management utility** built with **C# / Windows Forms (.NET Framework 4.8)**. It helps you identify disk usage, remove system junk, find duplicate files and move important files to your own **Google Drive** or external storage.
+
+### Features
+
+| Tool | What it does |
+|---|---|
+| 🧹 **Cleanup** | Review temporary files, caches, old update files, Zalo media, Downloads and large files before taking action. |
+| 🗺️ **Disk map** | Explore large folders and files with safety labels and available actions. |
+| 🧩 **Duplicates** | Find identical copies, keep at least one and send extra copies to the Recycle Bin. |
+| ☁️ **Moved files** | Track relocated files and restore them to their original location. |
+| 🌍 **Browsers** | Clean selected cache, history or cookies by browser profile. Saved passwords, bookmarks and extensions are not targeted. |
+| ⏱️ **Automation** | Optional tray monitoring, low-space warnings and scheduled **system-junk-only** cleanup. |
+
+**Languages:** Select **🇬🇧 English / 🇻🇳 Tiếng Việt** from the bottom-right status bar. Your choice is saved for the next launch. Switching refreshes the user interface; it does not move or delete any files.
+
+**Download:** Go to [Latest Release](https://github.com/kenhgt247/don-dep-may-tinh/releases/latest), download **`DonDepMayTinh.zip`**, extract it and launch **`Don Dep May Tinh.exe`** on Windows 10/11. The latest published release may lag behind the current source version.
+
+**Safety:** Manual operations ask for confirmation; protected system/Zalo message data is not treated as ordinary junk. Moving Zalo media may cause attachments to stop opening inside their original conversations until restored. Clearing cookies signs you out of websites. Automatic cleaning is opt-in and limited to system junk. See the [Privacy Policy](PRIVACY.md) and [Code Signing Policy](CODE_SIGNING_POLICY.md). Releases are currently unsigned.
+
+## 🧑‍💻 Dành cho nhà phát triển / For developers
+
+| | |
+|---|---|
+| **Source** | [`src/`](src/) |
+| **Language / UI** | C# · Windows Forms · .NET Framework 4.8 |
+| **Build** | `dotnet build src/DonDepMayTinh.csproj -c Release` |
+| **Tests** | `--selftest` (VI) · `--selftest-en` (EN) |
+| **CI** | [GitHub Actions](https://github.com/kenhgt247/don-dep-may-tinh/actions) — Windows build and bilingual smoke tests |
+| **Release workflow** | [Đóng gói và phát hành](.github/workflows/release.yml) — build, self-test, ZIP, GitHub Release |
+| **License** | [MIT](LICENSE) |
+
+Để phát hành phiên bản mới: cập nhật số `Version` trong `src/Core.cs` và `src/DonDepMayTinh.csproj`, sau đó chạy workflow phát hành trong **Actions** (hoặc tạo tag phù hợp). Kiểm tra kết quả trước khi giới thiệu bản mới cho người dùng.
+
+---
+
+<div align="center">
+
+**PC CLEANER — Dọn máy gọn gàng, dữ liệu trong tầm kiểm soát.**
+
+*Clean smarter. Keep what matters.*
+
+[⬇️ Download](https://github.com/kenhgt247/don-dep-may-tinh/releases/latest) ·
+[🐛 Report an issue](https://github.com/kenhgt247/don-dep-may-tinh/issues) ·
+[⭐ Star this project](https://github.com/kenhgt247/don-dep-may-tinh)
+
+**© kenhgt247 · [MIT License](LICENSE)**
+
+</div>

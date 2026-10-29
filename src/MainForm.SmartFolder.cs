@@ -18,7 +18,8 @@ namespace DonDep
         Label lblSmartCount, lblSmartHelp;
         RadioButton radioSmartPersonal, radioSmartWork;
         CheckBox chkSmartContent, chkSmartDate, chkSmartDup;
-        Button btnSmartScan, btnSmartApply, btnSmartUndo;
+        Button btnSmartScan, btnSmartApply, btnSmartUndo, btnSmartSelect;
+        bool smartLoading;
 
         void BuildSmartFolderTab(TabPage tab)
         {
@@ -42,8 +43,9 @@ namespace DonDep
             btnSmartApply = Btn("Áp dụng file đã chọn", 222, 145, 240, 36);
             btnSmartApply.BackColor = Yellow;
             btnSmartUndo = Btn("Hoàn tác lần gần nhất", 476, 145, 235, 36);
-            var btnOpen = Btn("Mở thư mục", 725, 145, 170, 36);
-            top.Controls.AddRange(new Control[]{btnSmartScan,btnSmartApply,btnSmartUndo,btnOpen});
+            var btnOpen = Btn("Mở thư mục", 725, 145, 165, 36);
+            btnSmartSelect = Btn("Chọn đề xuất", 902, 145, 170, 36);
+            top.Controls.AddRange(new Control[]{btnSmartScan,btnSmartApply,btnSmartUndo,btnOpen,btnSmartSelect});
             tab.Controls.Add(top);
 
             var bottom = new Panel { Dock = DockStyle.Bottom, Height = 84 };
@@ -83,10 +85,27 @@ namespace DonDep
                 if(smartList.Items[e.Index].Tag is SmartPlan p && !p.Suggested)
                     e.NewValue = CheckState.Unchecked;
             };
-            smartList.ItemChecked += (s,e) => UpdateSmartSummary();
+            smartList.ItemChecked += (s,e) => { if (!smartLoading) UpdateSmartSummary(); };
             smartList.DoubleClick += (s,e) => {
                 if(smartList.SelectedItems.Count > 0)
                     Fs.OpenInExplorer(((SmartPlan)smartList.SelectedItems[0].Tag).Source);
+            };
+            btnSmartSelect.Click += (s,e) => {
+                if(smartResult == null) return;
+                bool select = smartList.Items.Cast<ListViewItem>()
+                    .Any(i => ((SmartPlan)i.Tag).Suggested && !i.Checked);
+                if(select && SmartFolders.IsDriveRoot(txtSmartFolder.Text) &&
+                    !Confirm(UiLanguage.English ?
+                        "Select all suggested files on the entire data drive? Review the destinations before moving." :
+                        "Chọn tất cả file được đề xuất trên toàn bộ ổ dữ liệu? Hãy xem kỹ đường dẫn đích trước khi chuyển."))
+                    return;
+                smartLoading = true;
+                smartList.BeginUpdate();
+                try {
+                    foreach(ListViewItem i in smartList.Items)
+                        i.Checked = select && ((SmartPlan)i.Tag).Suggested;
+                } finally { smartList.EndUpdate(); smartLoading = false; }
+                UpdateSmartSummary();
             };
             btnSmartScan.Click += async (s,e) => await Guard(ScanSmartAsync);
             btnSmartApply.Click += async (s,e) => await Guard(ApplySmartAsync);
@@ -118,6 +137,7 @@ namespace DonDep
             smartResult = null;
             smartList.Items.Clear();
             btnSmartApply.Enabled = false;
+            if(btnSmartSelect != null) btnSmartSelect.Enabled = false;
             UpdateSmartUndoCount();
             UpdateSmartSummary();
         }
@@ -135,6 +155,13 @@ namespace DonDep
             int checkedCount = smartList.CheckedItems.Count;
             long bytes = smartList.CheckedItems.Cast<ListViewItem>().Sum(x => ((SmartPlan)x.Tag).Size);
             btnSmartApply.Enabled = checkedCount > 0 && !isBusy;
+            if(btnSmartSelect != null) {
+                btnSmartSelect.Enabled = smartResult != null && !isBusy;
+                btnSmartSelect.Text = smartList.Items.Cast<ListViewItem>()
+                    .Any(i => ((SmartPlan)i.Tag).Suggested && !i.Checked) ?
+                    (UiLanguage.English ? "Select suggested" : "Chọn đề xuất") :
+                    (UiLanguage.English ? "Clear selection" : "Bỏ chọn hết");
+            }
             if(smartResult == null) {
                 lblSmartCount.Text = UiLanguage.English ?
                     "Select a folder and click Scan & preview." : "Chọn thư mục rồi nhấn Quét & đề xuất.";
@@ -152,11 +179,19 @@ namespace DonDep
             bool work = radioSmartWork.Checked, content = chkSmartContent.Checked,
                 date = chkSmartDate.Checked, dup = chkSmartDup.Checked;
             SmartFolders.ValidateRoot(folder);
+            bool wholeDrive = SmartFolders.IsDriveRoot(folder);
+            if(wholeDrive && !Confirm(UiLanguage.English ?
+                "You selected an ENTIRE DATA DRIVE (" + folder +
+                "). The app will only scan and preview; it will NOT move files until you manually select and confirm them. System, Zalo and application folders are excluded. Continue scanning?" :
+                "Bạn đang chọn TOÀN BỘ Ổ DỮ LIỆU (" + folder +
+                "). Phần mềm chỉ quét và xem trước; KHÔNG chuyển file cho đến khi bạn tự chọn và xác nhận. Thư mục hệ thống, Zalo và ứng dụng được loại trừ. Tiếp tục quét?"))
+                return;
             smartLastFolder = folder;
             ResetSmartResults();
             SetBusy(true);
             var result = await Task.Run(() => SmartFolders.Scan(folder,work,content,date,dup,status.Report));
             smartResult = result;
+            smartLoading = true;
             smartList.BeginUpdate();
             try {
                 foreach(var p in result.Items) {
@@ -166,11 +201,11 @@ namespace DonDep
                     item.SubItems.Add(p.Reason);
                     item.SubItems.Add(p.Suggested ? p.Target : (UiLanguage.English ? "Keep original" : "Giữ nguyên"));
                     item.Tag=p;
-                    item.Checked=p.Suggested;
+                    item.Checked=p.Suggested && !wholeDrive;
                     if(!p.Suggested) item.ForeColor=Color.DimGray;
                     smartList.Items.Add(item);
                 }
-            } finally { smartList.EndUpdate(); }
+            } finally { smartList.EndUpdate(); smartLoading = false; }
             SetBusy(false);
             UpdateSmartSummary();
             UpdateSmartUndoCount();

@@ -5,6 +5,9 @@ name: Đóng gói và phát hành
 on:
   push:
     tags: ['v*']
+    branches: ['main']
+    paths:
+      - '.github/release-v1.2.1.trigger'
   workflow_dispatch:
     inputs:
       phat_hanh:
@@ -74,7 +77,7 @@ jobs:
           path: out/DonDepMayTinh.zip
 
       - name: Tạo trang phát hành
-        if: github.ref_type == 'tag' || inputs.phat_hanh
+        if: github.ref_type == 'tag' || (github.event_name == 'push' && github.ref_name == 'main') || inputs.phat_hanh
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}

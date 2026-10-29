@@ -648,11 +648,14 @@ namespace DonDep
         {
             var sb = new StringBuilder();
             UpdateDrives();
+            if (tabs.TabPages.Count != 7) throw new Exception("Smart Folder tab missing");
             sb.Append("tabs=").Append(tabs.TabPages.Count);
             string expectedFirstTab = UiLanguage.English ? "Cleanup" : "Dọn dẹp";
             if (tabs.TabPages[0].Text != expectedFirstTab) throw new Exception("Language tab mismatch: " + tabs.TabPages[0].Text);
             if (UiLanguage.English && UiLanguage.T("Xóa vĩnh viễn") != "Delete permanently") throw new Exception("Safety translation mismatch");
             sb.Append(" language=").Append(UiLanguage.Code);
+            SmartFolders.SelfTest();
+            sb.Append(" smart=OK");
             NativeShortcut.SelfTest();
             sb.Append(" shortcut=OK");
             var sources = Junk.Sources(cfg);

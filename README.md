@@ -60,6 +60,22 @@ Phần mềm hướng đến sự **rõ ràng và an toàn**: bạn xem danh sá
 | **☁️ Đã chuyển đi** | Theo dõi các file đã chuyển và khôi phục về đúng vị trí cũ khi cần. |
 | **🌍 Trình duyệt** | Xem dữ liệu Chrome, Edge, Cốc Cốc, Brave, Opera, Firefox theo hồ sơ; có thể dọn cache, lịch sử, cookie theo lựa chọn. **Không đụng mật khẩu, dấu trang hay tiện ích mở rộng.** |
 | **⏱️ Tự động** | Tùy chọn chạy cùng Windows, cảnh báo ổ gần đầy, và **chỉ dọn rác hệ thống** theo lịch khi bạn bật tính năng này. |
+| **📁 Smart Folder** | Sắp xếp **file cá nhân** theo loại và **tài liệu công việc** theo từ khóa tên hoặc nội dung Word/Excel/PowerPoint/TXT/CSV; xem trước đường dẫn mới, phát hiện bản trùng SHA-256, áp dụng sau xác nhận và **hoàn tác** qua nhật ký. Không dùng AI, không kết nối API. |
+
+### 📁 Smart Folder v1.3.0 — Sắp xếp thông minh không cần AI
+
+**Hoạt động 100% trên máy Windows, không gửi tài liệu lên máy chủ nào.**
+
+1. Vào tab **Smart Folder**, chọn thư mục cá nhân hoặc công việc.
+2. Chọn **Cá nhân** để phân loại theo ảnh, video, âm thanh, tài liệu, bảng tính, trình chiếu, file nén và bộ cài.
+3. Hoặc chọn **Công việc** để nhận diện công văn, quyết định, kế hoạch, báo cáo, hợp đồng, chứng từ, hồ sơ qua tên file và, nếu bật, nội dung TXT/CSV/RTF/DOCX/XLSX/PPTX.
+4. Tùy chọn chia theo năm/tháng và tìm file trùng bằng SHA-256. File trùng hoặc **chưa đủ căn cứ phân loại được giữ nguyên**.
+5. Bấm **Quét & đề xuất**, xem cột **File nguồn → Đường dẫn mới**, bỏ dấu chọn mục không muốn chuyển, sau đó bấm **Áp dụng file đã chọn** để xác nhận.
+6. Bấm **Hoàn tác lần gần nhất** để phục hồi file còn nguyên vẹn về vị trí cũ. Nhật ký được giữ khi mở lại ứng dụng.
+
+File được chuyển vào thư mục con `PC Cleaner - Da sap xep` trong thư mục nguồn bạn chọn. **Không xóa file, không ghi đè tên trùng**, bỏ qua liên kết symbolic/junction, thư mục hệ thống, dữ liệu Zalo và đường dẫn đồng bộ OneDrive/Google Drive. Nếu file bị chỉnh sửa/đổi tên sau khi chuyển, phần mềm sẽ không tự ghi đè khi hoàn tác.
+
+**Giới hạn phiên bản này:** PDF, DOC, XLS dạng cũ hoặc file ảnh quét chỉ được nhận diện qua **tên file**, chưa có OCR. File chưa rõ được để lại tại chỗ. Quy tắc phân loại có thể bổ sung ở các phiên bản sau.
 
 ### 🌐 Chuyển đổi Tiếng Việt / English
 
@@ -124,6 +140,8 @@ Nếu phần mềm hữu ích, hãy **⭐ Star** repository để ủng hộ. Đ
 | ☁️ **Moved files** | Track relocated files and restore them to their original location. |
 | 🌍 **Browsers** | Clean selected cache, history or cookies by browser profile. Saved passwords, bookmarks and extensions are not targeted. |
 | ⏱️ **Automation** | Optional tray monitoring, low-space warnings and scheduled **system-junk-only** cleanup. |
+
+**Smart Folder:** An entirely offline, rule-based organizer for personal files (by extension) and work documents (by filename and selected text content). Preview every proposed move, exclude duplicates and unknown files, confirm before moving, and undo from a persistent log. No AI, API key, remote upload or automatic deletion.
 
 **Languages:** Select **🇬🇧 English / 🇻🇳 Tiếng Việt** from the bottom-right status bar. Your choice is saved for the next launch. Switching refreshes the user interface; it does not move or delete any files.
 

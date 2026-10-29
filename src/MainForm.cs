@@ -81,12 +81,14 @@ namespace DonDep
             var tabMoved = NewTab("Đã chuyển đi");
             var tabBrowser = NewTab("Trình duyệt");
             var tabAuto = NewTab("Tự động");
+            var tabSmart = NewTab("Smart Folder");
             BuildCleanTab(tabClean);
             BuildMapTab(tabMap);
             BuildDupTab(tabDup);
             BuildMovedTab(tabMoved);
             BuildBrowserTab(tabBrowser);
             BuildAutoTab(tabAuto);
+            BuildSmartFolderTab(tabSmart);
 
             var strip = new StatusStrip();
             lblStatus = new ToolStripStatusLabel(UiLanguage.T("Sẵn sàng.")) { Spring = true, TextAlign = ContentAlignment.MiddleLeft };
@@ -167,6 +169,7 @@ namespace DonDep
             if (btnLanguage != null) btnLanguage.Enabled = !busy;
             foreach (var c in busyControls) c.Enabled = !busy;
             Cursor = busy ? Cursors.WaitCursor : Cursors.Default;
+            if (!busy && smartList != null && !smartList.IsDisposed) { UpdateSmartSummary(); UpdateSmartUndoCount(); }
         }
         void Status(string s) { status.Report(s); }
 

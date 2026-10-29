@@ -23,6 +23,7 @@ namespace DonDep
     {
         public List<SmartPlan> Items = new List<SmartPlan>();
         public int Skipped, Protected, Duplicates;
+        public bool Limited;
     }
     internal sealed class SmartMove
     {
@@ -232,13 +233,19 @@ namespace DonDep
                 }
                 catch { result.Skipped++; }
             }
+            result.Limited = files.Count >= 20000;
             progress?.Invoke("Đang phân loại " + files.Count + " file...");
             var duplicatePaths = new HashSet<string>(Cmp);
             if (checkDuplicates)
             {
                 var signatures = new HashSet<string>(Cmp);
+                // Protect responsiveness when scanning an entire disk: do not hash
+                // unlimited large videos, archives or backup images.
+                long hashBudget = 512L * 1024 * 1024;
                 foreach (var f in files.GroupBy(x => x.Length).Where(g => g.Count() > 1).SelectMany(g => g))
                     try {
+                        if (f.Length > 64L * 1024 * 1024 || f.Length > hashBudget) continue;
+                        hashBudget -= f.Length;
                         string digest;
                         using (var sha = SHA256.Create())
                         using (var stream = new FileStream(f.FullName, FileMode.Open, FileAccess.Read, FileShare.Read))

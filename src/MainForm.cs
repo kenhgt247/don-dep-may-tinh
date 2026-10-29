@@ -48,7 +48,6 @@ namespace DonDep
         IProgress<string> status;
 
         bool isBusy;
-        ToolStripButton btnLanguage;
 
         public MainForm(string languageOverride = null)
         {
@@ -75,49 +74,47 @@ namespace DonDep
             Text = App.Title;
             busyControls.Clear();
             tabs = new TabControl { Dock = DockStyle.Fill, Padding = new Point(14, 5) };
+            // Workflow first, settings always last. Keep this order in both languages.
             var tabClean = NewTab("Dọn dẹp");
             var tabMap = NewTab("Bản đồ ổ đĩa");
             var tabDup = NewTab("File trùng");
+            var tabSmart = NewTab("Smart Folder");
             var tabMoved = NewTab("Đã chuyển đi");
             var tabBrowser = NewTab("Trình duyệt");
-            var tabAuto = NewTab("Tự động");
-            var tabSmart = NewTab("Smart Folder");
+            var tabSettings = NewTab("⚙ Cài đặt");
             BuildCleanTab(tabClean);
             BuildMapTab(tabMap);
             BuildDupTab(tabDup);
+            BuildSmartFolderTab(tabSmart);
             BuildMovedTab(tabMoved);
             BuildBrowserTab(tabBrowser);
-            BuildAutoTab(tabAuto);
-            BuildSmartFolderTab(tabSmart);
+            BuildAutoTab(tabSettings);
 
             var strip = new StatusStrip();
             lblStatus = new ToolStripStatusLabel(UiLanguage.T("Sẵn sàng.")) { Spring = true, TextAlign = ContentAlignment.MiddleLeft };
-            btnLanguage = new ToolStripButton
-            {
-                Text = UiLanguage.English ? "🇻🇳 Tiếng Việt" : "🇬🇧 English",
-                ToolTipText = UiLanguage.English ? "Switch to Vietnamese" : "Chuyển sang tiếng Anh",
-                Alignment = ToolStripItemAlignment.Right,
-                DisplayStyle = ToolStripItemDisplayStyle.Text
-            };
-            btnLanguage.Click += (s, e) => SwitchLanguage();
+            // Language is configured in Settings rather than taking space in the status bar.
             strip.Items.Add(lblStatus);
-            strip.Items.Add(btnLanguage);
             Controls.Add(tabs);
             Controls.Add(strip);
             UiLanguage.Attach(tabs);
             status = new Progress<string>(s => { if (s.Length > 160) s = s.Substring(0, 157) + "..."; lblStatus.Text = UiLanguage.T(s); });
-            tabs.SelectedIndexChanged += (s, e) => { if (tabs.SelectedIndex == 3) LoadMovedList(); };
+            tabs.SelectedIndexChanged += (s, e) => { if (tabs.SelectedIndex == 4) LoadMovedList(); };
         }
 
-        void SwitchLanguage()
+        void SwitchLanguage(string language)
         {
-            if (isBusy) return; // Do not rebuild UI while a delete/move/scan is in progress.
+            if (isBusy || (language != "vi" && language != "en") ||
+                language == UiLanguage.Code) return;
             int tabIndex = tabs.SelectedIndex;
             SaveCleanSettings();
             cfg.DupFolders = lstDupFolders.Items.Cast<string>().ToList();
-            cfg.Language = UiLanguage.English ? "vi" : "en";
+            // Preserve other on-screen settings without silently changing Windows startup.
+            cfg.AlertGB = (int)numAlert.Value;
+            cfg.AutoDays = (int)numAutoDays.Value;
+            cfg.AutoClean = chkAutoClean.Checked;
+            cfg.Language = language;
             cfg.Save();
-            UiLanguage.Code = cfg.Language;
+            UiLanguage.Code = language;
             foreach (Control control in Controls.Cast<Control>().ToArray())
             {
                 Controls.Remove(control);
@@ -127,6 +124,7 @@ namespace DonDep
             tabs.SelectedIndex = Math.Max(0, Math.Min(tabs.TabPages.Count - 1, tabIndex));
             UpdateDrives();
             UpdateDriveLabel(false);
+            Status(language == "en" ? "Language changed to English." : "Đã chuyển sang tiếng Việt.");
         }
 
         TabPage NewTab(string t)
@@ -166,7 +164,6 @@ namespace DonDep
         void SetBusy(bool busy)
         {
             isBusy = busy;
-            if (btnLanguage != null) btnLanguage.Enabled = !busy;
             foreach (var c in busyControls) c.Enabled = !busy;
             Cursor = busy ? Cursors.WaitCursor : Cursors.Default;
             if (!busy && smartList != null && !smartList.IsDisposed) { UpdateSmartSummary(); UpdateSmartUndoCount(); }

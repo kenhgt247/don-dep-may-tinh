@@ -50,9 +50,9 @@ namespace DonDep
         bool isBusy;
         ToolStripButton btnLanguage;
 
-        public MainForm()
+        public MainForm(string languageOverride = null)
         {
-            UiLanguage.Code = cfg.Language;
+            UiLanguage.Code = languageOverride == "en" ? "en" : cfg.Language;
             Icon = App.AppIcon;
             AutoScaleMode = AutoScaleMode.None;
             Font = new Font("Segoe UI", 9.5f);

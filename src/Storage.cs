@@ -335,21 +335,9 @@ namespace DonDep
 
         public static void Create(string lnk, string args, string desc)
         {
-            var type = Type.GetTypeFromProgID("WScript.Shell");
-            object shell = Activator.CreateInstance(type);
-            try
-            {
-                object sc = type.InvokeMember("CreateShortcut", System.Reflection.BindingFlags.InvokeMethod, null, shell, new object[] { lnk });
-                var st = sc.GetType();
-                st.InvokeMember("TargetPath", System.Reflection.BindingFlags.SetProperty, null, sc, new object[] { App.ExePath });
-                st.InvokeMember("Arguments", System.Reflection.BindingFlags.SetProperty, null, sc, new object[] { args });
-                st.InvokeMember("WorkingDirectory", System.Reflection.BindingFlags.SetProperty, null, sc, new object[] { App.AppDir });
-                st.InvokeMember("Description", System.Reflection.BindingFlags.SetProperty, null, sc, new object[] { desc });
-                st.InvokeMember("IconLocation", System.Reflection.BindingFlags.SetProperty, null, sc, new object[] { App.ExePath + ",0" });
-                st.InvokeMember("WindowStyle", System.Reflection.BindingFlags.SetProperty, null, sc, new object[] { args == "-Tray" ? 7 : 1 });
-                st.InvokeMember("Save", System.Reflection.BindingFlags.InvokeMethod, null, sc, null);
-            }
-            finally { System.Runtime.InteropServices.Marshal.FinalReleaseComObject(shell); }
+            // Native Windows Shell Link API handles Unicode paths, OneDrive-redirection
+            // and Start Menu locations without WScript.Shell late-binding failures.
+            NativeShortcut.Create(lnk, App.ExePath, args, desc);
         }
 
         public static void SetStartup(bool on)

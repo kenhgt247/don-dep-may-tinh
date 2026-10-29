@@ -209,6 +209,11 @@ namespace DonDep
             SetBusy(false);
             UpdateSmartSummary();
             UpdateSmartUndoCount();
+            if(result.Limited)
+                Msg(UiLanguage.English ?
+                    "The scan reached its 20,000-file safety limit. Results are partial. Choose a smaller folder to scan the remaining files." :
+                    "Đã đạt giới hạn an toàn 20.000 file. Danh sách hiện tại chưa đầy đủ. Hãy chọn thư mục nhỏ hơn để quét phần còn lại.",
+                    MessageBoxIcon.Warning);
             Status(UiLanguage.English ? "Scan finished. Review all selected file moves." :
                 "Đã quét xong. Hãy xem kỹ từng file trước khi áp dụng.");
         }

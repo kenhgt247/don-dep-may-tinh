@@ -1,20 +1,23 @@
-# PC Cleaner v1.3.1 — Smart Folder cho phép quét ổ D:\ và ổ dữ liệu
+# PC Cleaner v1.4.0 — Giao diện Cài đặt mới / Redesigned Settings
 
-## 🛠️ Đã sửa
+## ✨ Thay đổi giao diện / UI improvements
 
-- Sửa lỗi **“Thư mục hệ thống, Zalo, ứng dụng và đồng bộ đám mây không được hỗ trợ”** khi chọn trực tiếp ổ dữ liệu `D:\` hoặc ổ USB.
-- Sửa chuẩn hóa đường dẫn gốc (`D:\` khác `D:` trong Windows), ngăn tạo đường dẫn đích không chính xác.
-- Vẫn **chặn quét trực tiếp ổ chứa Windows (thường là `C:\`)**, các thư mục hệ thống, dữ liệu Zalo, ứng dụng, OneDrive/Drive và đường dẫn liên kết.
-- Khi chọn toàn ổ: **xác nhận trước khi quét**, và **không tự đánh dấu file để di chuyển**. Có nút **Chọn đề xuất / Bỏ chọn hết** nếu người dùng muốn tự chọn hàng loạt.
-- Cảnh báo khi danh sách quét chạm giới hạn **20.000 file** (kết quả chưa đầy đủ).
-- Giới hạn tính SHA-256 cho file tối đa 64 MB, tổng dữ liệu băm tối đa 512 MB để tránh quá tải khi quét cả ổ.
+- **Sắp xếp lại thanh menu:** Dọn dẹp → Bản đồ ổ đĩa → File trùng → Smart Folder → Đã chuyển đi → Trình duyệt → **⚙ Cài đặt**.
+- Đổi tên **Tự động** thành **Cài đặt**, luôn nằm ở **tab cuối cùng** trong cả hai ngôn ngữ.
+- Thêm nhóm **🌐 Ngôn ngữ giao diện** ngay đầu trang Cài đặt: hai lựa chọn **🇻🇳 Tiếng Việt** / **🇬🇧 English**, đánh dấu rõ ngôn ngữ hiện tại.
+- Thay đổi ngôn ngữ **ngay lập tức, tự lưu** cho lần mở sau; giữ nguyên tab đang mở và các lựa chọn cài đặt chưa lưu.
+- Giao diện Cài đặt có bố cục mới với các khu vực: ngôn ngữ, chạy nền/tự động, shortcut và kiểm tra cập nhật. Tự cuộn khi cửa sổ nhỏ.
+- Di chuyển nút chuyển ngôn ngữ từ thanh trạng thái vào Cài đặt để giao diện chính gọn hơn.
+- Sửa xử lý chuyển tab: danh sách **Đã chuyển đi** tiếp tục được tải đúng sau khi thay đổi thứ tự menu.
 
-## 🛡️ An toàn
+## 🛡️ Giữ nguyên chức năng
 
-Không tự xóa file, không ghi đè file đích, giữ nguyên file không rõ loại và có hoàn tác qua nhật ký. Khi chọn ổ dữ liệu, xem kỹ danh sách file nguồn → đích trước khi xác nhận. Để thận trọng, nên thử trước với một thư mục nhỏ.
+Bản này **không thay đổi cơ chế xóa, chuyển file hoặc hoàn tác**. Giữ nguyên Smart Folder, xử lý Zalo, phân tích ổ cứng, file trùng, sao lưu Drive, dọn trình duyệt và chế độ chạy nền.
 
 ## ⬇️ Cài đặt
 
-Tải `DonDepMayTinh.zip` ở mục Assets, giải nén, chạy `Don Dep May Tinh.exe` trên Windows 10/11, vào **Smart Folder → Chọn thư mục → D:\ → Quét & đề xuất**.
+Tải `DonDepMayTinh.zip` trong phần **Assets** dưới đây, giải nén và mở `Don Dep May Tinh.exe` trên Windows 10/11. Chọn tab cuối **⚙ Cài đặt** để đổi ngôn ngữ.
 
-**English:** Smart Folder v1.3.1 allows scanning a non-system data drive root (e.g. D:\) or a USB drive, while still blocking the Windows system drive. Whole-drive scans require explicit confirmation, start with no files selected, and never delete or overwrite files.
+**English:** The Settings tab is always last. It now includes a prominent Vietnamese/English language picker, with instant application and saved preference. Existing automation, shortcuts, update checks, disk cleanup and Smart Folder features remain intact.
+
+**Lưu ý:** EXE chưa có chữ ký số nên Windows SmartScreen có thể cảnh báo. Chỉ tải từ trang GitHub chính thức của dự án.

@@ -20,7 +20,8 @@ namespace DonDep
             UiLanguage.Code = Settings.Load().Language;
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            bool selfTest = args.Any(a => a.Equals("--selftest", StringComparison.OrdinalIgnoreCase));
+            bool selfTestEn = args.Any(a => a.Equals("--selftest-en", StringComparison.OrdinalIgnoreCase));
+            bool selfTest = selfTestEn || args.Any(a => a.Equals("--selftest", StringComparison.OrdinalIgnoreCase));
             bool tray = args.Any(a => a.Equals("-Tray", StringComparison.OrdinalIgnoreCase) || a.Equals("--tray", StringComparison.OrdinalIgnoreCase));
 
             if (selfTest)
@@ -29,7 +30,7 @@ namespace DonDep
                 try
                 {
                     string r;
-                    using (var f = new MainForm()) r = f.SelfTest();
+                    using (var f = new MainForm(selfTestEn ? "en" : null)) r = f.SelfTest();
                     using (var t = new TrayContext(true)) r += " TRAY_OK";
                     File.WriteAllText(outFile, r, Encoding.UTF8);
                     return 0;

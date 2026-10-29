@@ -16,6 +16,15 @@ Phần mềm hoàn toàn miễn phí, mã nguồn mở. File `.exe` hiện **ch�
 
 ⭐ Thấy hữu ích? Bấm **Star** ở góc trên bên phải trang này để ủng hộ dự án.
 
+## 🌐 Ngôn ngữ / Languages (v1.2.0)
+
+- **Tiếng Việt** là ngôn ngữ mặc định. Nhấn nút **🇬🇧 English** ở góc phải thanh trạng thái để chuyển sang tiếng Anh.
+- Trong giao diện tiếng Anh, nhấn **🇻🇳 Tiếng Việt** để chuyển lại. Lựa chọn được lưu trong `Documents\\DonDepMayTinh\\caidat.json` (khóa `Language`).
+- Đổi ngôn ngữ không xóa hoặc di chuyển bất kỳ file nào. Giao diện được tải lại, vì vậy kết quả quét chưa xử lý cần quét lại sau khi chuyển.
+- **Lưu ý:** Chức năng song ngữ có trong mã nguồn v1.2.0; để tải bản ZIP mới, cần hoàn tất kiểm tra và phát hành v1.2.0 trong GitHub Actions. Liên kết `releases/latest` có thể vẫn trỏ tới bản cũ trước khi phát hành.
+
+**English:** Use **🇬🇧 English / 🇻🇳 Tiếng Việt** in the bottom-right status bar to switch language. The preference is saved. Switching language refreshes the UI but does not delete or move files.
+
 ## Tính năng
 
 | Tab | Làm gì |

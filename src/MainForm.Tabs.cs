@@ -153,6 +153,7 @@ namespace DonDep
                 mapList.Items.Add(it);
             }
             mapList.EndUpdate();
+            UiLanguage.TranslateRows(mapList, 4);
             string note = "";
             if (dir == mapRoot && driveUsed - dir.Size > Fmt.GB)
                 note = "   •   " + Fmt.Size(driveUsed - dir.Size) + " thuộc file hệ thống không đọc được" + (App.IsAdmin ? "" : " (thử Quyền admin)");
@@ -387,6 +388,7 @@ namespace DonDep
                 }
             }
             dupList.EndUpdate();
+            UiLanguage.TranslateRows(dupList, 4);
             lblDupSum.Text = "Tìm thấy " + found.Count + " nhóm file trùng — bản thừa chiếm " + Fmt.Size(waste) + ". Mỗi nhóm đã chọn sẵn để giữ lại 1 bản.";
             App.Log("File trùng: " + found.Count + " nhóm, thừa " + Fmt.Size(waste));
             Status("Xem lại các bản được chọn rồi bấm \"Xóa bản trùng đã chọn\".");
@@ -464,6 +466,7 @@ namespace DonDep
                 movedList.Items.Add(it);
             }
             movedList.EndUpdate();
+            UiLanguage.TranslateRows(movedList, 1, 4);
             lblMovedSum.Text = "Tổng cộng " + all.Count + " file đã từng chuyển đi. Đánh dấu file muốn lấy về rồi bấm \"Lấy về chỗ cũ\".";
         }
 

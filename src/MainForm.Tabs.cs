@@ -704,10 +704,25 @@ namespace DonDep
         {
             var sb = new StringBuilder();
             UpdateDrives();
-            if (tabs.TabPages.Count != 7) throw new Exception("Smart Folder tab missing");
+            if (tabs.TabPages.Count != 7) throw new Exception("Expected seven tabs");
             sb.Append("tabs=").Append(tabs.TabPages.Count);
             string expectedFirstTab = UiLanguage.English ? "Cleanup" : "Dọn dẹp";
             if (tabs.TabPages[0].Text != expectedFirstTab) throw new Exception("Language tab mismatch: " + tabs.TabPages[0].Text);
+            string expectedMoved = UiLanguage.English ? "Moved files" : "Đã chuyển đi";
+            string expectedSettings = UiLanguage.English ? "⚙ Settings" : "⚙ Cài đặt";
+            if (tabs.TabPages[3].Text != "Smart Folder" ||
+                tabs.TabPages[4].Text != expectedMoved ||
+                tabs.TabPages[6].Text != expectedSettings)
+                throw new Exception("Navigation order or Settings translation mismatch.");
+            if (btnSettingsVietnamese == null || btnSettingsEnglish == null ||
+                btnSettingsVietnamese.IsDisposed || btnSettingsEnglish.IsDisposed ||
+                !btnSettingsVietnamese.Text.Contains("Tiếng Việt") ||
+                !btnSettingsEnglish.Text.Contains("English"))
+                throw new Exception("Settings language controls missing.");
+            var activeButton = UiLanguage.English ? btnSettingsEnglish : btnSettingsVietnamese;
+            if (activeButton.FlatAppearance.BorderSize != 2)
+                throw new Exception("Selected Settings language is not highlighted.");
+            sb.Append(" settings=OK");
             if (UiLanguage.English && UiLanguage.T("Xóa vĩnh viễn") != "Delete permanently") throw new Exception("Safety translation mismatch");
             sb.Append(" language=").Append(UiLanguage.Code);
             SmartFolders.SelfTest();

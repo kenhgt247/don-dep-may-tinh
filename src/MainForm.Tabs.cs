@@ -618,6 +618,10 @@ namespace DonDep
             var sb = new StringBuilder();
             UpdateDrives();
             sb.Append("tabs=").Append(tabs.TabPages.Count);
+            string expectedFirstTab = UiLanguage.English ? "Cleanup" : "Dọn dẹp";
+            if (tabs.TabPages[0].Text != expectedFirstTab) throw new Exception("Language tab mismatch: " + tabs.TabPages[0].Text);
+            if (UiLanguage.English && UiLanguage.T("Xóa vĩnh viễn") != "Delete permanently") throw new Exception("Safety translation mismatch");
+            sb.Append(" language=").Append(UiLanguage.Code);
             var sources = Junk.Sources(cfg);
             sb.Append(" junk=").Append(sources.Count);
             var zr = Junk.ZaloRoots(cfg);

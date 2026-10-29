@@ -100,7 +100,7 @@ namespace DonDep
                 bool allCam = sel.All(n => n.Info.Level == Level.Cam);
                 miMapRecycle.Enabled = miMapDelete.Enabled = !allCam;
                 miMapMove.Enabled = sel.Any(n => !PathRules.IsProtected(n.Path));
-                miMapWhat.Text = "Đây là gì?  —  " + sel[0].Info.Short;
+                miMapWhat.Text = UiLanguage.T("Đây là gì?  —  " + sel[0].Info.Short);
             };
             miMapWhat.Click += (s, e) =>
             {

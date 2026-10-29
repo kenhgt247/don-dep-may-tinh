@@ -20,7 +20,7 @@ namespace DonDep
         public const string Version = "1.1.0";
         public const string Repo = "kenhgt247/don-dep-may-tinh";
         public const string Name = "Dọn Dẹp Máy Tính";
-        public static string Title => Name + " " + Version + (IsAdmin ? "  —  quyền quản trị" : "");
+        public static string Title => UiLanguage.T(Name) + " " + Version + (IsAdmin ? UiLanguage.T("  —  quyền quản trị") : "");
         public static readonly string ExePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
         public static readonly string AppDir = Path.GetDirectoryName(ExePath);
         public static readonly string DataDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "DonDepMayTinh");
@@ -77,7 +77,7 @@ namespace DonDep
     class Settings
     {
         public int Days = 90, LargeMB = 500, KeepGB = 10, AlertGB = 5, AutoDays = 7, DupMinMB = 1;
-        public string DestMode = "drive", DestFolder = "", LastAutoClean = "";
+        public string DestMode = "drive", DestFolder = "", LastAutoClean = "", Language = "vi";
         public bool AutoClean = false;
         public List<string> ExtraZalo = new List<string>();
         public List<string> DupFolders = new List<string>();
@@ -99,6 +99,7 @@ namespace DonDep
                 s.DestMode = GetStr(d, "DestMode", s.DestMode);
                 s.DestFolder = GetStr(d, "DestFolder", s.DestFolder);
                 s.LastAutoClean = GetStr(d, "LastAutoClean", s.LastAutoClean);
+                s.Language = GetStr(d, "Language", "vi") == "en" ? "en" : "vi";
                 object b;
                 if (d.TryGetValue("AutoClean", out b) && b is bool) s.AutoClean = (bool)b;
                 s.ExtraZalo = GetList(d, "ExtraZalo");
@@ -117,7 +118,7 @@ namespace DonDep
                 {
                     { "Days", Days }, { "LargeMB", LargeMB }, { "KeepGB", KeepGB }, { "AlertGB", AlertGB }, { "AutoDays", AutoDays },
                     { "DupMinMB", DupMinMB }, { "DestMode", DestMode }, { "DestFolder", DestFolder }, { "LastAutoClean", LastAutoClean },
-                    { "AutoClean", AutoClean }, { "ExtraZalo", ExtraZalo.ToArray() }, { "DupFolders", DupFolders.ToArray() }
+                    { "AutoClean", AutoClean }, { "ExtraZalo", ExtraZalo.ToArray() }, { "DupFolders", DupFolders.ToArray() }, { "Language", Language }
                 };
                 File.WriteAllText(App.SettingsFile, new JavaScriptSerializer().Serialize(d), new UTF8Encoding(false));
             }
@@ -152,7 +153,7 @@ namespace DonDep
     {
         public static string Size(double b)
         {
-            var ci = System.Globalization.CultureInfo.GetCultureInfo("vi-VN");
+            var ci = System.Globalization.CultureInfo.GetCultureInfo(UiLanguage.English ? "en-US" : "vi-VN");
             if (b >= 1099511627776.0) return (b / 1099511627776.0).ToString("N2", ci) + " TB";
             if (b >= 1073741824.0) return (b / 1073741824.0).ToString("N2", ci) + " GB";
             if (b >= 1048576.0) return (b / 1048576.0).ToString("N1", ci) + " MB";

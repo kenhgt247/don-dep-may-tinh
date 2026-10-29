@@ -520,13 +520,66 @@ namespace DonDep
             Msg("Đã lấy về " + ok + "/" + sel.Count + " file.");
         }
 
-        // ================================================================= TAB 5: TỰ ĐỘNG
+        // ================================================================= SETTINGS (ALWAYS LAST)
         CheckBox chkStartup, chkAutoClean;
         NumericUpDown numAlert, numAutoDays;
+        Button btnSettingsVietnamese, btnSettingsEnglish;
+
+        static void StyleSettingsLanguage(Button button, bool selected)
+        {
+            button.FlatStyle = FlatStyle.Flat;
+            button.FlatAppearance.BorderSize = selected ? 2 : 1;
+            button.FlatAppearance.BorderColor = selected ?
+                Color.FromArgb(38, 105, 215) : Color.FromArgb(204, 216, 234);
+            button.BackColor = selected ?
+                Color.FromArgb(225, 238, 255) : Color.White;
+            button.ForeColor = selected ?
+                Color.FromArgb(26, 86, 173) : Color.FromArgb(51, 65, 85);
+            button.Font = new Font("Segoe UI", 10, selected ? FontStyle.Bold : FontStyle.Regular);
+            button.UseVisualStyleBackColor = false;
+            button.Cursor = Cursors.Hand;
+        }
 
         void BuildAutoTab(TabPage tab)
         {
-            var grp = new GroupBox { Text = "Chạy ngầm cùng Windows", Location = new Point(16, 16), Size = new Size(720, 250) };
+            // Scrollable settings page: fits smaller Windows resolutions without clipping.
+            var scroll = new Panel { Dock = DockStyle.Fill, AutoScroll = true,
+                BackColor = Color.FromArgb(245, 248, 252) };
+            var content = new Panel { Location = Point.Empty, Size = new Size(1088, 745),
+                BackColor = Color.FromArgb(245, 248, 252) };
+            scroll.Controls.Add(content);
+            tab.Controls.Add(scroll);
+
+            var title = Lbl("Cài đặt & tùy chỉnh", 24, 15, 1000, 36);
+            title.Font = new Font("Segoe UI", 18, FontStyle.Bold);
+            title.ForeColor = Color.FromArgb(31, 56, 95);
+            var subtitle = Lbl("Thiết lập ngôn ngữ, chạy nền, biểu tượng và cập nhật ứng dụng.", 25, 52, 1000, 24);
+            subtitle.ForeColor = Color.FromArgb(100, 116, 139);
+            content.Controls.AddRange(new Control[] { title, subtitle });
+
+            var grpLanguage = new GroupBox { Text = "🌐 Ngôn ngữ giao diện",
+                Location = new Point(16, 91), Size = new Size(1050, 122), BackColor = Color.White };
+            grpLanguage.Controls.Add(Lbl("Chọn ngôn ngữ hiển thị. Thay đổi được lưu tự động và áp dụng ngay.", 20, 25, 970, 24));
+            btnSettingsVietnamese = new Button { Text = "🇻🇳 Tiếng Việt",
+                Location = new Point(20, 56), Size = new Size(183, 46) };
+            btnSettingsEnglish = new Button { Text = "🇬🇧 English",
+                Location = new Point(217, 56), Size = new Size(183, 46) };
+            StyleSettingsLanguage(btnSettingsVietnamese, !UiLanguage.English);
+            StyleSettingsLanguage(btnSettingsEnglish, UiLanguage.English);
+            var lblLanguageStatus = Lbl(
+                UiLanguage.English ? "Current language: English" : "Đang sử dụng: Tiếng Việt",
+                426, 68, 390, 26);
+            lblLanguageStatus.ForeColor = Color.FromArgb(76, 101, 134);
+            grpLanguage.Controls.AddRange(new Control[] {
+                btnSettingsVietnamese, btnSettingsEnglish, lblLanguageStatus });
+            btnSettingsVietnamese.Click += (s, e) => SwitchLanguage("vi");
+            btnSettingsEnglish.Click += (s, e) => SwitchLanguage("en");
+            busyControls.Add(btnSettingsVietnamese);
+            busyControls.Add(btnSettingsEnglish);
+            content.Controls.Add(grpLanguage);
+
+            var grp = new GroupBox { Text = "Tự động & chạy nền cùng Windows",
+                Location = new Point(16, 226), Size = new Size(1050, 250), BackColor = Color.White };
             chkStartup = new CheckBox { Text = "Bật: tự chạy ngầm khi mở máy (biểu tượng nhỏ ở góc phải thanh Taskbar)", Location = new Point(16, 28), Size = new Size(690, 26), Checked = File.Exists(Shortcut.StartupLink) };
             numAlert = Num(grp, "Cảnh báo khi một ổ còn trống dưới (GB):", 66, 1, 500, cfg.AlertGB, 36, 300);
             chkAutoClean = new CheckBox { Text = "Tự động dọn RÁC HỆ THỐNG theo lịch (không bao giờ tự chuyển hay xóa file cá nhân)", Location = new Point(16, 104), Size = new Size(690, 26), Checked = cfg.AutoClean };
@@ -537,20 +590,23 @@ namespace DonDep
             var lblLast = Lbl("Lần tự dọn gần nhất: " + last, 36, 176, 600, 22);
             var btnTray = Btn("Lưu và bật chạy ngầm ngay", 36, 204, 260, 34, false);
             var btnSave = Btn("Lưu thiết lập", 306, 204, 160, 34, false);
-            btnSave.BackColor = Yellow;
+            btnSave.BackColor = Color.FromArgb(228, 238, 255);
+            btnSave.ForeColor = Color.FromArgb(31, 83, 160);
+            btnSave.FlatStyle = FlatStyle.Flat;
+            btnSave.FlatAppearance.BorderColor = Color.FromArgb(165, 195, 240);
             grp.Controls.AddRange(new Control[] { chkStartup, chkAutoClean, lblLast, btnTray, btnSave });
 
-            var grpShort = new GroupBox { Text = "Biểu tượng", Location = new Point(16, 280), Size = new Size(720, 100) };
+            var grpShort = new GroupBox { Text = "Biểu tượng & truy cập nhanh", Location = new Point(16, 489), Size = new Size(1050, 100), BackColor = Color.White };
             grpShort.Controls.Add(Lbl("Tạo biểu tượng \"Dọn Dẹp Máy Tính\" trên Desktop và trong menu Start để mở app nhanh.", 16, 28, 690, 22));
             var btnShortcut = Btn("Tạo biểu tượng", 16, 54, 180, 34, false);
             grpShort.Controls.Add(btnShortcut);
 
-            var grpUpd = new GroupBox { Text = "Phiên bản", Location = new Point(16, 394), Size = new Size(720, 100) };
+            var grpUpd = new GroupBox { Text = "Phiên bản & cập nhật", Location = new Point(16, 602), Size = new Size(1050, 100), BackColor = Color.White };
             grpUpd.Controls.Add(Lbl("Bạn đang dùng bản " + App.Version + ". App tự kiểm tra bản mới mỗi lần mở. Trang chủ: github.com/" + App.Repo, 16, 28, 690, 22));
             var btnUpdate = Btn("Kiểm tra bản mới", 16, 54, 180, 34, false);
             var btnHome = Btn("Mở trang chủ", 206, 54, 160, 34, false);
             grpUpd.Controls.AddRange(new Control[] { btnUpdate, btnHome });
-            tab.Controls.AddRange(new Control[] { grp, grpShort, grpUpd });
+            content.Controls.AddRange(new Control[] { grp, grpShort, grpUpd });
 
             btnSave.Click += (s, e) => SaveAutoSettings(false);
             btnTray.Click += (s, e) =>

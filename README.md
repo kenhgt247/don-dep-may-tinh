@@ -37,7 +37,7 @@
 
 Phần mềm hướng đến sự **rõ ràng và an toàn**: bạn xem danh sách trước, chọn việc cần làm và được cảnh báo khi có nguy cơ mất dữ liệu. Không bán gói VIP, không yêu cầu tài khoản riêng để dọn rác trên máy.
 
-> **Phiên bản mã nguồn 1.2.0:** bổ sung **Tiếng Việt / English** và nút đổi ngôn ngữ ngay trong ứng dụng. Huy hiệu **RELEASE** và nút tải ở trên luôn dẫn tới **bản phát hành chính thức mới nhất**, có thể chưa phải 1.2.0 cho đến khi bản này được phát hành.
+> **Phiên bản mã nguồn 1.2.1:** bổ sung **Tiếng Việt / English** và nút đổi ngôn ngữ ngay trong ứng dụng. Huy hiệu **RELEASE** và nút tải ở trên luôn dẫn tới **bản phát hành chính thức mới nhất**, có thể chưa phải 1.2.0 cho đến khi bản này được phát hành.
 
 ### 🌟 Vì sao nên dùng?
 

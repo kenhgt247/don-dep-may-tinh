@@ -23,6 +23,7 @@ namespace DonDep
     {
         public List<SmartPlan> Items = new List<SmartPlan>();
         public int Skipped, Protected, Duplicates;
+        public bool Limited;
     }
     internal sealed class SmartMove
     {
@@ -51,11 +52,31 @@ namespace DonDep
         static readonly HashSet<string> Installers = Set(".msi", ".msix", ".exe");
         static readonly string[] Forbidden = { "Windows", "Program Files", "Program Files (x86)",
             "ProgramData", "AppData", "$Recycle.Bin", "System Volume Information", "Recovery",
-            "Zalo Data", "ZaloData", "WindowsApps", ".git", "node_modules" };
+            "Zalo Data", "ZaloData", "WindowsApps", ".git", "node_modules",
+            "SteamLibrary", "steamapps", "Epic Games", "Riot Games", "Garena", "XboxGames",
+            "MSOCache", "$WinREAgent", "Config.Msi", "EFI", "Boot", "PerfLogs" };
         static HashSet<string> Set(params string[] ext) { return new HashSet<string>(ext, Cmp); }
-        static string Full(string p) { return Path.GetFullPath(p).TrimEnd(Path.DirectorySeparatorChar); }
-        static bool Inside(string root, string path) {
-            return Full(path).StartsWith(Full(root) + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase);
+        // Preserve the trailing separator for volume roots: "D:\\" must never
+        // become "D:" (a drive-relative path in Windows).
+        static string Full(string p)
+        {
+            string full = Path.GetFullPath(p);
+            string volume = Path.GetPathRoot(full);
+            return Cmp.Equals(full.TrimEnd(Path.DirectorySeparatorChar),
+                volume.TrimEnd(Path.DirectorySeparatorChar))
+                ? volume : full.TrimEnd(Path.DirectorySeparatorChar);
+        }
+        internal static bool IsDriveRoot(string p)
+        {
+            if (string.IsNullOrWhiteSpace(p)) return false;
+            string full = Full(p);
+            return Regex.IsMatch(full, @"^[A-Za-z]:\\$") &&
+                Cmp.Equals(full, Path.GetPathRoot(full));
+        }
+        static bool Inside(string root, string path)
+        {
+            string prefix = Full(root).TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar;
+            return Full(path).StartsWith(prefix, StringComparison.OrdinalIgnoreCase);
         }
         static bool ForbiddenPath(string p)
         {
@@ -81,9 +102,20 @@ namespace DonDep
             if (string.IsNullOrWhiteSpace(folder)) throw new IOException("Chưa chọn thư mục.");
             string root = Full(folder);
             if (!Directory.Exists(root)) throw new DirectoryNotFoundException("Không thấy thư mục: " + root);
-            if (Cmp.Equals(root, Full(Path.GetPathRoot(root)))) throw new IOException("Không được sắp xếp cả ổ đĩa.");
-            if (ForbiddenPath(root) || PathRules.IsProtected(root) || LinkedDirectory(root) ||
-                Inside(App.DataDir, root) || Inside(App.AppDir, root))
+            bool driveRoot = IsDriveRoot(root);
+            if (driveRoot)
+            {
+                // Allow a *data* drive root such as D:\, but never the Windows drive.
+                // Network and other nonlocal volume roots are excluded.
+                if (Cmp.Equals(root, Full(Path.GetPathRoot(Fs.WinDir))))
+                    throw new IOException("Không cho phép sắp xếp toàn bộ ổ chứa Windows. Hãy chọn một thư mục riêng.");
+                var drive = new DriveInfo(root);
+                if (!drive.IsReady || (drive.DriveType != DriveType.Fixed &&
+                    drive.DriveType != DriveType.Removable))
+                    throw new IOException("Chỉ hỗ trợ ổ dữ liệu nội bộ hoặc USB đang kết nối.");
+            }
+            if (ForbiddenPath(root) || (!driveRoot && PathRules.IsProtected(root)) ||
+                LinkedDirectory(root) || Inside(App.DataDir, root) || Inside(App.AppDir, root))
                 throw new IOException("Thư mục hệ thống, Zalo, ứng dụng và đồng bộ đám mây không được hỗ trợ.");
         }
         static bool SafeFile(FileInfo f)
@@ -201,13 +233,19 @@ namespace DonDep
                 }
                 catch { result.Skipped++; }
             }
+            result.Limited = files.Count >= 20000;
             progress?.Invoke("Đang phân loại " + files.Count + " file...");
             var duplicatePaths = new HashSet<string>(Cmp);
             if (checkDuplicates)
             {
                 var signatures = new HashSet<string>(Cmp);
+                // Protect responsiveness when scanning an entire disk: do not hash
+                // unlimited large videos, archives or backup images.
+                long hashBudget = 512L * 1024 * 1024;
                 foreach (var f in files.GroupBy(x => x.Length).Where(g => g.Count() > 1).SelectMany(g => g))
                     try {
+                        if (f.Length > 64L * 1024 * 1024 || f.Length > hashBudget) continue;
+                        hashBudget -= f.Length;
                         string digest;
                         using (var sha = SHA256.Create())
                         using (var stream = new FileStream(f.FullName, FileMode.Open, FileAccess.Read, FileShare.Read))
@@ -345,6 +383,19 @@ namespace DonDep
                 File.WriteAllText(Path.Combine(root, "photo1.jpg"), "identical-picture-data");
                 File.WriteAllText(Path.Combine(root, "photo2.jpg"), "identical-picture-data");
 
+                // Validate volume root handling even when the CI runner has no D:.
+                if (!IsDriveRoot(@"D:\") || IsDriveRoot(@"D:\MyFiles") ||
+                    !Cmp.Equals(Full(@"D:\"), @"D:\") ||
+                    !Inside(@"D:\", @"D:\Documents\hello.pdf") ||
+                    !Cmp.Equals(Path.Combine(Full(@"D:\"), SortedFolder),
+                        @"D:\" + SortedFolder))
+                    throw new Exception("Smart Folder drive-root path regression.");
+                // The Windows system volume itself must remain blocked.
+                bool rejectedSystemDrive = false;
+                try { ValidateRoot(Path.GetPathRoot(Fs.WinDir)); }
+                catch (IOException) { rejectedSystemDrive = true; }
+                if (!rejectedSystemDrive)
+                    throw new Exception("System drive root was not blocked.");
                 var personal = Scan(root,false,false,true,true);
                 if(personal.Duplicates != 1 ||
                     personal.Items.Count(x=>x.Duplicate) != 1 ||

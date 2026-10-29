@@ -13,6 +13,7 @@ namespace DonDep
         static readonly Dictionary<string, string> En = new Dictionary<string, string>(StringComparer.Ordinal)
         {
             { "Dọn Dẹp Máy Tính", "PC Cleaner" },
+            { "Dọn Dẹp Máy Tính — đang theo dõi ổ đĩa", "PC Cleaner — monitoring disk space" },
             { "  —  quyền quản trị", "  —  administrator" },
             { "Sẵn sàng.", "Ready." },
             { "Dọn dẹp", "Cleanup" },

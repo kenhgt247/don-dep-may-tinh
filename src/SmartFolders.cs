@@ -338,11 +338,30 @@ namespace DonDep
             try {
                 string src = Path.Combine(root, "Quyet dinh 25.txt");
                 string unknown = Path.Combine(root, "unknown.random");
+                string content = Path.Combine(root, "misc.txt");
                 File.WriteAllText(src, "Noi dung");
                 File.WriteAllText(unknown, "Do not touch");
+                File.WriteAllText(content, "BAO CAO QUY IV");
+                File.WriteAllText(Path.Combine(root, "photo1.jpg"), "identical-picture-data");
+                File.WriteAllText(Path.Combine(root, "photo2.jpg"), "identical-picture-data");
+
+                var personal = Scan(root,false,false,true,true);
+                if(personal.Duplicates != 1 ||
+                    personal.Items.Count(x=>x.Duplicate) != 1 ||
+                    personal.Items.Count(x=>x.Suggested) != 3 ||
+                    !personal.Items.Single(x=>x.Source.EndsWith("photo1.jpg")).Target.Contains(
+                        DateTime.Now.ToString("yyyy")))
+                    throw new Exception("Personal/date/duplicate classification test failed.");
+
+                var workContent = Scan(root,true,true,false,true);
+                if(workContent.Items.Single(x=>x.Source==content).Group != "04 - Bao cao")
+                    throw new Exception("Offline document content classification test failed.");
+
                 var r = Scan(root,true,false,false,true);
-                if(r.Items.Count != 2 || r.Items.Count(x=>x.Suggested)!=1 ||
-                    r.Items.Single(x=>x.Source==unknown).Suggested) throw new Exception("Smart scan test failed.");
+                if(r.Items.Count != 5 || r.Items.Count(x=>x.Suggested)!=1 ||
+                    r.Items.Single(x=>x.Source==unknown).Suggested ||
+                    r.Items.Single(x=>x.Source==content).Suggested)
+                    throw new Exception("Smart scan test failed.");
                 var item=r.Items.Single(x=>x.Suggested);
                 var moved=Apply(root,new[]{item});
                 if(moved.Success!=1 || !File.Exists(item.Target) || PendingUndo(root)!=1)

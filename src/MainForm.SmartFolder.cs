@@ -63,8 +63,8 @@ namespace DonDep
             smartList.Columns.Add("Lý do", 245);
             smartList.Columns.Add("Đường dẫn mới (xem trước)", 380);
             tab.Controls.Add(smartList);
-            top.BringToFront();
-            bottom.BringToFront();
+            // Danh sách (Dock = Fill) phải nằm trên cùng thứ tự để chỉ chiếm phần còn lại, không che khung phía trên / dưới.
+            smartList.BringToFront();
 
             foreach(Control c in new Control[] { btnBrowse, radioSmartPersonal, radioSmartWork,
                 chkSmartContent, chkSmartDate, chkSmartDup, btnOpen }) busyControls.Add(c);

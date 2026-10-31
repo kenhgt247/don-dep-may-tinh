@@ -823,6 +823,8 @@ namespace DonDep
             sb.Append(" settings=OK");
             if (UiLanguage.English && UiLanguage.T("Xóa vĩnh viễn") != "Delete permanently") throw new Exception("Safety translation mismatch");
             sb.Append(" language=").Append(UiLanguage.Code);
+            smartList.Parent.PerformLayout();
+            if (smartList.Top < 150) throw new Exception("Smart Folder list covers its toolbar (top=" + smartList.Top + ")");
             SmartFolders.SelfTest();
             sb.Append(" smart=OK");
             NativeShortcut.SelfTest();

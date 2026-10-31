@@ -1,4 +1,4 @@
-﻿DỌN DẸP MÁY TÍNH (PC CLEANER) — phiên bản 1.4.1
+﻿DỌN DẸP MÁY TÍNH (PC CLEANER) — phiên bản 1.5.0
 ==============================================
 
 CÁCH MỞ
@@ -8,17 +8,21 @@ CÁCH MỞ
      bấm "More info" → "Run anyway".
   3. Muốn có biểu tượng trên Desktop và menu Start: vào tab "⚙ Cài đặt"
      → bấm "Tạo biểu tượng".
-  4. App tự báo khi có bản mới. Trang chủ: github.com/kenhgt247/don-dep-may-tinh
+  4. Khi có bản mới, app hỏi và TỰ CẬP NHẬT (tải, kiểm tra, thay thế, mở lại).
+     Trang chủ: github.com/kenhgt247/don-dep-may-tinh
 
 ĐỔI NGÔN NGỮ (TIẾNG VIỆT / ENGLISH)
   Vào tab cuối "⚙ Cài đặt" → mục "Ngôn ngữ giao diện" → chọn Tiếng Việt hoặc English.
   App đổi ngay và nhớ lựa chọn cho lần mở sau. Đổi ngôn ngữ không xóa hay chuyển file nào.
 
-7 TAB CỦA APP
+8 TAB CỦA APP
   1. Dọn dẹp
      - "Quét máy" (chỉ xem, chưa xóa gì) → bỏ chọn những gì muốn giữ → "Dọn dẹp ngay".
      - Rác hệ thống: file tạm, bộ nhớ đệm trình duyệt / Zalo / Teams, thùng rác,
        gói cập nhật Zalo, bản Zalo cũ (chưa chọn sẵn)...
+     - Bộ nhớ đệm CapCut (và các bản CapCut cũ), Telegram, Messenger, Discord,
+       Adobe (Premiere, After Effects), Steam, Epic Games. Phần mềm nào đang mở
+       thì app nhắc tắt trước. Không bao giờ đụng dự án CapCut hay tin nhắn.
      - Với file cá nhân, chuột phải để chọn từng file: chuyển lên Drive / ổ ngoài
        hay xóa vĩnh viễn.
      - Bấm "Quyền admin" để quét thêm gói cập nhật Windows cũ và file ngủ đông.
@@ -49,7 +53,17 @@ CÁCH MỞ
      - Cookie: xóa sẽ bị ĐĂNG XUẤT khỏi Facebook, Gmail, Zalo web... (hỏi 2 lần).
      - Không bao giờ đụng mật khẩu đã lưu, dấu trang, tiện ích mở rộng.
      - Nên tắt trình duyệt trước khi dọn (app sẽ nhắc).
-  7. ⚙ Cài đặt
+  7. Gỡ phần mềm
+     - "Quét phần mềm đã cài" → thấy phần mềm nào chiếm nhiều chỗ, lần mở gần nhất
+       (ước tính), ghi chú "Hơn 6 tháng chưa mở".
+     - Chọn một phần mềm → "Gỡ phần mềm đã chọn": trình gỡ cài đặt của chính phần mềm
+       đó sẽ mở ra. Driver, Visual C++, .NET... được đánh dấu cảnh báo, hỏi 2 lần.
+  8. ⚙ Cài đặt
+     - Thành tích: "App đã giúp bạn giải phóng X GB" + nút "Tạo ảnh khoe lên Facebook"
+       (ảnh lưu trong thư mục Ảnh và đã chép sẵn — vào Facebook bấm Ctrl+V để dán).
+     - Tự động đưa ảnh, video, file Zalo cũ lên Google Drive theo lịch
+       (ví dụ: file cũ hơn 90 ngày, mỗi 7 ngày). Cần bật chạy ngầm và kết nối Drive.
+       Có nút "Xem trước & chạy ngay".
      - Ngôn ngữ, chạy ngầm cùng Windows (biểu tượng nhỏ ở góc phải thanh Taskbar),
        báo khi một ổ còn trống dưới mức bạn đặt (mặc định 5 GB).
      - Tự dọn RÁC HỆ THỐNG theo lịch (không bao giờ tự đụng file cá nhân).

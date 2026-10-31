@@ -1,4 +1,4 @@
-﻿PC CLEANER (DON DEP MAY TINH) — version 1.4.1
+﻿PC CLEANER (DON DEP MAY TINH) — version 1.5.0
 ==============================================
 
 GETTING STARTED
@@ -7,19 +7,23 @@ GETTING STARTED
      If Windows shows the blue "Windows protected your PC" screen:
      click "More info" → "Run anyway" (the app is not code-signed yet).
   3. For Desktop and Start menu shortcuts: open the "⚙ Settings" tab → "Create shortcut".
-  4. The app tells you when a new version is available.
+  4. When a new version is out, the app offers to UPDATE ITSELF (download, verify,
+     replace, restart).
      Home page: github.com/kenhgt247/don-dep-may-tinh
 
 LANGUAGE
   Open the last tab "⚙ Settings" → "Display language" → choose English or Tiếng Việt.
   The change applies immediately and is remembered. No files are moved or deleted.
 
-THE 7 TABS
+THE 8 TABS
   1. Cleanup
      - "Scan PC" only lists items; nothing is deleted yet. Untick what you want to keep,
        then click "Clean now".
      - Personal files: right-click each file to choose "move to Drive / external disk"
        or "delete permanently".
+     - Also cleans caches of CapCut (plus old CapCut versions), Telegram, Messenger,
+       Discord, Adobe, Steam and Epic Games. You are asked to close running apps first.
+       CapCut projects and chat messages are never touched.
      - "Run as admin" adds old Windows update files and the hibernation file.
   2. Disk map
      - Pick a drive → "Analyze disk" to see which folders use the most space.
@@ -45,7 +49,16 @@ THE 7 TABS
      - Cache: pre-selected, safe. History: optional.
      - Cookies: deleting them signs you out of websites (you are asked twice).
      - Saved passwords, bookmarks and extensions are never touched.
-  7. ⚙ Settings
+  7. Uninstall
+     - "Scan installed programs" lists programs with size, install date, last opened
+       (estimate) and a "not opened for 6+ months" note.
+     - Select one → "Uninstall selected" opens that program's own uninstaller.
+       Drivers, Visual C++, .NET etc. are flagged and need a second confirmation.
+  8. ⚙ Settings
+     - Your results: total space freed + "Create a picture to share" (saved in Pictures
+       and copied — press Ctrl+V in Facebook).
+     - Automatically move old Zalo photos/videos/files to Google Drive on a schedule
+       (e.g. older than 90 days, every 7 days). Needs background mode and Google Drive.
      - Language, run in background with Windows (tray icon), low-disk warnings
        (default 5 GB), scheduled SYSTEM JUNK cleanup (never personal files),
        shortcuts and update check.

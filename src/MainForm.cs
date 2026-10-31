@@ -104,6 +104,7 @@ namespace DonDep
             Controls.Add(tabs);
             Controls.Add(strip);
             UiLanguage.Attach(tabs);
+            FixMnemonics(tabs);
             status = new Progress<string>(s => { if (s.Length > 160) s = s.Substring(0, 157) + "..."; lblStatus.Text = UiLanguage.T(s); });
             tabs.SelectedIndexChanged += (s, e) => { if (tabs.SelectedIndex == 4) LoadMovedList(); };
         }
@@ -146,6 +147,18 @@ namespace DonDep
             UpdateDrives();
             UpdateDriveLabel(false);
             Status(language == "en" ? "Language changed to English." : "Đã chuyển sang tiếng Việt.");
+        }
+
+        /// Hiện đúng ký tự "&" (WinForms mặc định coi "&" là phím tắt nên bị mất chữ).
+        static void FixMnemonics(Control root)
+        {
+            foreach (Control c in root.Controls)
+            {
+                if (c is Label) ((Label)c).UseMnemonic = false;
+                else if (c is ButtonBase) ((ButtonBase)c).UseMnemonic = false;
+                else if (c is GroupBox && c.Text.Contains("&") && !c.Text.Contains("&&")) c.Text = c.Text.Replace("&", "&&");
+                FixMnemonics(c);
+            }
         }
 
         TabPage NewTab(string t)

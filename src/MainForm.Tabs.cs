@@ -633,7 +633,7 @@ namespace DonDep
             lblZaloLast = Lbl("", 36, 128, 990, 22);
             var btnZaloNow = Btn(UiLanguage.L("Xem trước & chạy ngay", "Preview & run now"), 36, 152, 220, 34);
             grpZalo.Controls.Add(Lbl(UiLanguage.L("File chỉ bị bỏ khỏi máy sau khi đã tải lên Drive và kiểm tra xong. Lấy lại ở tab \"Đã chuyển đi\". Cần bật chạy ngầm và kết nối Google Drive.",
-                                                  "Files are removed from the PC only after upload and verification. Restore from \"Moved files\". Requires background mode and Google Drive."), 270, 160, 760, 22));
+                                                  "Files are removed from the PC only after upload and verification. Restore from \"Moved files\". Requires background mode and Google Drive."), 270, 150, 760, 40));
             grpZalo.Controls.AddRange(new Control[] { chkZaloAuto, lblZaloLast, btnZaloNow });
             content.Controls.Add(grpZalo);
             UpdateZaloLastLabel();
@@ -648,12 +648,12 @@ namespace DonDep
             btnZaloNow.Click += async (s, e) => await Guard(RunZaloAutoNowAsync);
 
             var grpShort = new GroupBox { Text = "Biểu tượng & truy cập nhanh", Location = new Point(16, 823), Size = new Size(1050, 100), BackColor = Color.White };
-            grpShort.Controls.Add(Lbl("Tạo biểu tượng \"Dọn Dẹp Máy Tính\" trên Desktop và trong menu Start để mở app nhanh.", 16, 28, 690, 22));
+            grpShort.Controls.Add(Lbl("Tạo biểu tượng \"Dọn Dẹp Máy Tính\" trên Desktop và trong menu Start để mở app nhanh.", 16, 28, 1010, 22));
             var btnShortcut = Btn("Tạo biểu tượng", 16, 54, 180, 34, false);
             grpShort.Controls.Add(btnShortcut);
 
             var grpUpd = new GroupBox { Text = "Phiên bản & cập nhật", Location = new Point(16, 936), Size = new Size(1050, 100), BackColor = Color.White };
-            grpUpd.Controls.Add(Lbl("Bạn đang dùng bản " + App.Version + ". App tự kiểm tra bản mới mỗi lần mở. Trang chủ: github.com/" + App.Repo, 16, 28, 690, 22));
+            grpUpd.Controls.Add(Lbl("Bạn đang dùng bản " + App.Version + ". App tự kiểm tra bản mới mỗi lần mở. Trang chủ: github.com/" + App.Repo, 16, 28, 1010, 22));
             var btnUpdate = Btn("Kiểm tra bản mới", 16, 54, 180, 34, false);
             var btnHome = Btn("Mở trang chủ", 206, 54, 160, 34, false);
             grpUpd.Controls.AddRange(new Control[] { btnUpdate, btnHome });

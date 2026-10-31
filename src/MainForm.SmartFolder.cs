@@ -131,6 +131,12 @@ namespace DonDep
             if(!names.TryGetValue(group, out vietnamese)) return group;
             return UiLanguage.English ? group : vietnamese;
         }
+        static string SmartReason(string reason)
+        {
+            int i = reason.IndexOf(" / ", StringComparison.Ordinal);
+            if (i < 0) return reason;
+            return UiLanguage.English ? reason.Substring(i + 3) : reason.Substring(0, i);
+        }
         void ResetSmartResults()
         {
             if (smartList == null || smartList.IsDisposed) return;
@@ -181,9 +187,9 @@ namespace DonDep
             SmartFolders.ValidateRoot(folder);
             bool wholeDrive = SmartFolders.IsDriveRoot(folder);
             if(wholeDrive && !Confirm(UiLanguage.English ?
-                "You selected an ENTIRE DATA DRIVE (" + folder +
+                "You selected an ENTIRE DATA DRIVE (" + UiLanguage.P(folder) +
                 "). The app will only scan and preview; it will NOT move files until you manually select and confirm them. System, Zalo and application folders are excluded. Continue scanning?" :
-                "Bạn đang chọn TOÀN BỘ Ổ DỮ LIỆU (" + folder +
+                "Bạn đang chọn TOÀN BỘ Ổ DỮ LIỆU (" + UiLanguage.P(folder) +
                 "). Phần mềm chỉ quét và xem trước; KHÔNG chuyển file cho đến khi bạn tự chọn và xác nhận. Thư mục hệ thống, Zalo và ứng dụng được loại trừ. Tiếp tục quét?"))
                 return;
             smartLastFolder = folder;
@@ -198,7 +204,7 @@ namespace DonDep
                     var item = new ListViewItem(Path.GetFileName(p.Source));
                     item.SubItems.Add(SmartGroupName(p.Group));
                     item.SubItems.Add(Fmt.Size(p.Size));
-                    item.SubItems.Add(p.Reason);
+                    item.SubItems.Add(SmartReason(p.Reason));
                     item.SubItems.Add(p.Suggested ? p.Target : (UiLanguage.English ? "Keep original" : "Giữ nguyên"));
                     item.Tag=p;
                     item.Checked=p.Suggested && !wholeDrive;
@@ -226,10 +232,10 @@ namespace DonDep
             long bytes=selected.Sum(x=>x.Size);
             string msg = UiLanguage.English ?
                 "Move " + selected.Count + " selected files (" + Fmt.Size(bytes) + ") into:\n" +
-                Path.Combine(root,SmartFolders.SortedFolder) +
+                UiLanguage.P(Path.Combine(root,SmartFolders.SortedFolder)) +
                 "\n\nNo files will be deleted or overwritten. Continue?" :
                 "Chuyển " + selected.Count + " file đã chọn (" + Fmt.Size(bytes) + ") vào:\n" +
-                Path.Combine(root,SmartFolders.SortedFolder) +
+                UiLanguage.P(Path.Combine(root,SmartFolders.SortedFolder)) +
                 "\n\nKHÔNG xóa hay ghi đè file. Bạn đã xem trước và đồng ý?";
             if(!Confirm(msg)) return;
             SetBusy(true);

@@ -1,0 +1,67 @@
+﻿PC CLEANER (DON DEP MAY TINH) — version 1.4.1
+==============================================
+
+GETTING STARTED
+  1. Extract the whole folder (e.g. to your Desktop). Do not run it from inside the .zip.
+  2. Double-click "Don Dep May Tinh.exe".
+     If Windows shows the blue "Windows protected your PC" screen:
+     click "More info" → "Run anyway" (the app is not code-signed yet).
+  3. For Desktop and Start menu shortcuts: open the "⚙ Settings" tab → "Create shortcut".
+  4. The app tells you when a new version is available.
+     Home page: github.com/kenhgt247/don-dep-may-tinh
+
+LANGUAGE
+  Open the last tab "⚙ Settings" → "Display language" → choose English or Tiếng Việt.
+  The change applies immediately and is remembered. No files are moved or deleted.
+
+THE 7 TABS
+  1. Cleanup
+     - "Scan PC" only lists items; nothing is deleted yet. Untick what you want to keep,
+       then click "Clean now".
+     - Personal files: right-click each file to choose "move to Drive / external disk"
+       or "delete permanently".
+     - "Run as admin" adds old Windows update files and the hibernation file.
+  2. Disk map
+     - Pick a drive → "Analyze disk" to see which folders use the most space.
+     - Click an item to learn what it is and whether it is safe to delete.
+     - Right-click to send to Recycle Bin, delete permanently or move to Drive.
+       System, program and Zalo message folders are blocked.
+  3. Duplicate files
+     - Finds identical files. One copy per group is kept; extra copies go to the Recycle Bin.
+  4. Smart Folder (offline file organizer, no internet or AI needed)
+     - Choose a folder (or a whole data drive such as D:\) → "Personal" (by file type)
+       or "Work" (letters, decisions, reports, contracts...) → "Scan & preview".
+     - Check the "Destination" column, untick anything you want to leave → "Move selected files".
+     - Files go into "PC Cleaner - Da sap xep" inside the folder you chose.
+     - Nothing is deleted or overwritten. "Undo latest batch" puts files back.
+     - Never touches the Windows drive, Zalo data, OneDrive / Google Drive folders,
+       or program / game folders (so your software keeps working).
+  5. Moved files
+     - Every file moved to Drive / external disk. Tick files and click "Restore to original location" to bring
+       them back to their original location.
+  6. Browsers
+     - "Scan browsers" shows space used by Chrome, Edge, Coc Coc, Brave, Opera and Firefox
+       per profile.
+     - Cache: pre-selected, safe. History: optional.
+     - Cookies: deleting them signs you out of websites (you are asked twice).
+     - Saved passwords, bookmarks and extensions are never touched.
+  7. ⚙ Settings
+     - Language, run in background with Windows (tray icon), low-disk warnings
+       (default 5 GB), scheduled SYSTEM JUNK cleanup (never personal files),
+       shortcuts and update check.
+
+SAFETY
+  - Nothing happens until you click Yes on the confirmation dialog.
+  - Moves are refused if the destination lacks space.
+  - Files are removed from the PC only after the copy is complete and verified.
+  - Zalo message data, the Windows folder and programs are never touched.
+  - On Google Drive the app can only see files it uploaded itself.
+
+WHERE MOVED FILES GO
+  - Google Drive: DonDep / <PC name> / ...
+  - External disk: <chosen folder>\DonDep\<PC name>\...
+  - Smart Folder: <chosen folder>\PC Cleaner - Da sap xep\...
+  - Logs and lists: Documents\DonDepMayTinh ("Open logs" button).
+
+FEEDBACK / BUG REPORTS
+  github.com/kenhgt247/don-dep-may-tinh/issues

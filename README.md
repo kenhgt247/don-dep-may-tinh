@@ -37,7 +37,7 @@
 
 Phần mềm hướng đến sự **rõ ràng và an toàn**: bạn xem danh sách trước, chọn việc cần làm và được cảnh báo khi có nguy cơ mất dữ liệu. Không bán gói VIP, không yêu cầu tài khoản riêng để dọn rác trên máy.
 
-> **Phiên bản mã nguồn 1.2.2:** icon PC Cleaner màu xanh mới, đồng bộ giữa ứng dụng Windows và trang GitHub, đồng thời giữ nguyên giao diện song ngữ Tiếng Việt / English. Huy hiệu **RELEASE** và nút tải ở trên tự động trỏ tới bản phát hành mới nhất.
+> **Mới ở bản 1.4.1:** Smart Folder tự bỏ qua thư mục phần mềm / game để không làm hỏng chương trình; bản tiếng Anh dịch đầy đủ hơn và không bao giờ dịch nhầm tên file, tên thư mục của bạn; gói tải về có thêm hướng dẫn tiếng Anh.
 
 ### 🌟 Vì sao nên dùng?
 
@@ -62,7 +62,7 @@ Phần mềm hướng đến sự **rõ ràng và an toàn**: bạn xem danh sá
 | **⚙️ Cài đặt (tab cuối)** | Chọn **Tiếng Việt / English**, bật chạy ngầm cùng Windows, cảnh báo ổ gần đầy, hẹn lịch dọn rác hệ thống, tạo shortcut và kiểm tra cập nhật. |
 | **📁 Smart Folder** | Sắp xếp **file cá nhân** theo loại và **tài liệu công việc** theo từ khóa tên hoặc nội dung Word/Excel/PowerPoint/TXT/CSV; xem trước đường dẫn mới, phát hiện bản trùng SHA-256, áp dụng sau xác nhận và **hoàn tác** qua nhật ký. Không dùng AI, không kết nối API. |
 
-### 📁 Smart Folder v1.3.1 — Sắp xếp thông minh không cần AI
+### 📁 Smart Folder — Sắp xếp thông minh không cần AI
 
 **Hoạt động 100% trên máy Windows, không gửi tài liệu lên máy chủ nào.**
 
@@ -75,7 +75,7 @@ Phần mềm hướng đến sự **rõ ràng và an toàn**: bạn xem danh sá
 
 Khi quét **toàn bộ ổ dữ liệu**, phần mềm yêu cầu xác nhận trước khi quét và **không đánh dấu sẵn bất kỳ file nào**. Bạn tự chọn từng file hoặc chọn các đề xuất sau khi xem kỹ. Giới hạn quét 20.000 file mỗi lượt; phần mềm cảnh báo nếu danh sách chưa đầy đủ. Để tránh làm máy chậm khi quét cả ổ, phát hiện bản trùng SHA-256 chỉ kiểm tra file tối đa 64 MB, với tổng dữ liệu băm tối đa 512 MB.
 
-File được chuyển vào thư mục con `PC Cleaner - Da sap xep` trong thư mục nguồn bạn chọn. **Không xóa file, không ghi đè tên trùng**, bỏ qua liên kết symbolic/junction, thư mục hệ thống, dữ liệu Zalo và đường dẫn đồng bộ OneDrive/Google Drive. Nếu file bị chỉnh sửa/đổi tên sau khi chuyển, phần mềm sẽ không tự ghi đè khi hoàn tác.
+File được chuyển vào thư mục con `PC Cleaner - Da sap xep` trong thư mục nguồn bạn chọn. **Không xóa file, không ghi đè tên trùng**, bỏ qua liên kết symbolic/junction, thư mục hệ thống, dữ liệu Zalo, đường dẫn đồng bộ OneDrive/Google Drive và **thư mục của phần mềm / game** (có file .dll…), để chương trình không bị hỏng. Nếu file bị chỉnh sửa/đổi tên sau khi chuyển, phần mềm sẽ không tự ghi đè khi hoàn tác.
 
 **Giới hạn phiên bản này:** PDF, DOC, XLS dạng cũ hoặc file ảnh quét chỉ được nhận diện qua **tên file**, chưa có OCR. File chưa rõ được để lại tại chỗ. Quy tắc phân loại có thể bổ sung ở các phiên bản sau.
 

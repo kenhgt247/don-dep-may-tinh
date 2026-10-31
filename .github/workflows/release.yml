@@ -48,11 +48,13 @@ jobs:
           Copy-Item build\DonDepMayTinh.exe 'out\DonDepMayTinh\Don Dep May Tinh.exe'
           if (Test-Path build\DonDepMayTinh.exe.config) { Copy-Item build\DonDepMayTinh.exe.config 'out\DonDepMayTinh\Don Dep May Tinh.exe.config' }
           Copy-Item 'dist\HUONG DAN.txt' out\DonDepMayTinh\
+          Copy-Item 'dist\GUIDE (English).txt' out\DonDepMayTinh\
           Copy-Item 'dist\HUONG DAN.txt' out\DonDepMayTinh\dup_a.txt; Copy-Item 'dist\HUONG DAN.txt' out\DonDepMayTinh\dup_b.txt
           foreach ($mode in @('--selftest', '--selftest-en')) {
             $p = Start-Process -FilePath 'out\DonDepMayTinh\Don Dep May Tinh.exe' -ArgumentList $mode -Wait -PassThru
             $r = Get-Content out\DonDepMayTinh\selftest.txt -Raw -ErrorAction SilentlyContinue
             Write-Host "$mode exit=$($p.ExitCode) result=$r"
+            Write-Host "::notice title=Selftest::$mode $r"
             if ($p.ExitCode -ne 0 -or $r -notmatch 'UI_OK' -or $r -notmatch 'TRAY_OK' -or $r -notmatch 'dup=[1-9]') {
               $msg = ("$mode exit=$($p.ExitCode) | $r") -replace "`r?`n", ' / '
               Write-Host "::error title=Selftest::$msg"

@@ -1,44 +1,59 @@
-﻿DỌN DẸP MÁY TÍNH — phiên bản 1.1.0
-================================
+﻿DỌN DẸP MÁY TÍNH (PC CLEANER) — phiên bản 1.4.1
+==============================================
 
 CÁCH MỞ
   1. Giải nén cả thư mục ra (ví dụ ra Desktop). Không chạy trực tiếp trong file .zip.
   2. Bấm đúp vào "Don Dep May Tinh.exe".
      Nếu Windows hiện cảnh báo màu xanh "Windows protected your PC":
      bấm "More info" → "Run anyway".
-  3. Muốn có biểu tượng trên Desktop và menu Start: vào tab "Tự động"
+  3. Muốn có biểu tượng trên Desktop và menu Start: vào tab "⚙ Cài đặt"
      → bấm "Tạo biểu tượng".
   4. App tự báo khi có bản mới. Trang chủ: github.com/kenhgt247/don-dep-may-tinh
 
-6 TAB CỦA APP
+ĐỔI NGÔN NGỮ (TIẾNG VIỆT / ENGLISH)
+  Vào tab cuối "⚙ Cài đặt" → mục "Ngôn ngữ giao diện" → chọn Tiếng Việt hoặc English.
+  App đổi ngay và nhớ lựa chọn cho lần mở sau. Đổi ngôn ngữ không xóa hay chuyển file nào.
+
+7 TAB CỦA APP
   1. Dọn dẹp
      - "Quét máy" (chỉ xem, chưa xóa gì) → bỏ chọn những gì muốn giữ → "Dọn dẹp ngay".
      - Rác hệ thống: file tạm, bộ nhớ đệm trình duyệt / Zalo / Teams, thùng rác,
        gói cập nhật Zalo, bản Zalo cũ (chưa chọn sẵn)...
+     - Với file cá nhân, chuột phải để chọn từng file: chuyển lên Drive / ổ ngoài
+       hay xóa vĩnh viễn.
      - Bấm "Quyền admin" để quét thêm gói cập nhật Windows cũ và file ngủ đông.
-     - Bấm vào một ảnh trong danh sách để xem trước ở khung bên phải.
   2. Bản đồ ổ đĩa
      - Chọn ổ → "Phân tích ổ đĩa" → thấy thư mục nào chiếm nhiều chỗ nhất.
      - Bấm đúp để đi sâu vào từng thư mục, "Lên trên" để quay lại.
-     - Chọn thư mục / file rồi bấm "Thêm vào danh sách chuyển đi" để chuyển nó
-       lên Drive hoặc ổ ngoài. Mục màu xám (Windows, chương trình) không chuyển được.
+     - Bấm vào một mục để biết đó là gì, có xóa được không.
+     - Chuột phải: xóa vào Thùng rác, xóa vĩnh viễn, hoặc chuyển lên Drive / ổ ngoài.
+       Mục hệ thống (Windows, chương trình, tin nhắn Zalo) bị chặn.
   3. File trùng
      - Tìm các file giống hệt nhau. Mỗi nhóm tự giữ lại 1 bản, các bản thừa
        được chuyển vào Thùng rác (vẫn khôi phục được từ Thùng rác).
-  4. Đã chuyển đi
+  4. Smart Folder (sắp xếp file, chạy hoàn toàn trên máy, không cần mạng)
+     - Chọn thư mục (hoặc cả ổ dữ liệu như D:\) → chọn "Cá nhân" (theo loại file)
+       hoặc "Công việc" (công văn, quyết định, báo cáo, hợp đồng...) → "Quét & đề xuất".
+     - Xem cột "Đường dẫn mới", bỏ chọn file không muốn chuyển → "Áp dụng file đã chọn".
+     - File được gom vào thư mục "PC Cleaner - Da sap xep" ngay trong thư mục bạn chọn.
+     - Không xóa, không ghi đè. Bấm "Hoàn tác lần gần nhất" để đưa file về chỗ cũ.
+     - Không bao giờ đụng ổ Windows, thư mục Zalo, OneDrive / Google Drive,
+       và thư mục của phần mềm / game (để phần mềm không bị hỏng).
+  5. Đã chuyển đi
      - Danh sách mọi file đã từng chuyển lên Drive / ổ ngoài.
      - Đánh dấu rồi bấm "Lấy về chỗ cũ" để tải file về đúng vị trí ban đầu.
-  5. Trình duyệt
+  6. Trình duyệt
      - "Quét trình duyệt" → thấy Chrome, Edge, Cốc Cốc, Brave, Opera, Firefox
        chiếm bao nhiêu chỗ, tách theo từng tài khoản (profile).
      - Bộ nhớ đệm: chọn sẵn, xóa an toàn. Lịch sử: tự chọn nếu muốn.
      - Cookie: xóa sẽ bị ĐĂNG XUẤT khỏi Facebook, Gmail, Zalo web... (hỏi 2 lần).
      - Không bao giờ đụng mật khẩu đã lưu, dấu trang, tiện ích mở rộng.
      - Nên tắt trình duyệt trước khi dọn (app sẽ nhắc).
-  6. Tự động
-     - Chạy ngầm cùng Windows: biểu tượng nhỏ ở góc phải thanh Taskbar,
-       báo ngay khi một ổ còn trống dưới mức bạn đặt (mặc định 5 GB).
+  7. ⚙ Cài đặt
+     - Ngôn ngữ, chạy ngầm cùng Windows (biểu tượng nhỏ ở góc phải thanh Taskbar),
+       báo khi một ổ còn trống dưới mức bạn đặt (mặc định 5 GB).
      - Tự dọn RÁC HỆ THỐNG theo lịch (không bao giờ tự đụng file cá nhân).
+     - Tạo biểu tượng, kiểm tra bản mới.
 
 APP BẢO VỆ BẠN NHƯ THẾ NÀO
   - Không làm gì khi bạn chưa bấm Yes ở bảng xác nhận.
@@ -51,4 +66,8 @@ APP BẢO VỆ BẠN NHƯ THẾ NÀO
 FILE ĐÃ CHUYỂN NẰM Ở ĐÂU
   - Google Drive: thư mục DonDep / <tên máy> / ...
   - Ổ ngoài: <thư mục bạn chọn>\DonDep\<tên máy>\...
+  - Smart Folder: <thư mục bạn chọn>\PC Cleaner - Da sap xep\...
   - Nhật ký và danh sách: Documents\DonDepMayTinh (nút "Mở nhật ký").
+
+GÓP Ý / BÁO LỖI
+  github.com/kenhgt247/don-dep-may-tinh/issues

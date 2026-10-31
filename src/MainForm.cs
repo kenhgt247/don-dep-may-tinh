@@ -580,7 +580,7 @@ namespace DonDep
                     long after = destFree - movBytes;
                     if (after < keep) { Msg("Ổ " + destRoot + " không đủ chỗ an toàn.\n\nCòn trống: " + Fmt.Size(destFree) + "\nCần: " + Fmt.Size(movBytes) + "\nSau khi chuyển sẽ còn: " + Fmt.Size(Math.Max(0, after)) + "\nMức giữ trống tối thiểu: " + Fmt.Size(keep) + "\n\nHãy bỏ bớt file hoặc chọn ổ khác.", MessageBoxIcon.Warning); return; }
                     destBase = Path.Combine(dest, "DonDep", App.PcName);
-                    destText = destBase + " (ổ " + destRoot + " còn " + Fmt.Size(destFree) + " → sau khi chuyển còn " + Fmt.Size(after) + ")";
+                    destText = UiLanguage.P(destBase) + " (ổ " + destRoot + " còn " + Fmt.Size(destFree) + " → sau khi chuyển còn " + Fmt.Size(after) + ")";
                 }
             }
 
@@ -601,7 +601,7 @@ namespace DonDep
             if (perms.Count > 0)
             {
                 msg += "\n•  XÓA VĨNH VIỄN " + perms.Count + " file cá nhân (" + Fmt.Size(permBytes) + ") — KHÔNG lấy lại được:";
-                foreach (var o in perms.OrderByDescending(x => x.Size).Take(6)) msg += "\n      " + o.Name + " (" + Fmt.Size(o.Size) + ")";
+                foreach (var o in perms.OrderByDescending(x => x.Size).Take(6)) msg += "\n      " + UiLanguage.P(o.Name) + " (" + Fmt.Size(o.Size) + ")";
                 if (perms.Count > 6) msg += "\n      ... và " + (perms.Count - 6) + " file khác";
             }
             if (moves.Count > 0)

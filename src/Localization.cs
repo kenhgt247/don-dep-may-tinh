@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
 namespace DonDep
@@ -447,7 +448,7 @@ namespace DonDep
             { "Không chuyển được ", "Could not move " },
             { "Tải lên Google Drive: ", "Uploading to Google Drive: " },
             { "Để dùng Google Drive, app cần công cụ miễn phí rclone (khoảng 25 MB) từ trang chính thức rclone.org.\n\nTải về ngay?", "To use Google Drive, the app needs the free rclone utility (about 25 MB) from rclone.org.\n\nDownload it now?" },
-            { "Trình duyệt sẽ mở trang đăng nhập Google.\n\n1. Chọn tài khoản Google muốn dùng để lưu file.\n2. Bấm Cho phép (Allow).\n\nApp chỉ được truy cập những file do chính app tải lên.", "Your browser will open Google sign-in.\n\n1. Select the Google account for file storage.\n2. Click Allow.\n\nThe app can only access files that it uploads." },
+            { "Trình duyệt sẽ mở trang đăng nhập Google.\n\n1. Chọn tài khoản Google muốn dùng để lưu file.\n2. Bấm Cho phép (Allow).\n\nApp chỉ được truy cập những file do chính nó tải lên, không đọc được các file khác trong Drive của bạn.", "Your browser will open Google sign-in.\n\n1. Select the Google account for file storage.\n2. Click Allow.\n\nThe app can only access files that it uploads itself; it cannot read other files in your Drive." },
             { "Đang chờ bạn đăng nhập Google trong trình duyệt...", "Waiting for Google sign-in in browser..." },
             { "Chưa kết nối được Google Drive. Hãy thử lại và nhớ bấm Cho phép trong trình duyệt.", "Could not connect to Google Drive. Retry and click Allow in your browser." },
             { "App đang chạy với quyền quản trị rồi.", "The app is already running as administrator." },
@@ -511,23 +512,74 @@ namespace DonDep
             { "Có bản mới ", "New version available: " },
             { " (bạn đang dùng ", " (current version " },
             { "Đã có bản mới ", "New version found: " },
-            { ") .\n\nMở trang tải về?", ").\n\nOpen download page?" },
+            { ").\n\nMở trang tải về?", ").\n\nOpen download page?" },
             { "Bạn đang dùng bản mới nhất (", "You have the latest version (" },
             { " trình duyệt, tổng ", " browsers, total " },
             { "\n\nCòn ", "\n\nRemaining " },
+            { " còn ", " free " },
+            { "Chỉ còn ", "Only " },
+            { " file từ ", " files from " },
+            { ") — KHÔNG lấy lại được:", ") — CANNOT be recovered:" },
+            { "  (nay còn trống ", "  (now free " },
+            { " mục.", " items." },
+            { " mục — ", " items — " },
+            { " mục (", " items (" },
+            { "Đang so sánh nhóm ", "Comparing group " },
+            { " thư mục, ", " folders, " },
+            { " đọc được, mất ", " readable, took " },
+            { " giây.", " seconds." },
+            { "Gói cập nhật Zalo đã tải", "Downloaded Zalo update packages" },
+            { "Gói cập nhật Zalo đã tải (", "Downloaded Zalo update packages (" },
+            { "Bản Zalo cũ không dùng nữa (", "Unused old Zalo versions (" },
+            { "Gói cập nhật Windows đã cài xong", "Installed Windows update packages" },
+            { "Bộ nhớ đệm phân phối cập nhật", "Delivery Optimization cache" },
+            { "Báo cáo lỗi Windows (hệ thống)", "Windows error reports (system)" },
+            { "Không đủ chỗ trống để tải công cụ kết nối Google Drive (cần khoảng 150 MB, ổ ", "Not enough free space to download the Google Drive tool (about 150 MB needed, drive " },
+            { " chỉ còn ", " has only " },
+            { ").\n\nHãy dọn Rác hệ thống trước để giải phóng chỗ, sau đó kết nối lại.", ").\n\nClean System junk first to free space, then connect again." },
+            { "Đang tải rclone từ ", "Downloading rclone from " },
+            { "Không tải được rclone: ", "Could not download rclone: " },
+            { "Đang tải lên: ", "Uploading: " },
+            { "rclone báo lỗi (mã ", "rclone reported an error (code " },
+            { "). Chi tiết trong: ", "). Details in: " },
+            { "Đã tạo shortcut tại: ", "Shortcut created at: " },
+            { "Đã tạo biểu tượng tại: ", "Shortcuts created at: " },
+            { "Chưa tạo được biểu tượng.", "Could not create shortcuts." },
+            { "\n\nChi tiết lỗi:\n", "\n\nError details:\n" },
+            { "Chọn thư mục cá nhân / công việc muốn sắp xếp", "Choose the personal / work folder to organize" },
+            { "Chưa chọn thư mục.", "No folder selected." },
+            { "Không thấy thư mục: ", "Folder not found: " },
+            { "Không cho phép sắp xếp toàn bộ ổ chứa Windows. Hãy chọn một thư mục riêng.", "Organizing the entire Windows drive is not allowed. Choose a specific folder." },
+            { "Chỉ hỗ trợ ổ dữ liệu nội bộ hoặc USB đang kết nối.", "Only internal data drives or connected USB drives are supported." },
+            { "Thư mục hệ thống, Zalo, ứng dụng và đồng bộ đám mây không được hỗ trợ.", "System, Zalo, application and cloud-sync folders are not supported." },
+            { "Đây là thư mục của một phần mềm hoặc game. Chuyển file ra khỏi đây sẽ làm phần mềm không chạy được nên Smart Folder không sắp xếp thư mục này.", "This is a program or game folder. Moving files out of it would break the program, so Smart Folder will not organize it." },
         };
         static readonly KeyValuePair<string, string>[] Phrases = En.OrderByDescending(p => p.Key.Length).ToArray();
+
+        // Đánh dấu tên file / đường dẫn của người dùng để bộ dịch không bao giờ dịch nhầm.
+        // U+2068 / U+2069 là ký tự định dạng vô hình (không hiện ra trên màn hình).
+        const char Open = '\u2068', Close = '\u2069';
+        public static string P(string userText) { return Open + (userText ?? "") + Close; }
 
         public static string T(string text)
         {
             if (!English || string.IsNullOrEmpty(text)) return text;
             string exact;
             if (En.TryGetValue(text, out exact)) return exact;
-            // Longer phrases first: preserves inserted file paths, counts and disk sizes.
-            foreach (var phrase in Phrases)
-                if (phrase.Key.Length >= 5 && text.Contains(phrase.Key))
-                    text = text.Replace(phrase.Key, phrase.Value);
-            return text;
+            // Giấu phần do người dùng đặt tên (đường dẫn, tên file) trước khi dịch.
+            var kept = new List<string>();
+            text = Regex.Replace(text, "\u2068[^\u2069]*\u2069", m => { kept.Add(m.Value); return "\uE000" + (kept.Count - 1) + "\uE001"; });
+            if (En.TryGetValue(text, out exact)) text = exact;
+            else
+            {
+                // Longer phrases first: preserves inserted file paths, counts and disk sizes.
+                foreach (var phrase in Phrases)
+                    if (phrase.Key.Length >= 5 && text.Contains(phrase.Key))
+                        text = text.Replace(phrase.Key, phrase.Value);
+                // "Ổ C:" / "(ổ D:" quá ngắn để nằm trong bảng cụm từ.
+                text = Regex.Replace(text, "(^|[\n(\\s])[Ổổ] (?=[A-Za-z]:)", m => m.Groups[1].Value + (m.Value.Contains("Ổ") ? "Drive " : "drive "));
+            }
+            return Regex.Replace(text, "\uE000(\\d+)\uE001", m => kept[int.Parse(m.Groups[1].Value)]);
         }
 
         public static void Attach(Control root)

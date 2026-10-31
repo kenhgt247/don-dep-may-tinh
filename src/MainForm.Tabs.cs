@@ -174,7 +174,7 @@ namespace DonDep
             lblInfoLevel.ForeColor = n.Info.Color;
             lblInfoTitle.Text = n.Info.Title;
             var sb = new StringBuilder(n.Info.Text);
-            sb.Append("\n\n").Append(n.IsDir ? "Thư mục: " : "File: ").Append(n.Name).Append("\nDung lượng: ").Append(Fmt.Size(n.Size)).Append("\n").Append(n.Path);
+            sb.Append("\n\n").Append(n.IsDir ? "Thư mục: " : "File: ").Append(UiLanguage.P(n.Name)).Append("\nDung lượng: ").Append(Fmt.Size(n.Size)).Append("\n").Append(UiLanguage.P(n.Path));
             if (sel.Count > 1) sb.Append("\n\n(Đang chọn ").Append(sel.Count).Append(" mục, tổng ").Append(Fmt.Size(sel.Sum(x => x.Size))).Append(")");
             lblInfoText.Text = sb.ToString();
             btnInfoRecycle.Enabled = btnInfoDelete.Enabled = n.Info.Level != Level.Cam;
@@ -189,7 +189,7 @@ namespace DonDep
             if (blocked.Count > 0)
             {
                 var t = new StringBuilder("Những mục sau KHÔNG ĐƯỢC XÓA:\n");
-                foreach (var b in blocked) t.Append("\n⛔ ").Append(b.Name).Append(" — ").Append(b.Info.Title).Append("\n    ").Append(b.Info.Text).Append("\n");
+                foreach (var b in blocked) t.Append("\n⛔ ").Append(UiLanguage.P(b.Name)).Append(" — ").Append(b.Info.Title).Append("\n    ").Append(b.Info.Text).Append("\n");
                 Msg(t.ToString(), MessageBoxIcon.Stop);
                 sel = sel.Where(n => n.Info.Level != Level.Cam).ToList();
                 if (sel.Count == 0) return;
@@ -197,10 +197,10 @@ namespace DonDep
             long sum = sel.Sum(n => n.Size);
             var risky = sel.Where(n => n.Info.Level == Level.CanThan || n.Info.Level == Level.KhongRo).ToList();
             var msg = new StringBuilder(permanent ? "XÓA VĨNH VIỄN — không khôi phục được:\n" : "Chuyển vào Thùng rác (còn khôi phục được):\n");
-            foreach (var n in sel.Take(10)) msg.Append("\n• ").Append(n.Name).Append("  (").Append(Fmt.Size(n.Size)).Append(")  —  ").Append(n.Info.Short).Append(": ").Append(n.Info.Title);
+            foreach (var n in sel.Take(10)) msg.Append("\n• ").Append(UiLanguage.P(n.Name)).Append("  (").Append(Fmt.Size(n.Size)).Append(")  —  ").Append(n.Info.Short).Append(": ").Append(n.Info.Title);
             if (sel.Count > 10) msg.Append("\n   ... và ").Append(sel.Count - 10).Append(" mục khác");
             msg.Append("\n\nTổng: ").Append(Fmt.Size(sum));
-            if (risky.Count > 0) { msg.Append("\n\n⚠️ CHÚ Ý:"); foreach (var n in risky) msg.Append("\n").Append(n.Name).Append(": ").Append(n.Info.Text); }
+            if (risky.Count > 0) { msg.Append("\n\n⚠️ CHÚ Ý:"); foreach (var n in risky) msg.Append("\n").Append(UiLanguage.P(n.Name)).Append(": ").Append(n.Info.Text); }
             if (!permanent) msg.Append("\n\nLưu ý: ổ đĩa chỉ trống thêm sau khi dọn Thùng rác. File quá lớn có thể bị Windows hỏi xóa hẳn.");
             msg.Append("\n\nTiếp tục?");
             if (!Confirm(msg.ToString())) return;
@@ -763,6 +763,15 @@ namespace DonDep
             FillBrowserList(br);
             UpdateBrowserSummary();
             sb.Append(" browsers=").Append(br.Select(x => x.Browser).Distinct().Count()).Append("/").Append(br.Count);
+            if (UiLanguage.English)
+            {
+                string path = UiLanguage.P(@"D:\Thư mục công ty\Báo cáo.docx");
+                string shown = UiLanguage.T("Thư mục: " + path);
+                if (shown != "Folder: " + path) throw new Exception("Bộ dịch làm thay đổi đường dẫn của người dùng: " + shown);
+                string warn = UiLanguage.T("Ổ C: sắp đầy!");
+                if (warn != "Drive C: almost full!") throw new Exception("Dịch sai cảnh báo ổ đầy: " + warn);
+                sb.Append(" EN_OK");
+            }
             sb.Append(" UI_OK");
             return sb.ToString();
         }

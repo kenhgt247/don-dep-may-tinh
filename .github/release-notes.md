@@ -1,23 +1,21 @@
-# PC Cleaner v1.4.0 — Giao diện Cài đặt mới / Redesigned Settings
+# PC Cleaner v1.4.1 — An toàn hơn & dịch tốt hơn / Safer and better translated
 
-## ✨ Thay đổi giao diện / UI improvements
+## 🛡️ An toàn
+- **Smart Folder không còn đụng vào thư mục phần mềm / game.** Thư mục có file chương trình (.dll…) hoặc trình gỡ cài đặt sẽ được bỏ qua toàn bộ. Trước đây chế độ "Cá nhân" có thể đề xuất chuyển cả file .exe, ảnh, tài liệu bên trong thư mục game trên ổ D, làm game/phần mềm không chạy được.
+- Nếu bạn chọn đúng một thư mục phần mềm để sắp xếp, app sẽ báo và dừng lại.
 
-- **Sắp xếp lại thanh menu:** Dọn dẹp → Bản đồ ổ đĩa → File trùng → Smart Folder → Đã chuyển đi → Trình duyệt → **⚙ Cài đặt**.
-- Đổi tên **Tự động** thành **Cài đặt**, luôn nằm ở **tab cuối cùng** trong cả hai ngôn ngữ.
-- Thêm nhóm **🌐 Ngôn ngữ giao diện** ngay đầu trang Cài đặt: hai lựa chọn **🇻🇳 Tiếng Việt** / **🇬🇧 English**, đánh dấu rõ ngôn ngữ hiện tại.
-- Thay đổi ngôn ngữ **ngay lập tức, tự lưu** cho lần mở sau; giữ nguyên tab đang mở và các lựa chọn cài đặt chưa lưu.
-- Giao diện Cài đặt có bố cục mới với các khu vực: ngôn ngữ, chạy nền/tự động, shortcut và kiểm tra cập nhật. Tự cuộn khi cửa sổ nhỏ.
-- Di chuyển nút chuyển ngôn ngữ từ thanh trạng thái vào Cài đặt để giao diện chính gọn hơn.
-- Sửa xử lý chuyển tab: danh sách **Đã chuyển đi** tiếp tục được tải đúng sau khi thay đổi thứ tự menu.
+## 🌐 Tiếng Anh
+- Tên file và đường dẫn của bạn **không bao giờ bị dịch nhầm** trong các bảng xác nhận (ví dụ thư mục "Thư mục công ty" trước đây có thể hiện thành "Folder công ty").
+- Dịch nốt các chỗ còn sót: cảnh báo "Ổ C: sắp đầy", bảng đăng nhập Google Drive, câu hỏi mở trang tải bản mới, thông báo lỗi Smart Folder, tên tài khoản trình duyệt mặc định…
+- Cột "Lý do" trong Smart Folder hiện đúng một ngôn ngữ.
 
-## 🛡️ Giữ nguyên chức năng
-
-Bản này **không thay đổi cơ chế xóa, chuyển file hoặc hoàn tác**. Giữ nguyên Smart Folder, xử lý Zalo, phân tích ổ cứng, file trùng, sao lưu Drive, dọn trình duyệt và chế độ chạy nền.
+## 📄 Tài liệu
+- `HUONG DAN.txt` cập nhật đủ 7 tab (Smart Folder, Cài đặt, đổi ngôn ngữ).
+- Thêm `GUIDE (English).txt` cho người dùng tiếng Anh.
 
 ## ⬇️ Cài đặt
+Tải `DonDepMayTinh.zip` trong **Assets**, giải nén và mở `Don Dep May Tinh.exe` (Windows 10/11). Đổi ngôn ngữ ở tab cuối **⚙ Cài đặt**.
 
-Tải `DonDepMayTinh.zip` trong phần **Assets** dưới đây, giải nén và mở `Don Dep May Tinh.exe` trên Windows 10/11. Chọn tab cuối **⚙ Cài đặt** để đổi ngôn ngữ.
-
-**English:** The Settings tab is always last. It now includes a prominent Vietnamese/English language picker, with instant application and saved preference. Existing automation, shortcuts, update checks, disk cleanup and Smart Folder features remain intact.
+**English:** Smart Folder now skips program and game folders entirely so it can never break installed software. English mode no longer alters your own file/folder names in dialogs, and the remaining untranslated messages are fixed. The download now includes an English guide.
 
 **Lưu ý:** EXE chưa có chữ ký số nên Windows SmartScreen có thể cảnh báo. Chỉ tải từ trang GitHub chính thức của dự án.

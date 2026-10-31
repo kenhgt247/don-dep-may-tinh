@@ -8,7 +8,7 @@
     <AssemblyName>DonDepMayTinh</AssemblyName>
     <RootNamespace>DonDep</RootNamespace>
     <ApplicationIcon>DonDep.ico</ApplicationIcon>
-    <Version>1.4.0</Version>
+    <Version>1.4.1</Version>
     <Product>Dọn Dẹp Máy Tính</Product>
     <AssemblyTitle>Dọn Dẹp Máy Tính</AssemblyTitle>
     <Description>Phần mềm miễn phí dọn ổ đĩa Windows</Description>

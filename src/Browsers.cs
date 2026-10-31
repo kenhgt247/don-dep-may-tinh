@@ -88,9 +88,10 @@ namespace DonDep
                 {
                     string dirName = Path.GetFileName(prof);
                     string label;
-                    if (b.Name.StartsWith("Opera")) label = "Mặc định";
+                    string def = UiLanguage.English ? "Default" : "Mặc định";
+                    if (b.Name.StartsWith("Opera")) label = def;
                     else if (names.TryGetValue(dirName, out label) && !string.IsNullOrEmpty(label) && label != dirName) label = dirName + " — " + label;
-                    else label = dirName == "Default" ? "Mặc định" : dirName;
+                    else label = dirName == "Default" ? def : dirName;
                     // Opera để cache ở thư mục Local riêng
                     var cacheBase = new List<string> { prof };
                     if (b.Name.StartsWith("Opera")) cacheBase.Add(Path.Combine(Fs.LocalAppData, @"Opera Software\" + Path.GetFileName(prof)));

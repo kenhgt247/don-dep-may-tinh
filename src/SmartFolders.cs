@@ -55,6 +55,24 @@ namespace DonDep
             "Zalo Data", "ZaloData", "WindowsApps", ".git", "node_modules",
             "SteamLibrary", "steamapps", "Epic Games", "Riot Games", "Garena", "XboxGames",
             "MSOCache", "$WinREAgent", "Config.Msi", "EFI", "Boot", "PerfLogs" };
+        // Dấu hiệu của thư mục chương trình / game (thư viện, gói dữ liệu của phần mềm).
+        // Chuyển file ra khỏi những thư mục này sẽ làm phần mềm không chạy được.
+        static readonly HashSet<string> AppMarkers = Set(".dll", ".ocx", ".pak", ".asar", ".vdf", ".uasset", ".pck");
+        internal static bool IsAppFolder(string dir)
+        {
+            try
+            {
+                foreach (var f in Directory.EnumerateFiles(dir))
+                {
+                    string ext = Path.GetExtension(f);
+                    if (AppMarkers.Contains(ext)) return true;
+                    string n = Path.GetFileName(f);
+                    if (Cmp.Equals(ext, ".exe") && n.StartsWith("unins", StringComparison.OrdinalIgnoreCase)) return true;
+                }
+            }
+            catch { }
+            return false;
+        }
         static HashSet<string> Set(params string[] ext) { return new HashSet<string>(ext, Cmp); }
         // Preserve the trailing separator for volume roots: "D:\\" must never
         // become "D:" (a drive-relative path in Windows).
@@ -101,7 +119,7 @@ namespace DonDep
         {
             if (string.IsNullOrWhiteSpace(folder)) throw new IOException("Chưa chọn thư mục.");
             string root = Full(folder);
-            if (!Directory.Exists(root)) throw new DirectoryNotFoundException("Không thấy thư mục: " + root);
+            if (!Directory.Exists(root)) throw new DirectoryNotFoundException("Không thấy thư mục: " + UiLanguage.P(root));
             bool driveRoot = IsDriveRoot(root);
             if (driveRoot)
             {
@@ -206,6 +224,8 @@ namespace DonDep
         {
             ValidateRoot(folder);
             string root = Full(folder), outputBase = Path.Combine(root, SortedFolder);
+            if (IsAppFolder(root))
+                throw new IOException("Đây là thư mục của một phần mềm hoặc game. Chuyển file ra khỏi đây sẽ làm phần mềm không chạy được nên Smart Folder không sắp xếp thư mục này.");
             var result = new SmartResult();
             var files = new List<FileInfo>();
             var stack = new Stack<string>(); stack.Push(root);
@@ -225,7 +245,7 @@ namespace DonDep
                     }
                     foreach (var sub in Directory.EnumerateDirectories(dir))
                         try {
-                            if (ForbiddenPath(sub) || PathRules.IsProtected(sub) || LinkedDirectory(sub) ||
+                            if (ForbiddenPath(sub) || PathRules.IsProtected(sub) || LinkedDirectory(sub) || IsAppFolder(sub) ||
                                 Cmp.Equals(sub, outputBase) || Cmp.Equals(Full(sub), Full(App.AppDir)) ||
                                 Cmp.Equals(Full(sub), Full(App.DataDir))) result.Protected++;
                             else stack.Push(sub);
@@ -382,6 +402,16 @@ namespace DonDep
                 File.WriteAllText(content, "BAO CAO QUY IV");
                 File.WriteAllText(Path.Combine(root, "photo1.jpg"), "identical-picture-data");
                 File.WriteAllText(Path.Combine(root, "photo2.jpg"), "identical-picture-data");
+                // Thư mục game/phần mềm: không được đề xuất chuyển bất kỳ file nào bên trong.
+                string game = Path.Combine(root, "MyGame");
+                Directory.CreateDirectory(Path.Combine(game, "data"));
+                File.WriteAllText(Path.Combine(game, "game.exe"), "x");
+                File.WriteAllText(Path.Combine(game, "engine.dll"), "x");
+                File.WriteAllText(Path.Combine(game, "readme.txt"), "Bao cao");
+                File.WriteAllText(Path.Combine(game, "data", "level.png"), "x");
+                bool rejectedApp = false;
+                try { Scan(game,false,false,false,false); } catch (IOException) { rejectedApp = true; }
+                if (!rejectedApp) throw new Exception("App folder root was not blocked.");
 
                 // Validate volume root handling even when the CI runner has no D:.
                 if (!IsDriveRoot(@"D:\") || IsDriveRoot(@"D:\MyFiles") ||
@@ -403,6 +433,8 @@ namespace DonDep
                     !personal.Items.Single(x=>x.Source.EndsWith("photo1.jpg")).Target.Contains(
                         DateTime.Now.ToString("yyyy")))
                     throw new Exception("Personal/date/duplicate classification test failed.");
+                if (personal.Items.Any(x => x.Source.IndexOf("MyGame", StringComparison.OrdinalIgnoreCase) >= 0))
+                    throw new Exception("Files inside an application folder were proposed for moving.");
 
                 var workContent = Scan(root,true,true,false,true);
                 if(workContent.Items.Single(x=>x.Source==content).Group != "04 - Bao cao")

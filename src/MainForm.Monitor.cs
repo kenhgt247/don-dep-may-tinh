@@ -37,7 +37,7 @@ namespace DonDep
             var btnKill = Btn(UiLanguage.L("Đóng chương trình đã chọn", "Close selected program"), 12, 178, 230, 32);
             var hint = Lbl(UiLanguage.L("Danh sách gộp theo chương trình (ví dụ Chrome gồm nhiều tiến trình). Cập nhật mỗi 2 giây. Không cho đóng thành phần của Windows.",
                                         "Grouped by program (e.g. Chrome has many processes). Updates every 2 seconds. Windows components cannot be closed."), 252, 186, 900, 22);
-            top.Controls.AddRange(new Control[] { btnKill, hint });
+            top.Controls.AddRange(new Control[] { lblTip, btnKill, hint });
 
             procList = new ListView { View = View.Details, FullRowSelect = true, GridLines = true, Dock = DockStyle.Fill, MultiSelect = false, HideSelection = false };
             procList.Columns.Add(UiLanguage.L("Chương trình", "Program"), 360);

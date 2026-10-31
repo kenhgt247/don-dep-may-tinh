@@ -1,4 +1,4 @@
-﻿PC CLEANER (DON DEP MAY TINH) — version 1.5.0
+﻿PC CLEANER (DON DEP MAY TINH) — version 1.6.0
 ==============================================
 
 GETTING STARTED
@@ -15,7 +15,7 @@ LANGUAGE
   Open the last tab "⚙ Settings" → "Display language" → choose English or Tiếng Việt.
   The change applies immediately and is remembered. No files are moved or deleted.
 
-THE 8 TABS
+THE 10 TABS
   1. Cleanup
      - "Scan PC" only lists items; nothing is deleted yet. Untick what you want to keep,
        then click "Clean now".
@@ -24,6 +24,9 @@ THE 8 TABS
      - Also cleans caches of CapCut (plus old CapCut versions), Telegram, Messenger,
        Discord, Adobe, Steam and Epic Games. You are asked to close running apps first.
        CapCut projects and chat messages are never touched.
+     - "Leftover installers": .exe, .msi, .iso... in Downloads, Desktop and Zalo / Telegram
+       folders (suggested for deletion; download again if ever needed).
+     - Right-click an item → "Never clean this item" to add it to the protected list.
      - "Run as admin" adds old Windows update files and the hibernation file.
   2. Disk map
      - Pick a drive → "Analyze disk" to see which folders use the most space.
@@ -54,11 +57,19 @@ THE 8 TABS
        (estimate) and a "not opened for 6+ months" note.
      - Select one → "Uninstall selected" opens that program's own uninstaller.
        Drivers, Visual C++, .NET etc. are flagged and need a second confirmation.
-  8. ⚙ Settings
+     - After uninstalling, the app looks for LEFTOVER folders (AppData, ProgramData,
+       Program Files) and offers to send them to the Recycle Bin.
+  8. Performance
+     - Live CPU, memory, network, disks and the heaviest programs. Close a program from
+       the list (Windows components are blocked).
+  9. History
+     - Every cleanup, deletion, move, uninstall... is recorded. Click a row for details.
+  10. ⚙ Settings
      - Your results: total space freed + "Create a picture to share" (saved in Pictures
        and copied — press Ctrl+V in Facebook).
      - Automatically move old Zalo photos/videos/files to Google Drive on a schedule
        (e.g. older than 90 days, every 7 days). Needs background mode and Google Drive.
+     - Protected list: folders / files that are NEVER cleaned, deleted or moved.
      - Language, run in background with Windows (tray icon), low-disk warnings
        (default 5 GB), scheduled SYSTEM JUNK cleanup (never personal files),
        shortcuts and update check.

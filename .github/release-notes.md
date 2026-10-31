@@ -1,19 +1,15 @@
-# PC Cleaner v1.5.0 — Gỡ phần mềm, dọn CapCut/Telegram, tự đưa ảnh Zalo lên Drive, tự cập nhật
+# PC Cleaner v1.6.0 — Tàn dư phần mềm, file cài đặt thừa, Hiệu năng, Bảo vệ, Lịch sử
 
 ## ✨ Mới
-- **🧰 Tab Gỡ phần mềm:** xem phần mềm nào chiếm nhiều chỗ, ngày cài, **lần mở gần nhất (ước tính)**, đánh dấu phần mềm *hơn 6 tháng chưa mở*. Chọn rồi bấm **Gỡ** — trình gỡ cài đặt của chính phần mềm đó sẽ mở ra. Driver, Visual C++, .NET… được cảnh báo và hỏi 2 lần.
-- **🧹 Dọn thêm phần mềm người Việt hay dùng:** bộ nhớ đệm **CapCut** (và các bản CapCut cũ — có máy lên tới hàng chục GB), **Telegram**, **Messenger**, **Discord**, **Adobe** (Premiere, After Effects), **Steam**, **Epic Games**. Phần mềm đang mở thì app nhắc tắt trước. Không đụng dự án CapCut hay tin nhắn.
-- **☁ Tự động đưa ảnh, video, file Zalo cũ lên Google Drive** theo lịch (ví dụ: cũ hơn 90 ngày, mỗi 7 ngày) khi app chạy ngầm. Có nút **Xem trước & chạy ngay**. File chỉ bị bỏ khỏi máy sau khi tải lên và kiểm tra xong; lấy lại ở tab *Đã chuyển đi*.
-- **🔄 Tự cập nhật:** có bản mới, app hỏi rồi tự tải, kiểm tra mã SHA-256 của GitHub, thay thế và mở lại. Không phải vào GitHub tải lại nữa (áp dụng từ bản 1.5.0 trở đi).
-- **🏆 Thành tích:** "App đã giúp bạn giải phóng X GB" + nút **Tạo ảnh khoe lên Facebook** (ảnh đã chép sẵn, vào Facebook bấm Ctrl+V).
-
-## 🛠 Sửa
-- Chữ "&" trong tiêu đề, nút bấm hiện đúng (trước bị mất, ví dụ "Cài đặt  tùy chỉnh").
-- Dòng phiên bản trong Cài đặt không còn bị cắt.
+- **🧹 Dọn tàn dư sau khi gỡ phần mềm:** gỡ xong, app tìm các thư mục còn sót lại (AppData, ProgramData, Program Files) mang đúng tên phần mềm, cho bạn chọn rồi đưa vào **Thùng rác** (vẫn khôi phục được). Không đụng thư mục mà phần mềm khác còn dùng.
+- **📦 File cài đặt thừa:** nhóm mới trong tab Dọn dẹp — file .exe, .msi, .iso… đã cài xong nằm ở Downloads, Desktop, thư mục nhận file Zalo / Telegram. Phần mềm chạy trực tiếp (có .dll đi kèm) không bị tính.
+- **📈 Tab Hiệu năng:** CPU, RAM, mạng, ổ đĩa theo thời gian thực; chương trình nào đang ngốn máy nhất; đóng chương trình ngay trong app (chặn thành phần Windows).
+- **🛡 Danh sách bảo vệ:** thư mục / file không bao giờ bị dọn, xóa hay chuyển. Thêm ở tab Cài đặt hoặc chuột phải một mục trong tab Dọn dẹp → "Không bao giờ dọn mục này".
+- **🕘 Tab Lịch sử:** ghi lại mọi lần dọn rác, xóa, chuyển lên Drive, gỡ phần mềm, Smart Folder… kèm danh sách file chi tiết.
 
 ## ⬇️ Cài đặt
-Tải `DonDepMayTinh.zip` trong **Assets**, giải nén và mở `Don Dep May Tinh.exe` (Windows 10/11). Người đang dùng bản cũ: app sẽ báo có bản mới — bản này cần tải tay một lần, từ 1.5.0 trở đi app tự cập nhật.
+Đang dùng bản 1.5.0: app sẽ hỏi và **tự cập nhật**. Bản cũ hơn: tải `DonDepMayTinh.zip` trong **Assets**, giải nén và mở `Don Dep May Tinh.exe` (Windows 10/11).
 
-**English:** New Uninstall tab (size, estimated last use, launches the program's own uninstaller), caches for CapCut/Telegram/Messenger/Discord/Adobe/Steam/Epic, scheduled upload of old Zalo media to Google Drive, in-app self-update with SHA-256 verification, and a "space freed" counter with a shareable picture.
+**English:** Leftover cleanup after uninstalling (to Recycle Bin), leftover installer finder, live Performance tab, a protected list that is never cleaned, and a History tab with file-level details. Ideas inspired by open-source cleaners; all code is our own (MIT).
 
 **Lưu ý:** EXE chưa có chữ ký số nên Windows SmartScreen có thể cảnh báo. Chỉ tải từ trang GitHub chính thức của dự án.

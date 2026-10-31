@@ -1,4 +1,4 @@
-﻿DỌN DẸP MÁY TÍNH (PC CLEANER) — phiên bản 1.5.0
+﻿DỌN DẸP MÁY TÍNH (PC CLEANER) — phiên bản 1.6.0
 ==============================================
 
 CÁCH MỞ
@@ -15,7 +15,7 @@ CÁCH MỞ
   Vào tab cuối "⚙ Cài đặt" → mục "Ngôn ngữ giao diện" → chọn Tiếng Việt hoặc English.
   App đổi ngay và nhớ lựa chọn cho lần mở sau. Đổi ngôn ngữ không xóa hay chuyển file nào.
 
-8 TAB CỦA APP
+10 TAB CỦA APP
   1. Dọn dẹp
      - "Quét máy" (chỉ xem, chưa xóa gì) → bỏ chọn những gì muốn giữ → "Dọn dẹp ngay".
      - Rác hệ thống: file tạm, bộ nhớ đệm trình duyệt / Zalo / Teams, thùng rác,
@@ -25,6 +25,9 @@ CÁCH MỞ
        thì app nhắc tắt trước. Không bao giờ đụng dự án CapCut hay tin nhắn.
      - Với file cá nhân, chuột phải để chọn từng file: chuyển lên Drive / ổ ngoài
        hay xóa vĩnh viễn.
+     - "File cài đặt thừa": file .exe, .msi, .iso... đã cài xong nằm trong Downloads,
+       Desktop, thư mục nhận file Zalo / Telegram (gợi ý xóa, cần thì tải lại).
+     - Chuột phải một mục → "Không bao giờ dọn mục này" để đưa vào danh sách bảo vệ.
      - Bấm "Quyền admin" để quét thêm gói cập nhật Windows cũ và file ngủ đông.
   2. Bản đồ ổ đĩa
      - Chọn ổ → "Phân tích ổ đĩa" → thấy thư mục nào chiếm nhiều chỗ nhất.
@@ -58,12 +61,21 @@ CÁCH MỞ
        (ước tính), ghi chú "Hơn 6 tháng chưa mở".
      - Chọn một phần mềm → "Gỡ phần mềm đã chọn": trình gỡ cài đặt của chính phần mềm
        đó sẽ mở ra. Driver, Visual C++, .NET... được đánh dấu cảnh báo, hỏi 2 lần.
-  8. ⚙ Cài đặt
+     - Gỡ xong, app tìm thư mục TÀN DƯ còn sót (AppData, ProgramData, Program Files)
+       và hỏi bạn có muốn dọn không — được đưa vào Thùng rác, vẫn khôi phục được.
+  8. Hiệu năng
+     - Xem trực tiếp CPU, RAM, mạng, ổ đĩa và chương trình nào đang ngốn máy nhất.
+     - Chọn một chương trình → "Đóng chương trình đã chọn". Thành phần Windows bị chặn.
+  9. Lịch sử
+     - Mọi lần dọn rác, xóa, chuyển lên Drive, gỡ phần mềm... đều được ghi lại.
+       Bấm một dòng để xem chi tiết từng file.
+  10. ⚙ Cài đặt
      - Thành tích: "App đã giúp bạn giải phóng X GB" + nút "Tạo ảnh khoe lên Facebook"
        (ảnh lưu trong thư mục Ảnh và đã chép sẵn — vào Facebook bấm Ctrl+V để dán).
      - Tự động đưa ảnh, video, file Zalo cũ lên Google Drive theo lịch
        (ví dụ: file cũ hơn 90 ngày, mỗi 7 ngày). Cần bật chạy ngầm và kết nối Drive.
        Có nút "Xem trước & chạy ngay".
+     - Danh sách bảo vệ: thư mục / file KHÔNG BAO GIỜ bị dọn, xóa hay chuyển.
      - Ngôn ngữ, chạy ngầm cùng Windows (biểu tượng nhỏ ở góc phải thanh Taskbar),
        báo khi một ổ còn trống dưới mức bạn đặt (mặc định 5 GB).
      - Tự dọn RÁC HỆ THỐNG theo lịch (không bao giờ tự đụng file cá nhân).

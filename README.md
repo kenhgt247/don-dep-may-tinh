@@ -37,7 +37,9 @@
 
 Phần mềm hướng đến sự **rõ ràng và an toàn**: bạn xem danh sách trước, chọn việc cần làm và được cảnh báo khi có nguy cơ mất dữ liệu. Không bán gói VIP, không yêu cầu tài khoản riêng để dọn rác trên máy.
 
-> **Mới ở bản 1.5.0:** tab **Gỡ phần mềm** (xem phần mềm nào nặng, lâu không mở, gỡ ngay trong app) · dọn bộ nhớ đệm **CapCut, Telegram, Messenger, Discord, Adobe, Steam, Epic** · **tự động đưa ảnh Zalo cũ lên Google Drive** theo lịch · **tự cập nhật** trong app · thống kê "đã giải phóng X GB" kèm **ảnh khoe Facebook**.
+> **Mới ở bản 1.6.0:** dọn **tàn dư sau khi gỡ phần mềm** · tìm **file cài đặt thừa** (.exe, .msi, .iso ở Downloads, Desktop, Zalo, Telegram) · tab **Hiệu năng** (CPU, RAM, mạng, chương trình ngốn máy) · **danh sách bảo vệ** · tab **Lịch sử** dọn dẹp.
+>
+> **Bản 1.5.0:** tab **Gỡ phần mềm** (xem phần mềm nào nặng, lâu không mở, gỡ ngay trong app) · dọn bộ nhớ đệm **CapCut, Telegram, Messenger, Discord, Adobe, Steam, Epic** · **tự động đưa ảnh Zalo cũ lên Google Drive** theo lịch · **tự cập nhật** trong app · thống kê "đã giải phóng X GB" kèm **ảnh khoe Facebook**.
 
 ### 🌟 Vì sao nên dùng?
 
@@ -54,13 +56,15 @@ Phần mềm hướng đến sự **rõ ràng và an toàn**: bạn xem danh sá
 
 | Chức năng | Mô tả |
 |---|---|
-| **🧹 Dọn dẹp** | Quét file tạm, cache (cả **CapCut, Telegram, Messenger, Discord, Adobe, Steam, Epic**), gói cập nhật cũ, thùng rác; kiểm tra ảnh/video Zalo cũ, Downloads và file lớn. File cá nhân được chọn **chuyển đi hoặc xóa** theo từng mục. |
+| **🧹 Dọn dẹp** | Quét file tạm, cache (cả **CapCut, Telegram, Messenger, Discord, Adobe, Steam, Epic**), gói cập nhật cũ, thùng rác, **file cài đặt thừa**; kiểm tra ảnh/video Zalo cũ, Downloads và file lớn. File cá nhân được chọn **chuyển đi hoặc xóa** theo từng mục. |
 | **🗺️ Bản đồ ổ đĩa** | Xác định thư mục/file nào đang chiếm nhiều dung lượng; xem nhận diện mức độ an toàn, mở thư mục, hoặc đưa mục được phép vào danh sách xử lý. |
 | **🧩 File trùng** | Tìm các bản sao giống hệt nhau, giữ ít nhất một bản và đưa bản dư vào Thùng rác. |
 | **☁️ Đã chuyển đi** | Theo dõi các file đã chuyển và khôi phục về đúng vị trí cũ khi cần. |
 | **🌍 Trình duyệt** | Xem dữ liệu Chrome, Edge, Cốc Cốc, Brave, Opera, Firefox theo hồ sơ; có thể dọn cache, lịch sử, cookie theo lựa chọn. **Không đụng mật khẩu, dấu trang hay tiện ích mở rộng.** |
-| **🧰 Gỡ phần mềm** | Liệt kê phần mềm đã cài theo dung lượng, ngày cài, **lần mở gần nhất (ước tính)**; đánh dấu phần mềm hơn 6 tháng chưa mở; mở trình gỡ cài đặt ngay trong app. Driver, Visual C++, .NET… được cảnh báo riêng. |
-| **⚙️ Cài đặt (tab cuối)** | Chọn **Tiếng Việt / English**; **thành tích "đã giải phóng X GB" + ảnh khoe Facebook**; chạy ngầm cùng Windows, cảnh báo ổ gần đầy, hẹn lịch dọn rác hệ thống; **tự đưa ảnh/video/file Zalo cũ lên Google Drive theo lịch**; tạo shortcut; **tự cập nhật**. |
+| **🧰 Gỡ phần mềm** | Liệt kê phần mềm đã cài theo dung lượng, ngày cài, **lần mở gần nhất (ước tính)**; đánh dấu phần mềm hơn 6 tháng chưa mở; mở trình gỡ cài đặt ngay trong app, gỡ xong **tìm và dọn tàn dư** (vào Thùng rác). Driver, Visual C++, .NET… được cảnh báo riêng. |
+| **📈 Hiệu năng** | CPU, RAM, mạng, ổ đĩa theo thời gian thực; chương trình nào đang ngốn máy nhất; đóng chương trình ngay trong app (chặn thành phần Windows). |
+| **🕘 Lịch sử** | Ghi lại mọi lần dọn rác, xóa, chuyển lên Drive, gỡ phần mềm… kèm danh sách file chi tiết. |
+| **⚙️ Cài đặt (tab cuối)** | Chọn **Tiếng Việt / English**; **thành tích "đã giải phóng X GB" + ảnh khoe Facebook**; chạy ngầm cùng Windows, cảnh báo ổ gần đầy, hẹn lịch dọn rác hệ thống; **tự đưa ảnh/video/file Zalo cũ lên Google Drive theo lịch**; **danh sách bảo vệ** (không bao giờ dọn); tạo shortcut; **tự cập nhật**. |
 | **📁 Smart Folder** | Sắp xếp **file cá nhân** theo loại và **tài liệu công việc** theo từ khóa tên hoặc nội dung Word/Excel/PowerPoint/TXT/CSV; xem trước đường dẫn mới, phát hiện bản trùng SHA-256, áp dụng sau xác nhận và **hoàn tác** qua nhật ký. Không dùng AI, không kết nối API. |
 
 ### 📁 Smart Folder — Sắp xếp thông minh không cần AI
@@ -142,7 +146,9 @@ Nếu phần mềm hữu ích, hãy **⭐ Star** repository để ủng hộ. Đ
 | 🧩 **Duplicates** | Find identical copies, keep at least one and send extra copies to the Recycle Bin. |
 | ☁️ **Moved files** | Track relocated files and restore them to their original location. |
 | 🌍 **Browsers** | Clean selected cache, history or cookies by browser profile. Saved passwords, bookmarks and extensions are not targeted. |
-| 🧰 **Uninstall** | Installed programs by size, install date and estimated last use; launches each program's own uninstaller. Shared components are flagged. |
+| 🧰 **Uninstall** | Installed programs by size, install date and estimated last use; launches each program's own uninstaller, then finds leftover folders. Shared components are flagged. |
+| 📈 **Performance** | Live CPU, memory, network, disks and the heaviest programs. |
+| 🕘 **History** | Every cleanup, deletion, move and uninstall with file-level details. |
 | ⚙️ **Settings** | Always the last tab; language, "space freed" stats with a shareable picture, tray monitoring, low-space warnings, scheduled **system-junk-only** cleanup, **scheduled upload of old Zalo media to Google Drive**, shortcuts and **in-app updates**. |
 
 **Smart Folder:** An entirely offline, rule-based organizer for personal files (by extension) and work documents (by filename and selected text content). Preview every proposed move, exclude duplicates and unknown files, confirm before moving, and undo from a persistent log. No AI, API key, remote upload or automatic deletion.

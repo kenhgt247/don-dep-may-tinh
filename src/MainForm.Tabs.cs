@@ -551,6 +551,7 @@ namespace DonDep
                 BackColor = Color.FromArgb(245, 248, 252) };
             scroll.Controls.Add(content);
             tab.Controls.Add(scroll);
+            settingsContent = content;
 
             var title = Lbl("Cài đặt & tùy chỉnh", 24, 15, 1000, 36);
             title.Font = new Font("Segoe UI", 18, FontStyle.Bold);

@@ -56,7 +56,7 @@ namespace DonDep
         {
             this.justUpdated = justUpdated;
             AppState.Load();
-            UiLanguage.Code = languageOverride == "en" ? "en" : cfg.Language;
+            UiLanguage.Code = languageOverride == "en" ? "en" : languageOverride == "vi_force" ? "vi" : cfg.Language;
             Icon = App.AppIcon;
             AutoScaleMode = AutoScaleMode.None;
             Font = new Font("Segoe UI", 9.5f);

@@ -37,6 +37,16 @@ jobs:
             if ($p.ExitCode -ne 0 -or $report -notmatch 'UI_OK' -or $report -notmatch 'TRAY_OK' -or $report -notmatch 'dup=[1-9]') { throw "Selftest failed: $flag $report" }
           }
           Remove-Item out/DonDepMayTinh/selftest.txt, out/DonDepMayTinh/dup_a.txt, out/DonDepMayTinh/dup_b.txt -ErrorAction SilentlyContinue
+      - name: Screenshots
+        shell: pwsh
+        run: |
+          $p = Start-Process -FilePath 'out/DonDepMayTinh/Don Dep May Tinh.exe' -ArgumentList '--screens', "$PWD/screens" -Wait -PassThru
+          Write-Host "screens exit=$($p.ExitCode)"
+          Get-ChildItem screens | ForEach-Object { Write-Host $_.Name }
+      - uses: actions/upload-artifact@v4
+        with:
+          name: screens
+          path: screens
       - name: Package preview
         shell: pwsh
         run: Compress-Archive -Path out/DonDepMayTinh -DestinationPath out/DonDepMayTinh-bilingual-preview.zip -Force

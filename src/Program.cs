@@ -26,6 +26,13 @@ namespace DonDep
             bool updated = args.Any(a => a.Equals("--updated", StringComparison.OrdinalIgnoreCase));
             if (!selfTest) UpdateInstaller.CleanupOld();
 
+            int si = Array.FindIndex(args, a => a.Equals("--screens", StringComparison.OrdinalIgnoreCase));
+            if (si >= 0 && si + 1 < args.Length)
+            {
+                foreach (var lang in new[] { "vi", "en" })
+                    using (var f = new MainForm(lang == "en" ? "en" : "vi_force")) f.SaveScreens(args[si + 1]);
+                return 0;
+            }
             if (selfTest)
             {
                 string outFile = Path.Combine(App.AppDir, "selftest.txt");

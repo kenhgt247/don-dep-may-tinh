@@ -9,6 +9,35 @@ namespace DonDep
 {
     partial class MainForm
     {
+        System.Windows.Forms.Panel settingsContent;
+
+        /// Chụp ảnh từng tab (chỉ dùng khi kiểm tra tự động trên GitHub).
+        public void SaveScreens(string dir)
+        {
+            System.IO.Directory.CreateDirectory(dir);
+            string lang = UiLanguage.Code;
+            StartPosition = FormStartPosition.Manual;
+            Location = new System.Drawing.Point(0, 0);
+            Show();
+            for (int i = 0; i < tabs.TabPages.Count; i++)
+            {
+                tabs.SelectedIndex = i;
+                Application.DoEvents();
+                using (var bmp = new System.Drawing.Bitmap(Width, Height))
+                {
+                    DrawToBitmap(bmp, new System.Drawing.Rectangle(0, 0, Width, Height));
+                    bmp.Save(System.IO.Path.Combine(dir, lang + "_tab" + i + ".png"), System.Drawing.Imaging.ImageFormat.Png);
+                }
+            }
+            if (settingsContent != null)
+                using (var bmp = new System.Drawing.Bitmap(settingsContent.Width, settingsContent.Height))
+                {
+                    settingsContent.DrawToBitmap(bmp, new System.Drawing.Rectangle(0, 0, bmp.Width, bmp.Height));
+                    bmp.Save(System.IO.Path.Combine(dir, lang + "_settings_full.png"), System.Drawing.Imaging.ImageFormat.Png);
+                }
+            ShareCard.Create(37L * Fmt.GB + 512 * Fmt.MB, 12, dir);
+            Hide();
+        }
         void UpdateStatsLabel()
         {
             if (lblStats == null || lblStats.IsDisposed) return;

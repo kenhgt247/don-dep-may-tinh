@@ -17,7 +17,7 @@ namespace DonDep
 {
     static class App
     {
-        public const string Version = "1.5.0";
+        public const string Version = "1.6.0";
         public const string Repo = "kenhgt247/don-dep-may-tinh";
         public const string Name = "Dọn Dẹp Máy Tính";
         public static string Title => UiLanguage.T(Name) + " " + Version + (IsAdmin ? UiLanguage.T("  —  quyền quản trị") : "");
@@ -82,6 +82,7 @@ namespace DonDep
         public bool AutoClean = false;
         public List<string> ExtraZalo = new List<string>();
         public List<string> DupFolders = new List<string>();
+        public List<string> Protected = new List<string>();
 
         public static Settings Load()
         {
@@ -109,6 +110,7 @@ namespace DonDep
                 if (d.TryGetValue("AutoClean", out b) && b is bool) s.AutoClean = (bool)b;
                 s.ExtraZalo = GetList(d, "ExtraZalo");
                 s.DupFolders = GetList(d, "DupFolders");
+                s.Protected = GetList(d, "Protected");
             }
             catch { }
             return s;
@@ -124,9 +126,10 @@ namespace DonDep
                     { "Days", Days }, { "LargeMB", LargeMB }, { "KeepGB", KeepGB }, { "AlertGB", AlertGB }, { "AutoDays", AutoDays },
                     { "DupMinMB", DupMinMB }, { "DestMode", DestMode }, { "DestFolder", DestFolder }, { "LastAutoClean", LastAutoClean },
                     { "AutoClean", AutoClean }, { "ExtraZalo", ExtraZalo.ToArray() }, { "DupFolders", DupFolders.ToArray() }, { "Language", Language },
-                    { "ZaloAuto", ZaloAuto }, { "ZaloAutoDays", ZaloAutoDays }, { "ZaloAutoEvery", ZaloAutoEvery }
+                    { "Protected", Protected.ToArray() }, { "ZaloAuto", ZaloAuto }, { "ZaloAutoDays", ZaloAutoDays }, { "ZaloAutoEvery", ZaloAutoEvery }
                 };
                 File.WriteAllText(App.SettingsFile, new JavaScriptSerializer().Serialize(d), new UTF8Encoding(false));
+                Protect.Invalidate();
             }
             catch { }
         }
@@ -204,6 +207,7 @@ namespace DonDep
                             if (f.Length < minSize) continue;
                             if (before.HasValue && f.LastWriteTime >= before.Value) continue;
                             if (exts != null && !exts.Contains(f.Extension)) continue;
+                            if (Protect.Has(f.FullName)) continue;   // danh sách bảo vệ
                             result.Add(f);
                         }
                         catch { }
@@ -245,20 +249,23 @@ namespace DonDep
         /// Xóa cây thư mục: không đi theo liên kết, bỏ qua file còn mới hoặc đang dùng.
         public static void RemoveTreeSafe(string path, DateTime before)
         {
+            if (Protect.Has(path)) return;
             var di = new DirectoryInfo(path);
             if (!di.Exists) return;
+            bool hasProtected = Protect.Contains(path);
             if ((di.Attributes & FileAttributes.ReparsePoint) != 0) { try { di.Delete(); } catch { } return; }
             try
             {
                 foreach (var f in di.GetFiles())
                 {
                     if (f.LastWriteTime >= before) continue;
+                    if (hasProtected && Protect.Has(f.FullName)) continue;
                     try { f.Attributes = FileAttributes.Normal; f.Delete(); } catch { }
                 }
             }
             catch { }
             try { foreach (var d in di.GetDirectories()) RemoveTreeSafe(d.FullName, before); } catch { }
-            try { di.Delete(); } catch { }
+            if (!hasProtected) try { di.Delete(); } catch { }
         }
 
         public static Dictionary<string, long> FreeMap()
@@ -711,6 +718,7 @@ namespace DonDep
                 App.Log("Bỏ qua thư mục được bảo vệ: " + pth);
                 return;
             }
+            if (Protect.Has(pth)) { App.Log("Bỏ qua mục được bảo vệ: " + pth); return; }
             DateTime b = before ?? DateTime.MaxValue;
             if (name != null && (name.StartsWith("Bản Zalo cũ") || name.StartsWith("Bản CapCut cũ"))) { Fs.RemoveTreeSafe(pth, b); return; }
             var di = new DirectoryInfo(pth);
@@ -720,6 +728,7 @@ namespace DonDep
                 foreach (var f in di.GetFiles())
                 {
                     if (f.LastWriteTime >= b) continue;
+                    if (Protect.Has(f.FullName)) continue;
                     try { f.Attributes = FileAttributes.Normal; f.Delete(); } catch { }
                 }
             }

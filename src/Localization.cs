@@ -516,6 +516,7 @@ namespace DonDep
             { "Bạn đang dùng bản mới nhất (", "You have the latest version (" },
             { " trình duyệt, tổng ", " browsers, total " },
             { "\n\nCòn ", "\n\nRemaining " },
+            { "File cài đặt thừa", "Leftover installers" },
             { "Bộ nhớ đệm CapCut", "CapCut cache" },
             { "Bản CapCut cũ không dùng nữa (", "Unused old CapCut versions (" },
             { "Bộ nhớ đệm Telegram (ảnh, video đã xem)", "Telegram cache (viewed photos, videos)" },

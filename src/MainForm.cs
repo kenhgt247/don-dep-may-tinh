@@ -27,9 +27,9 @@ namespace DonDep
 
     partial class MainForm : Form
     {
-        static readonly string[] CatOrder = { "rac", "zalo", "tai", "lon", "tu" };
+        static readonly string[] CatOrder = { "rac", "cai", "zalo", "tai", "lon", "tu" };
         static readonly Dictionary<string, string> CatLabel = new Dictionary<string, string>
-        { { "rac", "Rác hệ thống" }, { "zalo", "Zalo" }, { "tai", "Downloads" }, { "lon", "File lớn" }, { "tu", "Tự chọn" } };
+        { { "rac", "Rác hệ thống" }, { "cai", "File cài đặt thừa" }, { "zalo", "Zalo" }, { "tai", "Downloads" }, { "lon", "File lớn" }, { "tu", "Tự chọn" } };
         static readonly ISet<string> ImageExt = Fs.ExtSet(".jpg", ".jpeg", ".png", ".gif", ".bmp", ".tif", ".tiff");
         static readonly ISet<string> VideoExt = Fs.ExtSet(".mp4", ".mkv", ".avi", ".mov", ".wmv", ".flv", ".m4v", ".mpg", ".mpeg", ".webm", ".3gp");
         static readonly ISet<string> LargeExt = Fs.ExtSet(".mp4", ".mkv", ".avi", ".mov", ".wmv", ".flv", ".m4v", ".mpg", ".mpeg", ".webm",
@@ -87,6 +87,8 @@ namespace DonDep
             var tabMoved = NewTab("Đã chuyển đi");
             var tabBrowser = NewTab("Trình duyệt");
             var tabPrograms = NewTab(UiLanguage.L("Gỡ phần mềm", "Uninstall"));
+            var tabMonitor = NewTab(UiLanguage.L("Hiệu năng", "Performance"));
+            var tabHistory = NewTab(UiLanguage.L("Lịch sử", "History"));
             var tabSettings = NewTab("⚙ Cài đặt");
             BuildCleanTab(tabClean);
             BuildMapTab(tabMap);
@@ -95,6 +97,8 @@ namespace DonDep
             BuildMovedTab(tabMoved);
             BuildBrowserTab(tabBrowser);
             BuildProgramsTab(tabPrograms);
+            BuildMonitorTab(tabMonitor);
+            BuildHistoryTab(tabHistory);
             BuildAutoTab(tabSettings);
 
             var strip = new StatusStrip();
@@ -240,7 +244,7 @@ namespace DonDep
 
         // ================================================================= TAB 1: DỌN DẸP
         FlowLayoutPanel flowDrives;
-        CheckBox chkJunk, chkZalo, chkDown, chkLarge;
+        CheckBox chkJunk, chkInst, chkZalo, chkDown, chkLarge;
         NumericUpDown numDays, numLarge, numKeep;
         ListView list;
         readonly Dictionary<string, ListViewGroup> groups = new Dictionary<string, ListViewGroup>();
@@ -261,11 +265,12 @@ namespace DonDep
 
             var grpScan = new GroupBox { Text = "Quét những gì", Location = new Point(374, 4), Size = new Size(420, 168) };
             Func<string, int, CheckBox> chk = (t, y) => new CheckBox { Text = t, Location = new Point(14, y), Size = new Size(396, 26), Checked = true };
-            chkJunk = chk("Rác hệ thống (file tạm, bộ nhớ đệm, bản cập nhật cũ…)", 24);
-            chkZalo = chk("Ảnh / video / file Zalo cũ", 56);
-            chkDown = chk("Thư mục Downloads (file cũ)", 88);
-            chkLarge = chk("File lớn (video, file nén, ISO…) — tự chọn từng file", 120);
-            grpScan.Controls.AddRange(new Control[] { chkJunk, chkZalo, chkDown, chkLarge });
+            chkJunk = chk("Rác hệ thống (file tạm, bộ nhớ đệm, bản cập nhật cũ…)", 20);
+            chkInst = chk(UiLanguage.L("File cài đặt thừa (.exe, .msi, .iso… đã cài xong)", "Leftover installers (.exe, .msi, .iso…)"), 48);
+            chkZalo = chk("Ảnh / video / file Zalo cũ", 76);
+            chkDown = chk("Thư mục Downloads (file cũ)", 104);
+            chkLarge = chk("File lớn (video, file nén, ISO…) — tự chọn từng file", 132);
+            grpScan.Controls.AddRange(new Control[] { chkJunk, chkInst, chkZalo, chkDown, chkLarge });
 
             var grpSet = new GroupBox { Text = "Thiết lập", Location = new Point(802, 4), Size = new Size(354, 168) };
             numDays = Num(grpSet, "Coi là \"cũ\" nếu quá (ngày):", 22, 7, 3650, cfg.Days);
@@ -312,7 +317,23 @@ namespace DonDep
             miSetMove = cleanMenu.Items.Add("☁  Chuyển lên Drive / ổ ngoài");
             miSetDel = cleanMenu.Items.Add("🗑  Xóa vĩnh viễn");
             cleanMenu.Items.Add(new ToolStripSeparator());
+            var miProtect = cleanMenu.Items.Add(UiLanguage.L("🛡  Không bao giờ dọn mục này", "🛡  Never clean this item"));
             var miOpen = cleanMenu.Items.Add("Mở thư mục chứa file");
+            miProtect.Click += (s, e) =>
+            {
+                var sel = list.SelectedItems.Cast<ListViewItem>().Where(i => { var o = (CleanItem)i.Tag; return o.Path != Junk.RecycleBin && o.Path != Junk.Hibernate; }).ToList();
+                if (sel.Count == 0) return;
+                foreach (var it in sel)
+                {
+                    var o = (CleanItem)it.Tag;
+                    if (!cfg.Protected.Contains(o.Path, StringComparer.OrdinalIgnoreCase)) cfg.Protected.Add(o.Path);
+                    list.Items.Remove(it);
+                }
+                cfg.Save();
+                RefreshProtectList();
+                UpdateGroupHeaders(); UpdateSummary();
+                Status(UiLanguage.L("Đã thêm " + sel.Count + " mục vào danh sách bảo vệ (xem ở tab Cài đặt).", "Added " + sel.Count + " items to the protected list (see Settings)."));
+            };
             cleanMenu.Opening += (s, e) =>
             {
                 if (list.SelectedItems.Count == 0) { e.Cancel = true; return; }
@@ -486,7 +507,7 @@ namespace DonDep
             SetBusy(true);
             SaveCleanSettings();
             var keepTu = groups["tu"].Items.Cast<ListViewItem>().Select(i => Tuple.Create((CleanItem)i.Tag, i.Checked)).ToList();
-            bool doJunk = chkJunk.Checked, doZalo = chkZalo.Checked, doDown = chkDown.Checked, doLarge = chkLarge.Checked;
+            bool doJunk = chkJunk.Checked, doInst = chkInst.Checked, doZalo = chkZalo.Checked, doDown = chkDown.Checked, doLarge = chkLarge.Checked;
             int days = (int)numDays.Value; long minLarge = (long)numLarge.Value * Fmt.MB;
             App.Log("Bắt đầu quét...");
             var rows = await Task.Run(() =>
@@ -503,6 +524,7 @@ namespace DonDep
                 {
                     foreach (var j in Junk.Sources(cfg))
                     {
+                        if (Protect.Has(j.Path)) continue;
                         status.Report("Đang tính: " + j.Name);
                         long size = Fs.FolderSize(j.Path, j.Before);
                         if (size > 0) r["rac"].Add(new CleanItem { Category = "rac", Kind = "xoa", Path = j.Path, Size = size, Name = j.Name, Folder = j.Path, Before = j.Before, Default = j.Default, Procs = j.Procs });
@@ -518,6 +540,15 @@ namespace DonDep
                         else App.Log("Gợi ý: file ngủ đông hiberfil.sys đang chiếm " + Fmt.Size(hib) + " trên ổ C. Bấm \"Quyền admin\" rồi quét lại nếu muốn tắt nó.");
                     }
                     if (!App.IsAdmin) App.Log("Mẹo: bấm \"Quyền admin\" để quét thêm gói cập nhật Windows cũ (thường vài GB).");
+                }
+                if (doInst)
+                {
+                    // File cài đặt: không xét tuổi, gợi ý xóa (cần thì tải lại từ trang chủ phần mềm).
+                    foreach (var root in Installers.Roots(cfg))
+                        foreach (var f in Fs.Walk(root, new[] { "node_modules", ".git", "DonDep*" }, Fmt.MB, null, null, status.Report))
+                            if (Installers.IsInstaller(f, root) && seen.Add(f.FullName))
+                                r["cai"].Add(new CleanItem { Category = "cai", Kind = "chuyen", Path = f.FullName, Root = root, Size = f.Length, Name = f.Name, Folder = f.DirectoryName, Date = f.LastWriteTime, Action = "xoa",
+                                                             Default = (DateTime.Now - f.LastWriteTime).TotalDays > 7 });
                 }
                 if (doZalo)
                 {
@@ -545,8 +576,8 @@ namespace DonDep
             suspendSummary = true;
             list.BeginUpdate();
             list.Items.Clear();
-            var defaults = new Dictionary<string, bool> { { "rac", true }, { "zalo", true }, { "tai", true }, { "lon", false } };
-            foreach (var c in new[] { "rac", "zalo", "tai", "lon" })
+            var defaults = new Dictionary<string, bool> { { "rac", true }, { "cai", true }, { "zalo", true }, { "tai", true }, { "lon", false } };
+            foreach (var c in new[] { "rac", "cai", "zalo", "tai", "lon" })
             {
                 var sorted = rows[c].OrderByDescending(o => o.Size).ToList();
                 list.Items.AddRange(sorted.Select(o => NewRow(o, defaults[c] && o.Default)).ToArray());
@@ -696,6 +727,9 @@ namespace DonDep
                 }
             });
 
+            if (junk.Count > 0) History.Add("rac", junk.Count, junk.Sum(o => o.Size), junk.Select(o => UiLanguage.T(o.Name) + "  —  " + o.Folder));
+            if (deleted.Count > 0) History.Add("xoa", deleted.Count, perms.Where(o => deleted.Contains(o.Path)).Sum(o => o.Size), deleted);
+            if (movedEntries.Count > 0) History.Add(useDrive ? "drive" : "ongoai", movedEntries.Count, movedEntries.Sum(m => m.Bytes), movedEntries.Select(m => m.Orig + "  →  " + m.Dest));
             var movedSet = new HashSet<string>(movedEntries.Select(m => m.Orig), StringComparer.OrdinalIgnoreCase);
             suspendSummary = true;
             list.BeginUpdate();

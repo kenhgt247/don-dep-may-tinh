@@ -380,6 +380,7 @@ namespace DonDep
             var after = Fs.FreeMap();
             long freed = AppState.Gain(before, after);
             AppState.AddFreed(freed);
+            History.Add("tudon", 1, freed);
             cfg.LastAutoClean = DateTime.Now.ToString("o");
             cfg.Save();
             App.Log("Tự dọn rác: đã giải phóng khoảng " + Fmt.Size(freed));

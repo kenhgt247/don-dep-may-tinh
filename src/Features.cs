@@ -255,6 +255,7 @@ namespace DonDep
                 res.Files = moved.Count;
                 res.Bytes = moved.Sum(m => m.Bytes);
                 AppState.AddFreed(res.Bytes);
+                History.Add("zalo_tudong", res.Files, res.Bytes, moved.Select(m => m.Orig + "  →  " + m.Dest));
             }
             App.Log("Đã đưa " + moved.Count + "/" + items.Count + " file Zalo lên Google Drive.");
             return res;

@@ -194,6 +194,14 @@ namespace DonDep
                 sel = sel.Where(n => n.Info.Level != Level.Cam).ToList();
                 if (sel.Count == 0) return;
             }
+            var prot = sel.Where(n => Protect.Blocks(n.Path)).ToList();
+            if (prot.Count > 0)
+            {
+                Msg(UiLanguage.P(UiLanguage.L("Các mục sau nằm trong danh sách bảo vệ (hoặc chứa mục được bảo vệ) nên sẽ không bị xóa:\n\n", "These items are protected (or contain a protected item) and will not be deleted:\n\n") +
+                    string.Join("\n", prot.Select(n => "🛡 " + n.Path))), MessageBoxIcon.Information);
+                sel = sel.Except(prot).ToList();
+                if (sel.Count == 0) return;
+            }
             long sum = sel.Sum(n => n.Size);
             var risky = sel.Where(n => n.Info.Level == Level.CanThan || n.Info.Level == Level.KhongRo).ToList();
             var msg = new StringBuilder(permanent ? "XÓA VĨNH VIỄN — không khôi phục được:\n" : "Chuyển vào Thùng rác (còn khôi phục được):\n");
@@ -248,6 +256,8 @@ namespace DonDep
             string report = "";
             foreach (var k in freeAfter.Keys.OrderBy(x => x)) { long b; if (freeBefore.TryGetValue(k, out b) && freeAfter[k] - b > 10 * Fmt.MB) report += "\n    " + k + "  +" + Fmt.Size(freeAfter[k] - b) + "  (nay còn trống " + Fmt.Size(freeAfter[k]) + ")"; }
             if (permanent) { AppState.AddFreed(AppState.Gain(freeBefore, freeAfter)); UpdateStatsLabel(); }
+            var gone = remainingMap.Where(kv => kv.Value < kv.Key.Size).ToList();
+            History.Add(permanent ? "xoa" : "thungrac", gone.Count, gone.Sum(kv => kv.Key.Size - kv.Value), gone.Select(kv => kv.Key.Path));
             string done = "Đã xóa xong " + ok + "/" + sel.Count + " mục.";
             if (partial > 0 || ok < sel.Count) done += "\n\nMột số file đang được dùng nên chưa xóa được. Hãy tắt phần mềm đang dùng chúng rồi thử lại.";
             if (report.Length > 0) done += "\n\nĐã giải phóng:" + report;
@@ -406,7 +416,7 @@ namespace DonDep
             if (!Confirm("Chuyển " + chk.Count + " bản trùng (" + Fmt.Size(sum) + ") vào Thùng rác?\n\nMỗi nhóm vẫn còn giữ lại ít nhất 1 bản. Dung lượng chỉ được giải phóng hẳn sau khi dọn Thùng rác (tab Dọn dẹp làm được việc này).")) return;
             SetBusy(true);
             var removed = new List<ListViewItem>();
-            var paths = chk.Select(i => (string)i.Tag).ToList();
+            var paths = chk.Select(i => (string)i.Tag).Where(p => !Protect.Has(p)).ToList();
             var okPaths = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             await RunSta(() =>
             {
@@ -418,6 +428,7 @@ namespace DonDep
             });
             foreach (var it in chk) if (okPaths.Contains((string)it.Tag)) dupList.Items.Remove(it);
             App.Log("Đã chuyển " + okPaths.Count + " bản trùng vào Thùng rác.");
+            History.Add("trung", okPaths.Count, 0, okPaths);
             Msg("Đã chuyển " + okPaths.Count + " bản trùng vào Thùng rác.");
         }
 
@@ -516,6 +527,7 @@ namespace DonDep
                 return n;
             });
             App.Log("Đã lấy về " + ok + "/" + sel.Count + " file.");
+            History.Add("laylai", ok, sel.Where(x => File.Exists(x.Orig)).Sum(x => x.Bytes), sel.Where(x => File.Exists(x.Orig)).Select(x => x.Orig));
             LoadMovedList();
             UpdateDrives();
             Msg("Đã lấy về " + ok + "/" + sel.Count + " file.");
@@ -547,7 +559,7 @@ namespace DonDep
             // Scrollable settings page: fits smaller Windows resolutions without clipping.
             var scroll = new Panel { Dock = DockStyle.Fill, AutoScroll = true,
                 BackColor = Color.FromArgb(245, 248, 252) };
-            var content = new Panel { Location = Point.Empty, Size = new Size(1088, 1150),
+            var content = new Panel { Location = Point.Empty, Size = new Size(1088, 1330),
                 BackColor = Color.FromArgb(245, 248, 252) };
             scroll.Controls.Add(content);
             tab.Controls.Add(scroll);
@@ -647,12 +659,46 @@ namespace DonDep
             };
             btnZaloNow.Click += async (s, e) => await Guard(RunZaloAutoNowAsync);
 
-            var grpShort = new GroupBox { Text = "Biểu tượng & truy cập nhanh", Location = new Point(16, 823), Size = new Size(1050, 100), BackColor = Color.White };
+            // ---- Danh sách bảo vệ
+            var grpProt = new GroupBox { Text = UiLanguage.L("🛡 Danh sách bảo vệ — không bao giờ dọn, xóa hay chuyển", "🛡 Protected list — never cleaned, deleted or moved"),
+                Location = new Point(16, 823), Size = new Size(1050, 170), BackColor = Color.White };
+            lstProtect = new ListBox { Location = new Point(16, 26), Size = new Size(800, 132), HorizontalScrollbar = true };
+            var btnProtDir = Btn(UiLanguage.L("Thêm thư mục…", "Add folder…"), 830, 26, 200, 32, false);
+            var btnProtFile = Btn(UiLanguage.L("Thêm file…", "Add file…"), 830, 64, 200, 32, false);
+            var btnProtDel = Btn(UiLanguage.L("Bỏ khỏi danh sách", "Remove from list"), 830, 102, 200, 32, false);
+            grpProt.Controls.AddRange(new Control[] { lstProtect, btnProtDir, btnProtFile, btnProtDel });
+            content.Controls.Add(grpProt);
+            RefreshProtectList();
+            Action<string> addProt = p =>
+            {
+                if (string.IsNullOrEmpty(p)) return;
+                if (!cfg.Protected.Contains(p, StringComparer.OrdinalIgnoreCase)) cfg.Protected.Add(p);
+                cfg.Save(); RefreshProtectList();
+            };
+            btnProtDir.Click += (s, e) =>
+            {
+                using (var dlg = new FolderBrowserDialog { Description = UiLanguage.L("Chọn thư mục không bao giờ được dọn", "Choose a folder that must never be cleaned") })
+                    if (dlg.ShowDialog(this) == DialogResult.OK) addProt(dlg.SelectedPath);
+            };
+            btnProtFile.Click += (s, e) =>
+            {
+                using (var dlg = new OpenFileDialog { Title = UiLanguage.L("Chọn file không bao giờ được dọn", "Choose a file that must never be cleaned"), CheckFileExists = true })
+                    if (dlg.ShowDialog(this) == DialogResult.OK) addProt(dlg.FileName);
+            };
+            btnProtDel.Click += (s, e) =>
+            {
+                if (lstProtect.SelectedItem == null) return;
+                string p = lstProtect.SelectedItem.ToString();
+                cfg.Protected.RemoveAll(x => x.Equals(p, StringComparison.OrdinalIgnoreCase));
+                cfg.Save(); RefreshProtectList();
+            };
+
+            var grpShort = new GroupBox { Text = "Biểu tượng & truy cập nhanh", Location = new Point(16, 1006), Size = new Size(1050, 100), BackColor = Color.White };
             grpShort.Controls.Add(Lbl("Tạo biểu tượng \"Dọn Dẹp Máy Tính\" trên Desktop và trong menu Start để mở app nhanh.", 16, 28, 1010, 22));
             var btnShortcut = Btn("Tạo biểu tượng", 16, 54, 180, 34, false);
             grpShort.Controls.Add(btnShortcut);
 
-            var grpUpd = new GroupBox { Text = "Phiên bản & cập nhật", Location = new Point(16, 936), Size = new Size(1050, 100), BackColor = Color.White };
+            var grpUpd = new GroupBox { Text = "Phiên bản & cập nhật", Location = new Point(16, 1119), Size = new Size(1050, 100), BackColor = Color.White };
             grpUpd.Controls.Add(Lbl("Bạn đang dùng bản " + App.Version + ". App tự kiểm tra bản mới mỗi lần mở. Trang chủ: github.com/" + App.Repo, 16, 28, 1010, 22));
             var btnUpdate = Btn("Kiểm tra bản mới", 16, 54, 180, 34, false);
             var btnHome = Btn("Mở trang chủ", 206, 54, 160, 34, false);
@@ -714,6 +760,17 @@ namespace DonDep
             btnHome.Click += (s, e) => { try { Process.Start("https://github.com/" + App.Repo); } catch { } };
         }
 
+        ListBox lstProtect;
+
+        void RefreshProtectList()
+        {
+            if (lstProtect == null || lstProtect.IsDisposed) return;
+            lstProtect.Items.Clear();
+            foreach (var p in cfg.Protected) lstProtect.Items.Add(p);
+            if (cfg.Protected.Count == 0) lstProtect.Items.Add(UiLanguage.L("(trống) — thêm thư mục / file ở bên phải, hoặc chuột phải một mục trong tab Dọn dẹp → \"Không bao giờ dọn mục này\"",
+                                                                           "(empty) — add folders / files on the right, or right-click an item in Cleanup → \"Never clean this item\""));
+        }
+
         void SaveAutoSettings(bool quiet)
         {
             cfg.AlertGB = (int)numAlert.Value;
@@ -744,7 +801,7 @@ namespace DonDep
         {
             var sb = new StringBuilder();
             UpdateDrives();
-            if (tabs.TabPages.Count != 8) throw new Exception("Expected eight tabs");
+            if (tabs.TabPages.Count != 10) throw new Exception("Expected ten tabs");
             sb.Append("tabs=").Append(tabs.TabPages.Count);
             string expectedFirstTab = UiLanguage.English ? "Cleanup" : "Dọn dẹp";
             if (tabs.TabPages[0].Text != expectedFirstTab) throw new Exception("Language tab mismatch: " + tabs.TabPages[0].Text);
@@ -753,7 +810,7 @@ namespace DonDep
             if (tabs.TabPages[3].Text != "Smart Folder" ||
                 tabs.TabPages[4].Text != expectedMoved ||
                 tabs.TabPages[6].Text != UiLanguage.L("Gỡ phần mềm", "Uninstall") ||
-                tabs.TabPages[7].Text != expectedSettings)
+                tabs.TabPages[9].Text != expectedSettings)
                 throw new Exception("Navigation order or Settings translation mismatch.");
             if (btnSettingsVietnamese == null || btnSettingsEnglish == null ||
                 btnSettingsVietnamese.IsDisposed || btnSettingsEnglish.IsDisposed ||
@@ -813,6 +870,7 @@ namespace DonDep
             if (UpdateInstaller.Sha256File(App.ExePath).Length != 64) throw new Exception("SHA-256 failed");
             sb.Append(" zaloOld=").Append(ZaloAuto.FindOld(cfg, 90, null).Count);
             UpdateStatsLabel(); UpdateZaloLastLabel();
+            SelfTestTools(sb);
             var br = Browsers.Detect();
             FillBrowserList(br);
             UpdateBrowserSummary();

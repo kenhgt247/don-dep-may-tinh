@@ -240,6 +240,7 @@ namespace DonDep
             if(!Confirm(msg)) return;
             SetBusy(true);
             var done = await Task.Run(() => SmartFolders.Apply(root,selected,status.Report));
+            History.Add("smart", done.Success, 0, selected.Where(x => File.Exists(x.Target)).Select(x => x.Source + "  →  " + x.Target));
             ResetSmartResults();
             Status((UiLanguage.English ? "Moved " : "Đã chuyển ") + done.Success +
                 (UiLanguage.English ? " files." : " file."));
@@ -261,6 +262,7 @@ namespace DonDep
                 "Khôi phục tối đa " + count + " file về vị trí cũ?\nFile đã thay đổi hoặc trùng đường dẫn sẽ được bỏ qua.")) return;
             SetBusy(true);
             var result=await Task.Run(() => SmartFolders.Undo(root,status.Report));
+            History.Add("smart_hoantac", result.Success, 0, null, root);
             ResetSmartResults();
             UpdateSmartUndoCount();
             Msg((UiLanguage.English ? "Restored: " : "Đã hoàn tác: ") + result.Success +

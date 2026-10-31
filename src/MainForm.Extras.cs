@@ -94,6 +94,7 @@ namespace DonDep
             });
             long done = moved.Sum(m => m.Bytes);
             AppState.AddFreed(done);
+            History.Add("drive", moved.Count, done, moved.Select(m => m.Orig + "  →  " + m.Dest), "Zalo");
             AppState.MarkZaloAuto(DateTime.Now);
             UpdateZaloLastLabel();
             UpdateStatsLabel();

@@ -142,6 +142,7 @@ namespace DonDep
             long freed = 0;
             foreach (var k in freeAfter.Keys) { long b; if (freeBefore.TryGetValue(k, out b) && freeAfter[k] > b) freed += freeAfter[k] - b; }
             AppState.AddFreed(freed);
+            History.Add("trinhduyet", sel.Count, freed, sel.Select(b => b.Browser + " (" + b.Profile + ") — " + b.KindText));
             UpdateStatsLabel();
             string done = "Đã dọn xong trình duyệt! Giải phóng khoảng " + Fmt.Size(freed) + ".";
             if (left > 10 * Fmt.MB) done += "\n\nCòn " + Fmt.Size(left) + " chưa xóa được vì trình duyệt đang dùng. Tắt trình duyệt rồi dọn lại để xóa hết.";

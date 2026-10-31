@@ -130,6 +130,63 @@ namespace DonDep
             }
         }
 
+        /// Sau khi gỡ: tìm thư mục còn sót lại, hỏi người dùng, đưa vào Thùng rác (còn khôi phục được).
+        async Task CleanLeftoversAsync(InstalledApp a)
+        {
+            var found = await Task.Run(() => Leftovers.Find(a, allApps));
+            found = found.Where(x => x.Size > 0 || Directory.Exists(x.Path)).ToList();
+            if (found.Count == 0) { Status(L("Đã gỡ " + a.Name + ". Không thấy tàn dư nào.", "Uninstalled " + a.Name + ". No leftovers found.")); return; }
+            var chosen = PickLeftovers(a, found);
+            if (chosen == null || chosen.Count == 0) { Status(L("Đã gỡ " + a.Name + ". Giữ lại các thư mục còn sót.", "Uninstalled " + a.Name + ". Leftover folders kept.")); return; }
+            var ok = new List<Leftover>();
+            await RunSta(() =>
+            {
+                foreach (var x in chosen)
+                {
+                    try
+                    {
+                        if (Protect.Blocks(x.Path)) continue;
+                        Microsoft.VisualBasic.FileIO.FileSystem.DeleteDirectory(x.Path, Microsoft.VisualBasic.FileIO.UIOption.OnlyErrorDialogs, Microsoft.VisualBasic.FileIO.RecycleOption.SendToRecycleBin);
+                        ok.Add(x);
+                        App.Log("Đã đưa tàn dư vào Thùng rác: " + x.Path + " (" + Fmt.Size(x.Size) + ")");
+                    }
+                    catch (Exception ex) { App.Log("Không dọn được tàn dư " + x.Path + ": " + ex.Message); }
+                }
+            });
+            History.Add("tandu", ok.Count, ok.Sum(x => x.Size), ok.Select(x => x.Path), a.Name);
+            UpdateDrives();
+            Status(L("Đã đưa " + ok.Count + " thư mục tàn dư (" + Fmt.Size(ok.Sum(x => x.Size)) + ") vào Thùng rác. Dọn Thùng rác ở tab Dọn dẹp để lấy lại dung lượng.",
+                     "Sent " + ok.Count + " leftover folders (" + Fmt.Size(ok.Sum(x => x.Size)) + ") to the Recycle Bin. Empty it from the Cleanup tab to reclaim space."));
+        }
+
+        List<Leftover> PickLeftovers(InstalledApp a, List<Leftover> found)
+        {
+            using (var dlg = new Form { Text = App.Name, Width = 900, Height = 460, StartPosition = FormStartPosition.CenterParent, Font = Font, Icon = Icon, MinimizeBox = false, MaximizeBox = false })
+            {
+                var head = new Label { Dock = DockStyle.Top, Height = 64, Padding = new Padding(10, 10, 10, 0), UseMnemonic = false,
+                    Text = L("Đã gỡ \"" + a.Name + "\". Tìm thấy các thư mục còn sót lại dưới đây (tổng " + Fmt.Size(found.Sum(x => x.Size)) + ").\nChọn những thư mục muốn dọn — chúng sẽ được đưa vào Thùng rác, vẫn khôi phục được nếu cần.",
+                             "\"" + a.Name + "\" was uninstalled. The folders below were left behind (" + Fmt.Size(found.Sum(x => x.Size)) + " in total).\nSelect the ones to clean — they go to the Recycle Bin and can still be restored.") };
+                var lv = new ListView { Dock = DockStyle.Fill, View = View.Details, CheckBoxes = true, FullRowSelect = true, GridLines = true };
+                lv.Columns.Add(L("Thư mục", "Folder"), 520);
+                lv.Columns.Add(L("Dung lượng", "Size"), 90, HorizontalAlignment.Right);
+                lv.Columns.Add(L("Lý do", "Reason"), 230);
+                foreach (var x in found)
+                {
+                    var it = new ListViewItem(x.Path) { Checked = true, Tag = x };
+                    it.SubItems.Add(Fmt.Size(x.Size)); it.SubItems.Add(x.Reason);
+                    lv.Items.Add(it);
+                }
+                var bar = new FlowLayoutPanel { Dock = DockStyle.Bottom, Height = 48, FlowDirection = FlowDirection.RightToLeft, Padding = new Padding(8) };
+                var ok = new Button { Text = L("Dọn các mục đã chọn", "Clean selected"), Width = 190, Height = 32, DialogResult = DialogResult.OK, UseMnemonic = false };
+                var cancel = new Button { Text = L("Giữ lại tất cả", "Keep everything"), Width = 150, Height = 32, DialogResult = DialogResult.Cancel };
+                bar.Controls.Add(ok); bar.Controls.Add(cancel);
+                dlg.Controls.Add(lv); dlg.Controls.Add(bar); dlg.Controls.Add(head);
+                dlg.AcceptButton = ok; dlg.CancelButton = cancel;
+                if (dlg.ShowDialog(this) != DialogResult.OK) return null;
+                return lv.CheckedItems.Cast<ListViewItem>().Select(i => (Leftover)i.Tag).ToList();
+            }
+        }
+
         async Task UninstallSelectedAsync()
         {
             var a = SelectedApp();
@@ -157,8 +214,10 @@ namespace DonDep
                 allApps.Remove(a);
                 FillAppList();
                 UpdateDrives();
-                Status(L("Đã gỡ " + a.Name + ".", "Uninstalled " + a.Name + "."));
+                Status(L("Đã gỡ " + a.Name + ". Đang tìm tàn dư...", "Uninstalled " + a.Name + ". Looking for leftovers..."));
                 App.Log("Đã gỡ phần mềm: " + a.Name);
+                History.Add("go", 1, a.Size, new[] { a.Name + (a.Version.Length > 0 ? " " + a.Version : "") });
+                await CleanLeftoversAsync(a);
             }
             else Status(L("Nếu bạn đã gỡ xong mà " + a.Name + " vẫn còn trong danh sách, bấm \"Quét phần mềm đã cài\" để làm mới.",
                           "If you finished uninstalling and " + a.Name + " is still listed, click \"Scan installed programs\" to refresh."));

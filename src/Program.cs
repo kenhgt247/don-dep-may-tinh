@@ -23,6 +23,8 @@ namespace DonDep
             bool selfTestEn = args.Any(a => a.Equals("--selftest-en", StringComparison.OrdinalIgnoreCase));
             bool selfTest = selfTestEn || args.Any(a => a.Equals("--selftest", StringComparison.OrdinalIgnoreCase));
             bool tray = args.Any(a => a.Equals("-Tray", StringComparison.OrdinalIgnoreCase) || a.Equals("--tray", StringComparison.OrdinalIgnoreCase));
+            bool updated = args.Any(a => a.Equals("--updated", StringComparison.OrdinalIgnoreCase));
+            if (!selfTest) UpdateInstaller.CleanupOld();
 
             if (selfTest)
             {
@@ -55,7 +57,13 @@ namespace DonDep
                 }
                 return 0;
             }
-            Application.Run(new MainForm());
+            if (updated)
+            {
+                // Vừa tự cập nhật: dọn file cũ (có thể cần chờ bản cũ thoát hẳn) và bật lại chạy ngầm nếu đang dùng.
+                for (int i = 0; i < 10 && File.Exists(UpdateInstaller.OldExe); i++) { Thread.Sleep(500); UpdateInstaller.CleanupOld(); }
+                if (File.Exists(Shortcut.StartupLink)) Shortcut.StartTray();
+            }
+            Application.Run(new MainForm(null, updated));
             return 0;
         }
 
@@ -73,7 +81,8 @@ namespace DonDep
         readonly NotifyIcon icon;
         readonly System.Windows.Forms.Timer timer, first;
         readonly Dictionary<string, DateTime> lastAlert = new Dictionary<string, DateTime>();
-        bool busy;
+        bool busy, driveWarned;
+        EventWaitHandle exitEvent;
 
         public TrayContext(bool test)
         {
@@ -90,7 +99,24 @@ namespace DonDep
             timer.Tick += (s, e) => Check();
             first = new System.Windows.Forms.Timer { Interval = 20 * 1000 };
             first.Tick += (s, e) => { first.Stop(); Check(); };
-            if (!test) { timer.Start(); first.Start(); }
+            if (!test)
+            {
+                timer.Start(); first.Start();
+                // Khi app tự cập nhật, bản mới báo cho bản chạy ngầm cũ thoát ra để thay file.
+                try
+                {
+                    exitEvent = new EventWaitHandle(false, EventResetMode.AutoReset, UpdateInstaller.TrayExitEvent);
+                    var ui = SynchronizationContext.Current;
+                    var waiter = new Thread(() =>
+                    {
+                        try { exitEvent.WaitOne(); } catch { return; }
+                        if (ui != null) ui.Post(_ => { icon.Visible = false; ExitThread(); }, null);
+                        else Environment.Exit(0);
+                    }) { IsBackground = true };
+                    waiter.Start();
+                }
+                catch { }
+            }
         }
 
         void CleanNow()
@@ -127,6 +153,37 @@ namespace DonDep
                     t.Start();
                 }
             }
+            if (!busy && ZaloAuto.Due(cfg))
+            {
+                if (!Rclone.Ready)
+                {
+                    if (!driveWarned)
+                    {
+                        driveWarned = true;
+                        try { icon.ShowBalloonTip(10000, UiLanguage.T(App.Name), UiLanguage.L("Chưa tự đưa ảnh Zalo lên Drive được vì chưa kết nối Google Drive. Mở app → tab Dọn dẹp → \"Kết nối Google Drive\".",
+                            "Zalo media could not be moved to Drive: Google Drive is not connected. Open the app → Cleanup tab → \"Connect Google Drive\"."), ToolTipIcon.Warning); } catch { }
+                    }
+                }
+                else
+                {
+                    busy = true;
+                    var t = new Thread(() =>
+                    {
+                        try
+                        {
+                            var r = ZaloAuto.Run(cfg, null);
+                            string text = r.Error != null ? UiLanguage.T(r.Error)
+                                : r.Files > 0 ? UiLanguage.L("Đã đưa " + r.Files + " ảnh/video/file Zalo cũ (" + Fmt.Size(r.Bytes) + ") lên Google Drive. Lấy lại bất cứ lúc nào ở tab \"Đã chuyển đi\".",
+                                                             "Moved " + r.Files + " old Zalo files (" + Fmt.Size(r.Bytes) + ") to Google Drive. Restore any time from the \"Moved files\" tab.")
+                                : null;
+                            if (text != null) icon.ShowBalloonTip(10000, UiLanguage.T(App.Name), text, r.Error != null ? ToolTipIcon.Warning : ToolTipIcon.Info);
+                        }
+                        catch (Exception ex) { App.Log("Lỗi khi tự đưa ảnh Zalo lên Drive: " + ex.Message); }
+                        busy = false;
+                    }) { IsBackground = true };
+                    t.Start();
+                }
+            }
             long limit = cfg.AlertGB * Fmt.GB;
             foreach (var d in Fs.FixedDrives())
             {
@@ -145,7 +202,7 @@ namespace DonDep
 
         protected override void Dispose(bool disposing)
         {
-            if (disposing) { timer.Dispose(); first.Dispose(); icon.Visible = false; icon.Dispose(); }
+            if (disposing) { timer.Dispose(); first.Dispose(); icon.Visible = false; icon.Dispose(); try { exitEvent?.Dispose(); } catch { } }
             base.Dispose(disposing);
         }
     }

@@ -247,6 +247,7 @@ namespace DonDep
             var freeAfter = Fs.FreeMap();
             string report = "";
             foreach (var k in freeAfter.Keys.OrderBy(x => x)) { long b; if (freeBefore.TryGetValue(k, out b) && freeAfter[k] - b > 10 * Fmt.MB) report += "\n    " + k + "  +" + Fmt.Size(freeAfter[k] - b) + "  (nay còn trống " + Fmt.Size(freeAfter[k]) + ")"; }
+            if (permanent) { AppState.AddFreed(AppState.Gain(freeBefore, freeAfter)); UpdateStatsLabel(); }
             string done = "Đã xóa xong " + ok + "/" + sel.Count + " mục.";
             if (partial > 0 || ok < sel.Count) done += "\n\nMột số file đang được dùng nên chưa xóa được. Hãy tắt phần mềm đang dùng chúng rồi thử lại.";
             if (report.Length > 0) done += "\n\nĐã giải phóng:" + report;
@@ -521,8 +522,9 @@ namespace DonDep
         }
 
         // ================================================================= SETTINGS (ALWAYS LAST)
-        CheckBox chkStartup, chkAutoClean;
-        NumericUpDown numAlert, numAutoDays;
+        CheckBox chkStartup, chkAutoClean, chkZaloAuto;
+        NumericUpDown numAlert, numAutoDays, numZaloDays, numZaloEvery;
+        Label lblStats, lblZaloLast;
         Button btnSettingsVietnamese, btnSettingsEnglish;
 
         static void StyleSettingsLanguage(Button button, bool selected)
@@ -545,7 +547,7 @@ namespace DonDep
             // Scrollable settings page: fits smaller Windows resolutions without clipping.
             var scroll = new Panel { Dock = DockStyle.Fill, AutoScroll = true,
                 BackColor = Color.FromArgb(245, 248, 252) };
-            var content = new Panel { Location = Point.Empty, Size = new Size(1088, 745),
+            var content = new Panel { Location = Point.Empty, Size = new Size(1088, 1150),
                 BackColor = Color.FromArgb(245, 248, 252) };
             scroll.Controls.Add(content);
             tab.Controls.Add(scroll);
@@ -578,8 +580,31 @@ namespace DonDep
             busyControls.Add(btnSettingsEnglish);
             content.Controls.Add(grpLanguage);
 
+            // ---- Thành tích: tổng dung lượng đã giải phóng + ảnh khoe Facebook
+            var grpStats = new GroupBox { Text = UiLanguage.L("🏆 Thành tích của bạn", "🏆 Your results"),
+                Location = new Point(16, 226), Size = new Size(1050, 112), BackColor = Color.White };
+            lblStats = Lbl("", 20, 28, 1010, 30);
+            lblStats.Font = new Font("Segoe UI", 13f, FontStyle.Bold);
+            lblStats.ForeColor = Color.FromArgb(22, 101, 52);
+            var btnShare = Btn(UiLanguage.L("📸 Tạo ảnh khoe lên Facebook", "📸 Create a picture to share"), 20, 64, 260, 36, false);
+            grpStats.Controls.Add(Lbl(UiLanguage.L("Ảnh được lưu trong thư mục Ảnh (Pictures) và đã chép sẵn — vào Facebook bấm Ctrl+V để dán.",
+                                                   "The picture is saved in Pictures and copied — press Ctrl+V in Facebook to paste it."), 292, 72, 740, 22));
+            grpStats.Controls.AddRange(new Control[] { lblStats, btnShare });
+            content.Controls.Add(grpStats);
+            UpdateStatsLabel();
+            btnShare.Click += (s, e) =>
+            {
+                AppState.Load();
+                if (AppState.TotalFreed <= 0) { Msg(UiLanguage.L("Chưa có số liệu. Hãy dọn máy một lần rồi quay lại đây nhé!", "No results yet. Clean your PC once, then come back!")); return; }
+                string file = ShareCard.Create(AppState.TotalFreed, AppState.Cleanups);
+                try { using (var img = Image.FromFile(file)) Clipboard.SetImage(img); } catch { }
+                try { Process.Start(file); } catch { }
+                App.Log("Đã tạo ảnh chia sẻ: " + file);
+                Status(UiLanguage.L("Đã tạo ảnh và chép vào bộ nhớ tạm. Vào Facebook bấm Ctrl+V để dán.", "Picture created and copied. Press Ctrl+V in Facebook to paste it."));
+            };
+
             var grp = new GroupBox { Text = "Tự động & chạy nền cùng Windows",
-                Location = new Point(16, 226), Size = new Size(1050, 250), BackColor = Color.White };
+                Location = new Point(16, 351), Size = new Size(1050, 250), BackColor = Color.White };
             chkStartup = new CheckBox { Text = "Bật: tự chạy ngầm khi mở máy (biểu tượng nhỏ ở góc phải thanh Taskbar)", Location = new Point(16, 28), Size = new Size(690, 26), Checked = File.Exists(Shortcut.StartupLink) };
             numAlert = Num(grp, "Cảnh báo khi một ổ còn trống dưới (GB):", 66, 1, 500, cfg.AlertGB, 36, 300);
             chkAutoClean = new CheckBox { Text = "Tự động dọn RÁC HỆ THỐNG theo lịch (không bao giờ tự chuyển hay xóa file cá nhân)", Location = new Point(16, 104), Size = new Size(690, 26), Checked = cfg.AutoClean };
@@ -596,12 +621,37 @@ namespace DonDep
             btnSave.FlatAppearance.BorderColor = Color.FromArgb(165, 195, 240);
             grp.Controls.AddRange(new Control[] { chkStartup, chkAutoClean, lblLast, btnTray, btnSave });
 
-            var grpShort = new GroupBox { Text = "Biểu tượng & truy cập nhanh", Location = new Point(16, 489), Size = new Size(1050, 100), BackColor = Color.White };
+            // ---- Tự đưa ảnh / video / file Zalo cũ lên Google Drive
+            var grpZalo = new GroupBox { Text = UiLanguage.L("☁ Tự động đưa ảnh, video, file Zalo cũ lên Google Drive", "☁ Automatically move old Zalo photos, videos and files to Google Drive"),
+                Location = new Point(16, 614), Size = new Size(1050, 196), BackColor = Color.White };
+            chkZaloAuto = new CheckBox { Text = UiLanguage.L("Bật: app chạy ngầm sẽ tự chuyển file Zalo cũ lên Drive theo lịch (không bao giờ đụng tin nhắn)",
+                                                             "On: the background app moves old Zalo files to Drive on a schedule (messages are never touched)"),
+                Location = new Point(16, 28), Size = new Size(1010, 26), Checked = cfg.ZaloAuto };
+            numZaloDays = Num(grpZalo, UiLanguage.L("Chuyển file cũ hơn (ngày):", "Move files older than (days):"), 62, 7, 3650, cfg.ZaloAutoDays, 36, 300);
+            numZaloEvery = Num(grpZalo, UiLanguage.L("Chạy mỗi (ngày):", "Run every (days):"), 96, 1, 90, cfg.ZaloAutoEvery, 36, 300);
+            lblZaloLast = Lbl("", 36, 128, 990, 22);
+            var btnZaloNow = Btn(UiLanguage.L("Xem trước & chạy ngay", "Preview & run now"), 36, 152, 220, 34);
+            grpZalo.Controls.Add(Lbl(UiLanguage.L("File chỉ bị bỏ khỏi máy sau khi đã tải lên Drive và kiểm tra xong. Lấy lại ở tab \"Đã chuyển đi\". Cần bật chạy ngầm và kết nối Google Drive.",
+                                                  "Files are removed from the PC only after upload and verification. Restore from \"Moved files\". Requires background mode and Google Drive."), 270, 160, 760, 22));
+            grpZalo.Controls.AddRange(new Control[] { chkZaloAuto, lblZaloLast, btnZaloNow });
+            content.Controls.Add(grpZalo);
+            UpdateZaloLastLabel();
+            chkZaloAuto.CheckedChanged += (s, e) =>
+            {
+                if (chkZaloAuto.Checked && !Rclone.Ready)
+                {
+                    Msg(UiLanguage.L("Hãy kết nối Google Drive trước: tab Dọn dẹp → \"Kết nối Google Drive\".", "Connect Google Drive first: Cleanup tab → \"Connect Google Drive\"."), MessageBoxIcon.Warning);
+                    chkZaloAuto.Checked = false;
+                }
+            };
+            btnZaloNow.Click += async (s, e) => await Guard(RunZaloAutoNowAsync);
+
+            var grpShort = new GroupBox { Text = "Biểu tượng & truy cập nhanh", Location = new Point(16, 823), Size = new Size(1050, 100), BackColor = Color.White };
             grpShort.Controls.Add(Lbl("Tạo biểu tượng \"Dọn Dẹp Máy Tính\" trên Desktop và trong menu Start để mở app nhanh.", 16, 28, 690, 22));
             var btnShortcut = Btn("Tạo biểu tượng", 16, 54, 180, 34, false);
             grpShort.Controls.Add(btnShortcut);
 
-            var grpUpd = new GroupBox { Text = "Phiên bản & cập nhật", Location = new Point(16, 602), Size = new Size(1050, 100), BackColor = Color.White };
+            var grpUpd = new GroupBox { Text = "Phiên bản & cập nhật", Location = new Point(16, 936), Size = new Size(1050, 100), BackColor = Color.White };
             grpUpd.Controls.Add(Lbl("Bạn đang dùng bản " + App.Version + ". App tự kiểm tra bản mới mỗi lần mở. Trang chủ: github.com/" + App.Repo, 16, 28, 690, 22));
             var btnUpdate = Btn("Kiểm tra bản mới", 16, 54, 180, 34, false);
             var btnHome = Btn("Mở trang chủ", 206, 54, 160, 34, false);
@@ -668,6 +718,9 @@ namespace DonDep
             cfg.AlertGB = (int)numAlert.Value;
             cfg.AutoClean = chkAutoClean.Checked;
             cfg.AutoDays = (int)numAutoDays.Value;
+            cfg.ZaloAuto = chkZaloAuto.Checked;
+            cfg.ZaloAutoDays = (int)numZaloDays.Value;
+            cfg.ZaloAutoEvery = (int)numZaloEvery.Value;
             cfg.Save();
             try { Shortcut.SetStartup(chkStartup.Checked); } catch (Exception ex) { App.Log("Không đặt được chạy cùng Windows: " + ex.Message); }
             App.Log("Đã lưu thiết lập tự động.");
@@ -679,24 +732,10 @@ namespace DonDep
                 m += "\n\nRác hệ thống sẽ được tự dọn mỗi " + cfg.AutoDays + " ngày (khi app đang chạy ngầm).";
                 if (!chkStartup.Checked) m += "\nLưu ý: cần bật chạy ngầm thì việc tự dọn mới diễn ra.";
             }
+            if (chkZaloAuto.Checked)
+                m += UiLanguage.L("\n\nẢnh, video, file Zalo cũ hơn " + cfg.ZaloAutoDays + " ngày sẽ được tự đưa lên Google Drive mỗi " + cfg.ZaloAutoEvery + " ngày" + (chkStartup.Checked ? "." : " — cần bật chạy ngầm."),
+                                  "\n\nZalo files older than " + cfg.ZaloAutoDays + " days will be moved to Google Drive every " + cfg.ZaloAutoEvery + " days" + (chkStartup.Checked ? "." : " — background mode must be on."));
             Msg(m);
-        }
-
-        async Task CheckUpdate(bool manual)
-        {
-            if (manual) Status("Đang kiểm tra bản mới...");
-            var info = await Updater.CheckAsync();
-            if (info == null)
-            {
-                if (manual) Msg("Không kiểm tra được bản mới (máy chưa có mạng hoặc chưa có bản phát hành nào).", MessageBoxIcon.Warning);
-            }
-            else if (Updater.IsNewer(info))
-            {
-                App.Log("Có bản mới " + info.Latest + " (bạn đang dùng " + App.Version + ").");
-                if (Confirm("Đã có bản mới " + info.Latest + " (bạn đang dùng " + App.Version + ").\n\nMở trang tải về?")) { try { Process.Start(info.Url); } catch { } }
-            }
-            else if (manual) Msg("Bạn đang dùng bản mới nhất (" + App.Version + ").");
-            if (manual) Status("Sẵn sàng.");
         }
 
         // ================================================================= tự kiểm tra khi đóng gói
@@ -704,7 +743,7 @@ namespace DonDep
         {
             var sb = new StringBuilder();
             UpdateDrives();
-            if (tabs.TabPages.Count != 7) throw new Exception("Expected seven tabs");
+            if (tabs.TabPages.Count != 8) throw new Exception("Expected eight tabs");
             sb.Append("tabs=").Append(tabs.TabPages.Count);
             string expectedFirstTab = UiLanguage.English ? "Cleanup" : "Dọn dẹp";
             if (tabs.TabPages[0].Text != expectedFirstTab) throw new Exception("Language tab mismatch: " + tabs.TabPages[0].Text);
@@ -712,7 +751,8 @@ namespace DonDep
             string expectedSettings = UiLanguage.English ? "⚙ Settings" : "⚙ Cài đặt";
             if (tabs.TabPages[3].Text != "Smart Folder" ||
                 tabs.TabPages[4].Text != expectedMoved ||
-                tabs.TabPages[6].Text != expectedSettings)
+                tabs.TabPages[6].Text != UiLanguage.L("Gỡ phần mềm", "Uninstall") ||
+                tabs.TabPages[7].Text != expectedSettings)
                 throw new Exception("Navigation order or Settings translation mismatch.");
             if (btnSettingsVietnamese == null || btnSettingsEnglish == null ||
                 btnSettingsVietnamese.IsDisposed || btnSettingsEnglish.IsDisposed ||
@@ -759,6 +799,19 @@ namespace DonDep
             list.Items.Add(NewRow(personal[0], false));
             UpdateGroupHeaders(); UpdateSummary();
             list.Items.Clear();
+            InstalledApps.SelfTest();
+            allApps = InstalledApps.Scan(null);
+            FillAppList();
+            if (allApps.Count == 0) throw new Exception("No installed programs found");
+            sb.Append(" apps=").Append(allApps.Count).Append("/").Append(allApps.Count(a => a.LastUsed.HasValue));
+            string cardDir = Path.Combine(Path.GetTempPath(), "PCCleanerCardTest");
+            string card = ShareCard.Create(37L * Fmt.GB + 512 * Fmt.MB, 12, cardDir);
+            if (!File.Exists(card) || new FileInfo(card).Length < 20000) throw new Exception("Share card not created");
+            try { Directory.Delete(cardDir, true); } catch { }
+            sb.Append(" card=OK");
+            if (UpdateInstaller.Sha256File(App.ExePath).Length != 64) throw new Exception("SHA-256 failed");
+            sb.Append(" zaloOld=").Append(ZaloAuto.FindOld(cfg, 90, null).Count);
+            UpdateStatsLabel(); UpdateZaloLastLabel();
             var br = Browsers.Detect();
             FillBrowserList(br);
             UpdateBrowserSummary();

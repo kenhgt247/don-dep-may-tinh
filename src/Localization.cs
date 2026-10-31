@@ -516,6 +516,27 @@ namespace DonDep
             { "Bạn đang dùng bản mới nhất (", "You have the latest version (" },
             { " trình duyệt, tổng ", " browsers, total " },
             { "\n\nCòn ", "\n\nRemaining " },
+            { "Bộ nhớ đệm CapCut", "CapCut cache" },
+            { "Bản CapCut cũ không dùng nữa (", "Unused old CapCut versions (" },
+            { "Bộ nhớ đệm Telegram (ảnh, video đã xem)", "Telegram cache (viewed photos, videos)" },
+            { "Bộ nhớ đệm Messenger (", "Messenger cache (" },
+            { "Bộ nhớ đệm Discord (", "Discord cache (" },
+            { "Bộ nhớ đệm Adobe (", "Adobe cache (" },
+            { "Bộ nhớ đệm Steam (trang web)", "Steam web cache" },
+            { "Bộ nhớ đệm Epic Games (", "Epic Games cache (" },
+            { "Chưa kết nối Google Drive. Mở app → tab Dọn dẹp → bấm \"Kết nối Google Drive\".", "Google Drive is not connected. Open the app → Cleanup tab → click \"Connect Google Drive\"." },
+            { "Google Drive không đủ chỗ (còn ", "Not enough Google Drive space (free " },
+            { "Đang tải bản ", "Downloading version " },
+            { "Đang cài bản ", "Installing version " },
+            { "Đang xem: ", "Checking: " },
+            { "Bản phát hành chưa có file tải về.", "The release has no downloadable file." },
+            { "File tải về không đủ dung lượng (kiểm tra kết nối mạng rồi thử lại).", "The download is incomplete (check your connection and try again)." },
+            { "File tải về không khớp mã kiểm tra của GitHub — đã hủy để an toàn.", "The download does not match GitHub's checksum — cancelled for safety." },
+            { "Không tìm thấy file chương trình trong bản tải về.", "No program file found in the download." },
+            { "File trong bản tải về không phải Dọn Dẹp Máy Tính — đã hủy.", "The downloaded file is not PC Cleaner — cancelled." },
+            { "Bản tải về không đúng phiên bản ", "The download is not version " },
+            { "App đang nằm trong thư mục cần quyền quản trị nên không tự thay file được.", "The app is in a folder that requires administrator rights, so it cannot replace itself." },
+            { "Không cập nhật được: ", "Update failed: " },
             { " còn ", " free " },
             { "Chỉ còn ", "Only " },
             { " file từ ", " files from " },
@@ -560,6 +581,9 @@ namespace DonDep
         // U+2068 / U+2069 là ký tự định dạng vô hình (không hiện ra trên màn hình).
         const char Open = '\u2068', Close = '\u2069';
         public static string P(string userText) { return Open + (userText ?? "") + Close; }
+
+        /// Chọn câu theo ngôn ngữ đang dùng (dùng cho các tính năng mới).
+        public static string L(string vi, string en) { return English ? en : vi; }
 
         public static string T(string text)
         {

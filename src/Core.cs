@@ -17,7 +17,7 @@ namespace DonDep
 {
     static class App
     {
-        public const string Version = "1.4.1";
+        public const string Version = "1.5.0";
         public const string Repo = "kenhgt247/don-dep-may-tinh";
         public const string Name = "Dọn Dẹp Máy Tính";
         public static string Title => UiLanguage.T(Name) + " " + Version + (IsAdmin ? UiLanguage.T("  —  quyền quản trị") : "");
@@ -76,7 +76,8 @@ namespace DonDep
     // ------------------------------------------------------------------ thiết lập (đọc được file caidat.json của bản cũ)
     class Settings
     {
-        public int Days = 90, LargeMB = 500, KeepGB = 10, AlertGB = 5, AutoDays = 7, DupMinMB = 1;
+        public int Days = 90, LargeMB = 500, KeepGB = 10, AlertGB = 5, AutoDays = 7, DupMinMB = 1, ZaloAutoDays = 90, ZaloAutoEvery = 7;
+        public bool ZaloAuto = false;
         public string DestMode = "drive", DestFolder = "", LastAutoClean = "", Language = "vi";
         public bool AutoClean = false;
         public List<string> ExtraZalo = new List<string>();
@@ -100,6 +101,10 @@ namespace DonDep
                 s.DestFolder = GetStr(d, "DestFolder", s.DestFolder);
                 s.LastAutoClean = GetStr(d, "LastAutoClean", s.LastAutoClean);
                 s.Language = GetStr(d, "Language", "vi") == "en" ? "en" : "vi";
+                s.ZaloAutoDays = Math.Max(7, GetInt(d, "ZaloAutoDays", s.ZaloAutoDays));
+                s.ZaloAutoEvery = Math.Max(1, GetInt(d, "ZaloAutoEvery", s.ZaloAutoEvery));
+                object za;
+                if (d.TryGetValue("ZaloAuto", out za) && za is bool) s.ZaloAuto = (bool)za;
                 object b;
                 if (d.TryGetValue("AutoClean", out b) && b is bool) s.AutoClean = (bool)b;
                 s.ExtraZalo = GetList(d, "ExtraZalo");
@@ -118,7 +123,8 @@ namespace DonDep
                 {
                     { "Days", Days }, { "LargeMB", LargeMB }, { "KeepGB", KeepGB }, { "AlertGB", AlertGB }, { "AutoDays", AutoDays },
                     { "DupMinMB", DupMinMB }, { "DestMode", DestMode }, { "DestFolder", DestFolder }, { "LastAutoClean", LastAutoClean },
-                    { "AutoClean", AutoClean }, { "ExtraZalo", ExtraZalo.ToArray() }, { "DupFolders", DupFolders.ToArray() }, { "Language", Language }
+                    { "AutoClean", AutoClean }, { "ExtraZalo", ExtraZalo.ToArray() }, { "DupFolders", DupFolders.ToArray() }, { "Language", Language },
+                    { "ZaloAuto", ZaloAuto }, { "ZaloAutoDays", ZaloAutoDays }, { "ZaloAutoEvery", ZaloAutoEvery }
                 };
                 File.WriteAllText(App.SettingsFile, new JavaScriptSerializer().Serialize(d), new UTF8Encoding(false));
             }
@@ -509,6 +515,14 @@ namespace DonDep
     class JunkSource
     {
         public string Name, Path; public DateTime? Before; public bool Default = true;
+        /// Tên tiến trình của phần mềm sở hữu thư mục này (để nhắc tắt trước khi dọn).
+        public string[] Procs;
+        public static bool AnyRunning(string[] procs)
+        {
+            if (procs == null) return false;
+            foreach (var p in procs) { try { if (Process.GetProcessesByName(p).Length > 0) return true; } catch { } }
+            return false;
+        }
     }
 
     static class Junk
@@ -565,6 +579,48 @@ namespace DonDep
             }
             foreach (var sub in new[] { "Cache", "Code Cache", "GPUCache", @"Service Worker\CacheStorage" })
                 add("Bộ nhớ đệm Teams (" + sub + ")", Path.Combine(roam, @"Microsoft\Teams\" + sub), null);
+            // Phần mềm người Việt hay dùng. Chỉ dọn thư mục bộ nhớ đệm, không bao giờ đụng dự án / tin nhắn.
+            Action<string, string, string[]> app = (n, p, procs) =>
+            {
+                if (!string.IsNullOrEmpty(p) && Directory.Exists(p)) items.Add(new JunkSource { Name = n, Path = p, Procs = procs });
+            };
+            var capcut = new[] { "CapCut" };
+            app("Bộ nhớ đệm CapCut", Path.Combine(local, @"CapCut\User Data\Cache"), capcut);
+            string ccApps = Path.Combine(local, @"CapCut\Apps");
+            if (Directory.Exists(ccApps))
+            {
+                var vers = new List<Tuple<Version, string>>();
+                try
+                {
+                    foreach (var d in Directory.GetDirectories(ccApps))
+                    {
+                        Version v;
+                        if (Version.TryParse(Path.GetFileName(d), out v)) vers.Add(Tuple.Create(v, d));
+                    }
+                }
+                catch { }
+                // Giữ lại bản mới nhất; các bản cũ CapCut để lại sau mỗi lần cập nhật.
+                foreach (var old in vers.OrderByDescending(t => t.Item1).Skip(1))
+                    items.Add(new JunkSource { Name = "Bản CapCut cũ không dùng nữa (" + Path.GetFileName(old.Item2) + ")", Path = old.Item2, Procs = capcut, Default = false });
+            }
+            app("Bộ nhớ đệm Telegram (ảnh, video đã xem)", Path.Combine(roam, @"Telegram Desktop\tdata\user_data"), new[] { "Telegram" });
+            foreach (var sub in new[] { "Cache", "Code Cache", "GPUCache" })
+            {
+                app("Bộ nhớ đệm Messenger (" + sub + ")", Path.Combine(roam, @"Messenger\" + sub), new[] { "Messenger" });
+                app("Bộ nhớ đệm Discord (" + sub + ")", Path.Combine(roam, @"discord\" + sub), new[] { "Discord" });
+            }
+            var adobe = new[] { "Adobe Premiere Pro", "AfterFX", "Adobe Media Encoder", "Photoshop" };
+            app("Bộ nhớ đệm Adobe (Media Cache Files)", Path.Combine(roam, @"Adobe\Common\Media Cache Files"), adobe);
+            app("Bộ nhớ đệm Adobe (Media Cache)", Path.Combine(roam, @"Adobe\Common\Media Cache"), adobe);
+            app("Bộ nhớ đệm Adobe (Peak Files)", Path.Combine(roam, @"Adobe\Common\Peak Files"), adobe);
+            app("Bộ nhớ đệm Steam (trang web)", Path.Combine(local, @"Steam\htmlcache"), new[] { "steam", "steamwebhelper" });
+            string epic = Path.Combine(local, @"EpicGamesLauncher\Saved");
+            if (Directory.Exists(epic))
+            {
+                string[] webs = new string[0];
+                try { webs = Directory.GetDirectories(epic, "webcache*"); } catch { }
+                foreach (var w in webs) app("Bộ nhớ đệm Epic Games (" + Path.GetFileName(w) + ")", w, new[] { "EpicGamesLauncher", "EpicWebHelper" });
+            }
             add("Bộ nhớ đệm npm (lập trình)", Path.Combine(local, "npm-cache"), null);
             add("Bộ nhớ đệm pip (lập trình)", Path.Combine(local, @"pip\cache"), null);
 
@@ -656,7 +712,7 @@ namespace DonDep
                 return;
             }
             DateTime b = before ?? DateTime.MaxValue;
-            if (name != null && name.StartsWith("Bản Zalo cũ")) { Fs.RemoveTreeSafe(pth, b); return; }
+            if (name != null && (name.StartsWith("Bản Zalo cũ") || name.StartsWith("Bản CapCut cũ"))) { Fs.RemoveTreeSafe(pth, b); return; }
             var di = new DirectoryInfo(pth);
             if (!di.Exists) return;
             try

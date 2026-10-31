@@ -22,6 +22,7 @@ namespace DonDep
         public long Size;
         public DateTime? Date, Before;
         public bool Default = true;
+        public string[] Procs;
     }
 
     partial class MainForm : Form
@@ -49,8 +50,12 @@ namespace DonDep
 
         bool isBusy;
 
-        public MainForm(string languageOverride = null)
+        readonly bool justUpdated;
+
+        public MainForm(string languageOverride = null, bool justUpdated = false)
         {
+            this.justUpdated = justUpdated;
+            AppState.Load();
             UiLanguage.Code = languageOverride == "en" ? "en" : cfg.Language;
             Icon = App.AppIcon;
             AutoScaleMode = AutoScaleMode.None;
@@ -81,6 +86,7 @@ namespace DonDep
             var tabSmart = NewTab("Smart Folder");
             var tabMoved = NewTab("Đã chuyển đi");
             var tabBrowser = NewTab("Trình duyệt");
+            var tabPrograms = NewTab(UiLanguage.L("Gỡ phần mềm", "Uninstall"));
             var tabSettings = NewTab("⚙ Cài đặt");
             BuildCleanTab(tabClean);
             BuildMapTab(tabMap);
@@ -88,6 +94,7 @@ namespace DonDep
             BuildSmartFolderTab(tabSmart);
             BuildMovedTab(tabMoved);
             BuildBrowserTab(tabBrowser);
+            BuildProgramsTab(tabPrograms);
             BuildAutoTab(tabSettings);
 
             var strip = new StatusStrip();
@@ -114,6 +121,9 @@ namespace DonDep
             int pendingDays = (int)numAutoDays.Value;
             bool pendingAuto = chkAutoClean.Checked;
             bool pendingStartup = chkStartup.Checked;
+            bool pendingZalo = chkZaloAuto.Checked;
+            int pendingZaloDays = (int)numZaloDays.Value, pendingZaloEvery = (int)numZaloEvery.Value;
+            var apps = allApps;
             cfg.Language = language;
             cfg.Save();
             UiLanguage.Code = language;
@@ -127,6 +137,11 @@ namespace DonDep
             numAutoDays.Value = pendingDays;
             chkAutoClean.Checked = pendingAuto;
             chkStartup.Checked = pendingStartup;
+            chkZaloAuto.Checked = pendingZalo;
+            numZaloDays.Value = pendingZaloDays;
+            numZaloEvery.Value = pendingZaloEvery;
+            allApps = apps;
+            FillAppList();
             tabs.SelectedIndex = Math.Max(0, Math.Min(tabs.TabPages.Count - 1, tabIndex));
             UpdateDrives();
             UpdateDriveLabel(false);
@@ -206,6 +221,7 @@ namespace DonDep
             long keep = (long)numKeep.Value * Fmt.GB;
             var low = Fs.FixedDrives().Where(d => { try { return d.AvailableFreeSpace < keep; } catch { return false; } }).Select(d => d.Name).ToList();
             if (low.Count > 0) Status("Ổ sắp đầy: " + string.Join(", ", low) + " — bấm \"Quét máy\" để dọn.");
+            if (justUpdated) { Status(UiLanguage.L("Đã cập nhật lên bản " + App.Version + ".", "Updated to version " + App.Version + ".")); return; }
             await CheckUpdate(false);
         }
 
@@ -476,7 +492,7 @@ namespace DonDep
                     {
                         status.Report("Đang tính: " + j.Name);
                         long size = Fs.FolderSize(j.Path, j.Before);
-                        if (size > 0) r["rac"].Add(new CleanItem { Category = "rac", Kind = "xoa", Path = j.Path, Size = size, Name = j.Name, Folder = j.Path, Before = j.Before, Default = j.Default });
+                        if (size > 0) r["rac"].Add(new CleanItem { Category = "rac", Kind = "xoa", Path = j.Path, Size = size, Name = j.Name, Folder = j.Path, Before = j.Before, Default = j.Default, Procs = j.Procs });
                     }
                     status.Report("Đang tính: Thùng rác");
                     long rb = Junk.RecycleBinSize();
@@ -497,7 +513,7 @@ namespace DonDep
                     {
                         if (!Directory.Exists(z.Path)) continue;
                         found = true;
-                        foreach (var f in Fs.Walk(z.Path, new[] { "sticker*", "emoji*", "avatar*", "*cache*", "thumb*", "*Thumb", "zinstant", "fileNoise" }, 0, before, z.Ext, status.Report))
+                        foreach (var f in Fs.Walk(z.Path, ZaloAuto.Skip, 0, before, z.Ext, status.Report))
                             addFile("zalo", f, z.Path);
                     }
                     if (!found) App.Log("Không tìm thấy thư mục Zalo. Nếu bạn đã chuyển dữ liệu Zalo sang chỗ khác, bấm \"Thêm thư mục Zalo khác\".");
@@ -623,6 +639,19 @@ namespace DonDep
                 }
             }
             if (junk.Any(o => o.Name.Contains("Zalo")) && Junk.ZaloRunning()) App.Log("Zalo đang mở nên một phần bộ nhớ đệm Zalo sẽ được bỏ qua. Tắt Zalo rồi dọn lại để xóa hết.");
+            // CapCut, Telegram, Discord, Adobe… đang mở thì nhắc tắt (xóa bộ nhớ đệm khi phần mềm đang chạy có thể làm nó lỗi).
+            while (true)
+            {
+                var running = junk.Where(o => JunkSource.AnyRunning(o.Procs)).ToList();
+                if (running.Count == 0) break;
+                var names = running.Select(o => o.Procs[0]).Distinct().ToList();
+                var r = MessageBox.Show(this, UiLanguage.L(
+                    "Các phần mềm sau đang mở:\n\n• " + string.Join("\n• ", names) + "\n\nHãy tắt chúng rồi bấm Retry.\nBấm Ignore để bỏ qua phần bộ nhớ đệm của chúng lần này.",
+                    "These programs are running:\n\n• " + string.Join("\n• ", names) + "\n\nClose them, then click Retry.\nClick Ignore to skip their caches this time."),
+                    App.Name, MessageBoxButtons.AbortRetryIgnore, MessageBoxIcon.Warning);
+                if (r == DialogResult.Abort) { Status("Đã hủy."); return; }
+                if (r == DialogResult.Ignore) { junk = junk.Except(running).ToList(); break; }
+            }
 
             App.Log("===== Bắt đầu dọn dẹp =====");
             var deleted = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -660,7 +689,7 @@ namespace DonDep
             foreach (var it in checkedItems)
             {
                 var o = (CleanItem)it.Tag;
-                if (o.Kind == "xoa" || movedSet.Contains(o.Path) || deleted.Contains(o.Path)) list.Items.Remove(it);
+                if ((o.Kind == "xoa" && junk.Contains(o)) || movedSet.Contains(o.Path) || deleted.Contains(o.Path)) list.Items.Remove(it);
             }
             UpdateGroupHeaders();
             list.EndUpdate();
@@ -671,9 +700,14 @@ namespace DonDep
             foreach (var k in freeAfter.Keys.OrderBy(x => x)) { long b; if (freeBefore.TryGetValue(k, out b) && freeAfter[k] - b > 10 * Fmt.MB) report += "\n    " + k + "  +" + Fmt.Size(freeAfter[k] - b) + "  (nay còn trống " + Fmt.Size(freeAfter[k]) + ")"; }
             UpdateDrives();
             App.Log("===== Xong =====");
+            AppState.AddFreed(AppState.Gain(freeBefore, freeAfter));
+            UpdateStatsLabel();
             Status("Đã dọn xong.");
             string done = "Đã dọn xong!";
             if (report.Length > 0) done += "\n\nĐã giải phóng:" + report;
+            if (AppState.TotalFreed > 0)
+                done += UiLanguage.L("\n\n🏆 Tổng cộng app đã giúp bạn giải phóng " + Fmt.Size(AppState.TotalFreed) + ". Vào tab Cài đặt để tạo ảnh khoe lên Facebook!",
+                                     "\n\n🏆 In total the app has freed " + Fmt.Size(AppState.TotalFreed) + " for you. Open Settings to create a picture to share on Facebook!");
             if (moves.Count > 0)
             {
                 done += "\n\nĐã chuyển " + movedEntries.Count + "/" + moves.Count + " file.";
@@ -715,23 +749,7 @@ namespace DonDep
 
         List<MovedEntry> MoveToDrive(List<CleanItem> items)
         {
-            var moved = new List<MovedEntry>();
-            foreach (var g in items.GroupBy(o => o.Root, StringComparer.OrdinalIgnoreCase))
-            {
-                string root = g.Key;
-                string remotePath = "DonDep/" + App.PcName + "/" + Fs.SafeName(root);
-                string remote = App.RemoteName + ":" + remotePath;
-                var rel = g.Select(o => Fs.RelPath(root, o.Path).Replace('\\', '/')).ToList();
-                App.Log("Tải lên Google Drive: " + rel.Count + " file từ " + root);
-                Rclone.Move(root, rel, remote, status.Report);
-                foreach (var o in g)
-                {
-                    if (File.Exists(o.Path)) continue;
-                    string r = Fs.RelPath(root, o.Path).Replace('\\', '/');
-                    moved.Add(Entry(o, "Google Drive/" + remotePath + "/" + r, remote + "/" + r));
-                }
-            }
-            return moved;
+            return DriveTransfer.Move(items, o => CatLabel[o.Category], status.Report);
         }
 
         async Task ConnectDrive()

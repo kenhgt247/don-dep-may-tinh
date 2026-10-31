@@ -301,7 +301,7 @@ namespace DonDep
     // ------------------------------------------------------------------ kiểm tra bản mới
     static class Updater
     {
-        public class Info { public Version Latest; public string Url; }
+        public class Info { public Version Latest; public string Url, ZipUrl, Sha256; public long ZipSize; }
 
         public static Task<Info> CheckAsync()
         {
@@ -318,7 +318,20 @@ namespace DonDep
                         Version v;
                         string tag = (d["tag_name"] ?? "").ToString().TrimStart('v', 'V');
                         if (!Version.TryParse(tag, out v)) return null;
-                        return new Info { Latest = v, Url = (d["html_url"] ?? "").ToString() };
+                        var info = new Info { Latest = v, Url = (d["html_url"] ?? "").ToString() };
+                        object assets;
+                        if (d.TryGetValue("assets", out assets) && assets is System.Collections.ArrayList)
+                            foreach (var a in (System.Collections.ArrayList)assets)
+                            {
+                                var ad = a as Dictionary<string, object>;
+                                if (ad == null || !(ad["name"] ?? "").ToString().EndsWith(".zip", StringComparison.OrdinalIgnoreCase)) continue;
+                                info.ZipUrl = (ad["browser_download_url"] ?? "").ToString();
+                                object sz, dg;
+                                if (ad.TryGetValue("size", out sz) && sz != null) info.ZipSize = Convert.ToInt64(sz);
+                                if (ad.TryGetValue("digest", out dg) && dg != null && dg.ToString().StartsWith("sha256:")) info.Sha256 = dg.ToString().Substring(7);
+                                break;
+                            }
+                        return info;
                     }
                 }
                 catch { return null; }
@@ -360,12 +373,13 @@ namespace DonDep
             foreach (var j in Junk.Sources(cfg))
             {
                 if (zalo && j.Name.Contains("Zalo")) continue;
-                if (j.Name.StartsWith("Bản Zalo cũ")) continue;
+                if (!j.Default) continue;                       // bản Zalo / CapCut cũ: chỉ dọn khi người dùng tự chọn
+                if (JunkSource.AnyRunning(j.Procs)) continue;   // phần mềm đang mở: để lần sau
                 Junk.Remove(j.Path, j.Name, j.Before);
             }
             var after = Fs.FreeMap();
-            long freed = 0;
-            foreach (var k in after.Keys) { long b; if (before.TryGetValue(k, out b) && after[k] > b) freed += after[k] - b; }
+            long freed = AppState.Gain(before, after);
+            AppState.AddFreed(freed);
             cfg.LastAutoClean = DateTime.Now.ToString("o");
             cfg.Save();
             App.Log("Tự dọn rác: đã giải phóng khoảng " + Fmt.Size(freed));

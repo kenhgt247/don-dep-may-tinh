@@ -21,157 +21,124 @@
   <a href="https://github.com/kenhgt247/don-dep-may-tinh/releases/latest"><img alt="Download the latest release" src="https://img.shields.io/badge/%E2%AC%87%20T%E1%BA%A2I%20B%E1%BA%A2N%20M%E1%BB%9AI%20NH%E1%BA%A4T%20%2F%20DOWNLOAD-LATEST%20RELEASE-2563eb?style=for-the-badge"></a>
 </p>
 
-[🇻🇳 Giới thiệu](#-giới-thiệu-tổng-quan) ·
-[✨ Tính năng](#-các-tính-năng) ·
-[⬇️ Cài đặt](#%EF%B8%8F-tải-về--cài-đặt) ·
-[🛡️ An toàn](#%EF%B8%8F-an-toàn-dữ-liệu) ·
-[🇬🇧 English](#-english-overview)
+[🇻🇳 Giới thiệu](#-giới-thiệu) ·
+[✨ 10 chức năng](#-10-chức-năng) ·
+[⬇️ Tải về](#️-tải-về--cài-đặt) ·
+[🛡️ An toàn](#️-an-toàn-dữ-liệu) ·
+[🇬🇧 English](#-english)
+
+<img src="docs/screens/don-dep.png" width="820" alt="Giao diện PC Cleaner — tab Dọn dẹp" />
 
 </div>
 
 ---
 
-## 🇻🇳 Giới thiệu tổng quan
+## 🇻🇳 Giới thiệu
 
-**PC Cleaner (Dọn Dẹp Máy Tính)** là phần mềm **miễn phí và mã nguồn mở**, giúp máy tính Windows bớt đầy ổ C: quét rác hệ thống, tìm thư mục chiếm dung lượng, phát hiện file trùng và chuyển những file cần giữ lên **Google Drive** hoặc **ổ cứng ngoài/USB**.
+**PC Cleaner (Dọn Dẹp Máy Tính)** là phần mềm **miễn phí, mã nguồn mở** giúp máy Windows hết cảnh **ổ C đầy**: dọn rác, tìm thứ đang chiếm chỗ, gỡ phần mềm không dùng, và chuyển bớt ảnh/video lên **Google Drive** hoặc **ổ cứng ngoài** — luôn cho bạn **xem trước và tự quyết định**.
 
-Phần mềm hướng đến sự **rõ ràng và an toàn**: bạn xem danh sách trước, chọn việc cần làm và được cảnh báo khi có nguy cơ mất dữ liệu. Không bán gói VIP, không yêu cầu tài khoản riêng để dọn rác trên máy.
+- 💚 **Miễn phí hoàn toàn** — không quảng cáo, không gói VIP, không cần tài khoản.
+- 🇻🇳 **Làm cho người Việt** — hiểu Zalo, CapCut, Cốc Cốc; giao diện **Tiếng Việt / English**.
+- 🛡️ **An toàn trước tiên** — chặn thư mục hệ thống và tin nhắn Zalo, hỏi lại trước mỗi việc quan trọng, có **danh sách bảo vệ** và **lịch sử** mọi thao tác.
+- 🔄 **Tự cập nhật** — có bản mới, app tự tải, kiểm tra và thay thế.
+- 🪶 **Gọn nhẹ** — một file `.exe` dưới 1 MB, không cần cài thêm gì.
 
-> **Mới ở bản 1.6.0:** dọn **tàn dư sau khi gỡ phần mềm** · tìm **file cài đặt thừa** (.exe, .msi, .iso ở Downloads, Desktop, Zalo, Telegram) · tab **Hiệu năng** (CPU, RAM, mạng, chương trình ngốn máy) · **danh sách bảo vệ** · tab **Lịch sử** dọn dẹp.
->
-> **Bản 1.5.0:** tab **Gỡ phần mềm** (xem phần mềm nào nặng, lâu không mở, gỡ ngay trong app) · dọn bộ nhớ đệm **CapCut, Telegram, Messenger, Discord, Adobe, Steam, Epic** · **tự động đưa ảnh Zalo cũ lên Google Drive** theo lịch · **tự cập nhật** trong app · thống kê "đã giải phóng X GB" kèm **ảnh khoe Facebook**.
+## ✨ 10 chức năng
 
-### 🌟 Vì sao nên dùng?
+| | Tab | Làm được gì |
+|:-:|---|---|
+| 🧹 | **Dọn dẹp** | Quét **rác hệ thống** (file tạm, thùng rác, gói cập nhật cũ, bộ nhớ đệm trình duyệt / Zalo / Teams), bộ nhớ đệm **CapCut** (kể cả bản CapCut cũ), **Telegram, Messenger, Discord, Adobe, Steam, Epic**; **file cài đặt thừa** (.exe, .msi, .iso ở Downloads, Desktop, thư mục Zalo / Telegram); **ảnh/video Zalo cũ**; file cũ trong **Downloads**; **file lớn**. Với file cá nhân, chọn từng file: **chuyển lên Drive / ổ ngoài** hay **xóa vĩnh viễn**. |
+| 🗺️ | **Bản đồ ổ đĩa** | Thư mục nào chiếm nhiều chỗ nhất, đi sâu từng cấp. Bấm vào là biết **đó là gì, có xóa được không**. Chuột phải để xóa (Thùng rác / vĩnh viễn) hoặc chuyển đi. |
+| 🧩 | **File trùng** | Tìm file giống hệt nhau, giữ lại 1 bản, bản thừa vào Thùng rác. |
+| 📁 | **Smart Folder** | Tự sắp xếp file **cá nhân** (theo loại) hoặc **công việc** (công văn, quyết định, báo cáo, hợp đồng… — đọc cả nội dung Word/Excel/PowerPoint). Chạy hoàn toàn trên máy, không AI, không gửi dữ liệu đi. Xem trước, **hoàn tác** được. |
+| ☁️ | **Đã chuyển đi** | Danh sách file đã chuyển lên Drive / ổ ngoài; lấy về đúng chỗ cũ bất cứ lúc nào. |
+| 🌍 | **Trình duyệt** | Chrome, Edge, **Cốc Cốc**, Brave, Opera, Firefox — theo từng tài khoản: dọn bộ nhớ đệm, lịch sử, cookie. **Không đụng mật khẩu, dấu trang, tiện ích.** |
+| 🧰 | **Gỡ phần mềm** | Phần mềm đã cài theo **dung lượng**, ngày cài, **lần mở gần nhất**; đánh dấu phần mềm hơn 6 tháng chưa mở; gỡ ngay trong app, gỡ xong **dọn luôn tàn dư** còn sót. |
+| 📈 | **Hiệu năng** | CPU, RAM, mạng, ổ đĩa theo thời gian thực; chương trình nào đang ngốn máy; đóng chương trình ngay trong app. |
+| 🕘 | **Lịch sử** | Mọi lần dọn, xóa, chuyển, gỡ đều được ghi lại kèm danh sách file. |
+| ⚙️ | **Cài đặt** | Đổi ngôn ngữ · **"App đã giúp bạn giải phóng X GB"** + ảnh khoe Facebook · chạy ngầm, báo ổ sắp đầy, **tự dọn rác theo lịch** · **tự đưa ảnh Zalo cũ lên Google Drive theo lịch** · **danh sách bảo vệ** · biểu tượng Desktop · cập nhật. |
 
-| | Lợi ích |
-|:--:|---|
-| 🧹 | **Dọn đúng thứ cần dọn** — xem trước rác và dữ liệu trước khi thực hiện |
-| 🗺️ | **Biết ổ cứng đầy vì đâu** — phân tích và đi sâu từng thư mục |
-| ☁️ | **Giữ file quan trọng** — chuyển lên Drive/USB thay vì xóa vĩnh viễn |
-| 🛡️ | **Bảo vệ dữ liệu hệ thống và Zalo** — chặn thao tác nguy hiểm, cảnh báo mất dữ liệu |
-| 🌐 | **Hai ngôn ngữ** — Việt/Anh, ghi nhớ lựa chọn |
-| 💚 | **Miễn phí, nguồn mở** — mã nguồn C# công khai tại [`src/`](src/) |
+<table>
+<tr>
+<td width="50%"><img src="docs/screens/smart-folder.png" alt="Smart Folder" /><br/><sub>📁 Smart Folder — sắp xếp file không cần AI</sub></td>
+<td width="50%"><img src="docs/screens/hieu-nang.png" alt="Hiệu năng" /><br/><sub>📈 Hiệu năng — CPU, RAM, chương trình ngốn máy</sub></td>
+</tr>
+<tr>
+<td width="50%"><img src="docs/screens/anh-khoe.png" alt="Ảnh khoe Facebook" /><br/><sub>🏆 Ảnh khoe lên Facebook — tạo bằng một nút bấm</sub></td>
+<td width="50%"><img src="docs/screens/cai-dat.png" alt="Cài đặt" /><br/><sub>⚙️ Cài đặt — tự động hóa, danh sách bảo vệ, ngôn ngữ</sub></td>
+</tr>
+</table>
 
-## ✨ Các tính năng
+### ☁️ Ảnh Zalo đầy máy? Đưa lên Google Drive
 
-| Chức năng | Mô tả |
-|---|---|
-| **🧹 Dọn dẹp** | Quét file tạm, cache (cả **CapCut, Telegram, Messenger, Discord, Adobe, Steam, Epic**), gói cập nhật cũ, thùng rác, **file cài đặt thừa**; kiểm tra ảnh/video Zalo cũ, Downloads và file lớn. File cá nhân được chọn **chuyển đi hoặc xóa** theo từng mục. |
-| **🗺️ Bản đồ ổ đĩa** | Xác định thư mục/file nào đang chiếm nhiều dung lượng; xem nhận diện mức độ an toàn, mở thư mục, hoặc đưa mục được phép vào danh sách xử lý. |
-| **🧩 File trùng** | Tìm các bản sao giống hệt nhau, giữ ít nhất một bản và đưa bản dư vào Thùng rác. |
-| **☁️ Đã chuyển đi** | Theo dõi các file đã chuyển và khôi phục về đúng vị trí cũ khi cần. |
-| **🌍 Trình duyệt** | Xem dữ liệu Chrome, Edge, Cốc Cốc, Brave, Opera, Firefox theo hồ sơ; có thể dọn cache, lịch sử, cookie theo lựa chọn. **Không đụng mật khẩu, dấu trang hay tiện ích mở rộng.** |
-| **🧰 Gỡ phần mềm** | Liệt kê phần mềm đã cài theo dung lượng, ngày cài, **lần mở gần nhất (ước tính)**; đánh dấu phần mềm hơn 6 tháng chưa mở; mở trình gỡ cài đặt ngay trong app, gỡ xong **tìm và dọn tàn dư** (vào Thùng rác). Driver, Visual C++, .NET… được cảnh báo riêng. |
-| **📈 Hiệu năng** | CPU, RAM, mạng, ổ đĩa theo thời gian thực; chương trình nào đang ngốn máy nhất; đóng chương trình ngay trong app (chặn thành phần Windows). |
-| **🕘 Lịch sử** | Ghi lại mọi lần dọn rác, xóa, chuyển lên Drive, gỡ phần mềm… kèm danh sách file chi tiết. |
-| **⚙️ Cài đặt (tab cuối)** | Chọn **Tiếng Việt / English**; **thành tích "đã giải phóng X GB" + ảnh khoe Facebook**; chạy ngầm cùng Windows, cảnh báo ổ gần đầy, hẹn lịch dọn rác hệ thống; **tự đưa ảnh/video/file Zalo cũ lên Google Drive theo lịch**; **danh sách bảo vệ** (không bao giờ dọn); tạo shortcut; **tự cập nhật**. |
-| **📁 Smart Folder** | Sắp xếp **file cá nhân** theo loại và **tài liệu công việc** theo từ khóa tên hoặc nội dung Word/Excel/PowerPoint/TXT/CSV; xem trước đường dẫn mới, phát hiện bản trùng SHA-256, áp dụng sau xác nhận và **hoàn tác** qua nhật ký. Không dùng AI, không kết nối API. |
-
-### 📁 Smart Folder — Sắp xếp thông minh không cần AI
-
-**Hoạt động 100% trên máy Windows, không gửi tài liệu lên máy chủ nào.**
-
-1. Vào tab **Smart Folder**, chọn thư mục cá nhân hoặc công việc. Từ **v1.3.1** có thể chọn trực tiếp ổ dữ liệu như `D:\` hoặc ổ USB. Ổ chứa Windows (thường là `C:\`) vẫn bị chặn.
-2. Chọn **Cá nhân** để phân loại theo ảnh, video, âm thanh, tài liệu, bảng tính, trình chiếu, file nén và bộ cài.
-3. Hoặc chọn **Công việc** để nhận diện công văn, quyết định, kế hoạch, báo cáo, hợp đồng, chứng từ, hồ sơ qua tên file và, nếu bật, nội dung TXT/CSV/RTF/DOCX/XLSX/PPTX.
-4. Tùy chọn chia theo năm/tháng và tìm file trùng bằng SHA-256. File trùng hoặc **chưa đủ căn cứ phân loại được giữ nguyên**.
-5. Bấm **Quét & đề xuất**, xem cột **File nguồn → Đường dẫn mới**, bỏ dấu chọn mục không muốn chuyển, sau đó bấm **Áp dụng file đã chọn** để xác nhận.
-6. Bấm **Hoàn tác lần gần nhất** để phục hồi file còn nguyên vẹn về vị trí cũ. Nhật ký được giữ khi mở lại ứng dụng.
-
-Khi quét **toàn bộ ổ dữ liệu**, phần mềm yêu cầu xác nhận trước khi quét và **không đánh dấu sẵn bất kỳ file nào**. Bạn tự chọn từng file hoặc chọn các đề xuất sau khi xem kỹ. Giới hạn quét 20.000 file mỗi lượt; phần mềm cảnh báo nếu danh sách chưa đầy đủ. Để tránh làm máy chậm khi quét cả ổ, phát hiện bản trùng SHA-256 chỉ kiểm tra file tối đa 64 MB, với tổng dữ liệu băm tối đa 512 MB.
-
-File được chuyển vào thư mục con `PC Cleaner - Da sap xep` trong thư mục nguồn bạn chọn. **Không xóa file, không ghi đè tên trùng**, bỏ qua liên kết symbolic/junction, thư mục hệ thống, dữ liệu Zalo, đường dẫn đồng bộ OneDrive/Google Drive và **thư mục của phần mềm / game** (có file .dll…), để chương trình không bị hỏng. Nếu file bị chỉnh sửa/đổi tên sau khi chuyển, phần mềm sẽ không tự ghi đè khi hoàn tác.
-
-**Giới hạn phiên bản này:** PDF, DOC, XLS dạng cũ hoặc file ảnh quét chỉ được nhận diện qua **tên file**, chưa có OCR. File chưa rõ được để lại tại chỗ. Quy tắc phân loại có thể bổ sung ở các phiên bản sau.
-
-### 🌐 Chuyển đổi Tiếng Việt / English
-
-<div align="center">
-
-**🇻🇳 Tiếng Việt** ⇄ **🇬🇧 English**
-
-</div>
-
-**Từ v1.4.0:** Mở **⚙ Cài đặt** ở cuối thanh menu → chọn **🇻🇳 Tiếng Việt** hoặc **🇬🇧 English** trong khu vực **Ngôn ngữ giao diện**. Nút đang sử dụng được đánh dấu màu xanh. Lựa chọn được áp dụng ngay và tự lưu trong `Documents\DonDepMayTinh\caidat.json` (mục `Language`).
-
-Đổi ngôn ngữ sẽ **tải lại giao diện** nhưng **không xóa hay di chuyển dữ liệu**. Nếu đang có danh sách quét chưa xử lý, hãy quét lại sau khi chuyển. Nút chuyển ngôn ngữ bị khóa khi có tác vụ đang chạy.
+Zalo lưu toàn bộ ảnh, video, file nhận được ngay trên máy nên ổ C đầy rất nhanh. PC Cleaner tìm các file Zalo cũ (ví dụ hơn 90 ngày) và chuyển lên **Google Drive của chính bạn** — bằng tay, hoặc **tự động theo lịch** khi app chạy ngầm. File chỉ bị bỏ khỏi máy **sau khi đã tải lên và kiểm tra xong**; lấy lại bất cứ lúc nào ở tab *Đã chuyển đi*. **Tin nhắn Zalo không bao giờ bị đụng tới.**
 
 ## ⬇️ Tải về & cài đặt
 
 <div align="center">
 
-### [⬇️ TẢI BẢN PHÁT HÀNH MỚI NHẤT · DOWNLOAD LATEST RELEASE](https://github.com/kenhgt247/don-dep-may-tinh/releases/latest)
+### [⬇️ TẢI BẢN MỚI NHẤT](https://github.com/kenhgt247/don-dep-may-tinh/releases/latest)
 
 </div>
 
-1. Mở trang **[Releases](https://github.com/kenhgt247/don-dep-may-tinh/releases/latest)** và tải file **`DonDepMayTinh.zip`** trong **Assets**.
-2. **Giải nén** vào một thư mục, chẳng hạn Desktop.
-3. Mở **`Don Dep May Tinh.exe`**. Phần mềm dành cho **Windows 10/11**, dùng **.NET Framework 4.8**.
-4. Chọn các mục muốn quét, xem lại kết quả, chọn nơi chuyển file nếu cần, rồi xác nhận trước khi xóa/chuyển.
+1. Mở trang **[Releases](https://github.com/kenhgt247/don-dep-may-tinh/releases/latest)**, tải file **`DonDepMayTinh.zip`** ở mục *Assets*.
+2. **Giải nén** (ví dụ ra Desktop) — đừng chạy trực tiếp trong file .zip.
+3. Bấm đúp **`Don Dep May Tinh.exe`**. Nếu Windows hiện màn hình xanh *"Windows protected your PC"*: bấm **More info → Run anyway**.
+4. Muốn có biểu tượng trên Desktop: tab **⚙ Cài đặt → Tạo biểu tượng**.
 
-**Lưu ý về Windows SmartScreen:** Tệp thực thi hiện **chưa được ký số** nên Windows có thể hiển thị cảnh báo về nhà phát hành không xác định. Chỉ tải từ trang Releases chính thức và kiểm tra nguồn trước khi chạy. Xem thêm [chính sách ký số](CODE_SIGNING_POLICY.md).
+Chạy trên **Windows 10 / 11** (.NET Framework 4.8 có sẵn trong Windows). Hướng dẫn chi tiết nằm trong file `HUONG DAN.txt` (tiếng Việt) và `GUIDE (English).txt` trong gói tải về.
 
-**Google Drive:** Khi dùng lần đầu, ứng dụng có thể đề nghị tải công cụ mã nguồn mở [rclone](https://rclone.org/) rồi yêu cầu bạn đăng nhập Google trong trình duyệt. Dữ liệu được tải lên **tài khoản Drive do bạn chọn**, không phải máy chủ của dự án.
+> **Vì sao Windows cảnh báo?** File `.exe` chưa có chữ ký số (dự án mới, sẽ đăng ký khi có nhiều người dùng). Toàn bộ mã nguồn công khai trong [`src/`](src/) — ai cũng kiểm tra được. Chỉ tải từ trang Releases chính thức. Xem [chính sách ký số](CODE_SIGNING_POLICY.md).
 
 ## 🛡️ An toàn dữ liệu
 
-- **Thao tác thủ công** cho phép xem trước và yêu cầu xác nhận. Không coi tất cả file lớn hoặc file cũ là rác.
-- Thư mục **Windows, dữ liệu ứng dụng và cơ sở dữ liệu tin nhắn Zalo** thuộc nhóm bảo vệ: không được coi là file rác có thể tùy tiện di chuyển/xóa.
-- Với ảnh/video/file đã chuyển ra khỏi máy, **Zalo có thể không mở lại được tệp đó từ hội thoại** cho đến khi bạn khôi phục tệp. Hãy kiểm tra kỹ trước khi quyết định.
-- Nếu chọn **xóa vĩnh viễn**, việc khôi phục có thể không thực hiện được. Nếu còn phân vân, hãy giữ lại hoặc chuyển sang nơi lưu an toàn.
-- **Cookie** có thể khiến bạn đăng xuất khỏi website; phần mềm có cảnh báo bổ sung trước khi dọn.
-- **Tự dọn theo lịch** chỉ hoạt động khi bạn chủ động bật chế độ này và chỉ áp dụng với rác hệ thống; không tự ý chuyển/xóa file cá nhân.
-- File được chuyển khỏi máy **sau khi bản sao đã được chép và kiểm tra**. Không xóa dữ liệu nguồn khi quá trình chuyển thất bại.
-
-Đọc thêm: [🔒 Chính sách quyền riêng tư](PRIVACY.md) · [📜 Giấy phép MIT](LICENSE) · [🔏 Chính sách ký số](CODE_SIGNING_POLICY.md).
+- **Không làm gì khi bạn chưa bấm Yes.** Bảng xác nhận cho biết sẽ xóa gì, chuyển gì, ổ còn trống bao nhiêu sau khi dọn. Xóa vĩnh viễn file cá nhân phải xác nhận 2 lần.
+- **Chặn thư mục nguy hiểm:** Windows, chương trình đã cài, dữ liệu tin nhắn Zalo, thư mục OneDrive / Google Drive, thư mục phần mềm / game.
+- **Chép xong mới xóa:** file chỉ bị bỏ khỏi máy sau khi bản sao trên Drive / ổ ngoài đã kiểm tra đúng. Không đủ chỗ thì không cho chuyển.
+- **Danh sách bảo vệ:** thư mục / file bạn đánh dấu sẽ không bao giờ bị dọn, xóa hay chuyển — kể cả khi app tự chạy theo lịch.
+- **Phần mềm đang mở** (Zalo, CapCut, Telegram, trình duyệt…) thì app nhắc tắt trước khi dọn bộ nhớ đệm của nó.
+- **Lịch sử** ghi lại mọi thao tác; nhật ký chi tiết ở `Documents\DonDepMayTinh`.
+- **Google Drive:** app dùng công cụ mã nguồn mở [rclone](https://rclone.org) với quyền `drive.file` — **chỉ thấy file do chính nó tải lên**, không đọc được các file khác trong Drive của bạn. Dữ liệu đi thẳng vào Drive của bạn, không qua máy chủ nào của dự án. Xem [chính sách quyền riêng tư](PRIVACY.md).
 
 ## 💬 Câu chuyện dự án
 
-> Tôi quá khó chịu vì ổ cứng lúc nào cũng đầy — máy chậm, Zalo không mở được, lưu file lại báo hết chỗ. Nhiều công cụ dọn rác xóa quá khó kiểm soát hoặc phải trả phí. Vì vậy, tôi tự xây dựng một công cụ dễ hiểu, cho phép **xem trước và tự quyết định** rồi chia sẻ miễn phí với mọi người.
+> Tôi quá khó chịu vì ổ cứng lúc nào cũng đầy — máy chậm, Zalo không mở được, lưu file lại báo hết chỗ. Nhiều công cụ dọn rác xóa quá khó kiểm soát hoặc phải trả phí. Vì vậy, tôi tự làm một công cụ dễ hiểu, cho phép **xem trước và tự quyết định**, rồi chia sẻ miễn phí với mọi người.
 
-Nếu phần mềm hữu ích, hãy **⭐ Star** repository để ủng hộ. Để báo lỗi hoặc đề xuất tính năng, mở [Issues](https://github.com/kenhgt247/don-dep-may-tinh/issues) và mô tả hệ điều hành, phiên bản, các bước tái hiện lỗi (không đăng tải dữ liệu cá nhân nhạy cảm).
+⭐ Thấy hữu ích? Bấm **Star** ở góc trên bên phải để ủng hộ dự án. Gặp lỗi hoặc muốn thêm tính năng: vào **[Issues](https://github.com/kenhgt247/don-dep-may-tinh/issues)** → **New issue** (ghi phiên bản Windows, phiên bản app, các bước gặp lỗi; kèm ảnh chụp nếu được).
 
 ---
 
-## 🇬🇧 English overview
+## 🇬🇧 English
 
-**PC Cleaner** is a **free, open-source Windows disk cleanup and storage management utility** built with **C# / Windows Forms (.NET Framework 4.8)**. It helps you identify disk usage, remove system junk, find duplicate files and move important files to your own **Google Drive** or external storage.
+**PC Cleaner** is a **free, open-source disk cleanup and storage toolkit for Windows 10/11**, built with C# / Windows Forms. It always shows you what it will do and asks before acting.
 
-### Features
+<img src="docs/screens/cleanup-en.png" width="720" alt="PC Cleaner in English" />
 
-| Tool | What it does |
+| Tab | What it does |
 |---|---|
-| 🧹 **Cleanup** | Review temporary files, caches, old update files, Zalo media, Downloads and large files before taking action. |
-| 🗺️ **Disk map** | Explore large folders and files with safety labels and available actions. |
-| 🧩 **Duplicates** | Find identical copies, keep at least one and send extra copies to the Recycle Bin. |
-| ☁️ **Moved files** | Track relocated files and restore them to their original location. |
-| 🌍 **Browsers** | Clean selected cache, history or cookies by browser profile. Saved passwords, bookmarks and extensions are not targeted. |
-| 🧰 **Uninstall** | Installed programs by size, install date and estimated last use; launches each program's own uninstaller, then finds leftover folders. Shared components are flagged. |
+| 🧹 **Cleanup** | System junk, browser/Zalo/Teams caches, **CapCut, Telegram, Messenger, Discord, Adobe, Steam, Epic** caches, **leftover installers**, old Zalo media, old Downloads, large files. Personal files: move to Drive / external disk or delete permanently, file by file. |
+| 🗺️ **Disk map** | See what uses the space, with a plain-language safety label for every folder. |
+| 🧩 **Duplicates** | Identical files; keeps one copy, extras go to the Recycle Bin. |
+| 📁 **Smart Folder** | Offline, rule-based organizer for personal and work files, with preview and undo. No AI, no uploads. |
+| ☁️ **Moved files** | Restore anything moved to Drive / external disk. |
+| 🌍 **Browsers** | Cache, history, cookies per profile (Chrome, Edge, Cốc Cốc, Brave, Opera, Firefox). Passwords, bookmarks and extensions are never touched. |
+| 🧰 **Uninstall** | Programs by size and estimated last use; runs the program's own uninstaller, then offers to remove leftover folders. |
 | 📈 **Performance** | Live CPU, memory, network, disks and the heaviest programs. |
-| 🕘 **History** | Every cleanup, deletion, move and uninstall with file-level details. |
-| ⚙️ **Settings** | Always the last tab; language, "space freed" stats with a shareable picture, tray monitoring, low-space warnings, scheduled **system-junk-only** cleanup, **scheduled upload of old Zalo media to Google Drive**, shortcuts and **in-app updates**. |
+| 🕘 **History** | Every cleanup, deletion, move and uninstall, with file-level details. |
+| ⚙️ **Settings** | Language · "space freed" counter with a shareable picture · tray mode, low-disk alerts, scheduled junk cleanup · **scheduled upload of old Zalo media to your Google Drive** · protected list · shortcuts · **self-update** (SHA-256 verified). |
 
-**Smart Folder:** An entirely offline, rule-based organizer for personal files (by extension) and work documents (by filename and selected text content). Preview every proposed move, exclude duplicates and unknown files, confirm before moving, and undo from a persistent log. No AI, API key, remote upload or automatic deletion.
-
-**Languages:** Open the **⚙ Settings** tab (always last in the navigation) and select **🇬🇧 English** or **🇻🇳 Tiếng Việt**. The active language is highlighted and saved. Switching refreshes the interface without moving or deleting files.
-
-**Download:** Go to [Latest Release](https://github.com/kenhgt247/don-dep-may-tinh/releases/latest), download **`DonDepMayTinh.zip`**, extract it and launch **`Don Dep May Tinh.exe`** on Windows 10/11. The latest published release may lag behind the current source version.
-
-**Safety:** Manual operations ask for confirmation; protected system/Zalo message data is not treated as ordinary junk. Moving Zalo media may cause attachments to stop opening inside their original conversations until restored. Clearing cookies signs you out of websites. Automatic cleaning is opt-in and limited to system junk. See the [Privacy Policy](PRIVACY.md) and [Code Signing Policy](CODE_SIGNING_POLICY.md). Releases are currently unsigned.
+**Download:** [Latest release](https://github.com/kenhgt247/don-dep-may-tinh/releases/latest) → `DonDepMayTinh.zip` → extract → run `Don Dep May Tinh.exe`. Switch language in **⚙ Settings**. Releases are currently unsigned, so SmartScreen may warn on first launch.
 
 ## 🧑‍💻 Dành cho nhà phát triển / For developers
 
 | | |
 |---|---|
-| **Source** | [`src/`](src/) |
-| **Language / UI** | C# · Windows Forms · .NET Framework 4.8 |
+| **Source** | [`src/`](src/) — C# · Windows Forms · .NET Framework 4.8 |
 | **Build** | `dotnet build src/DonDepMayTinh.csproj -c Release` |
-| **Tests** | `--selftest` (VI) · `--selftest-en` (EN) · `--screens <thư mục>` (chụp ảnh giao diện) |
-| **CI** | [GitHub Actions](https://github.com/kenhgt247/don-dep-may-tinh/actions) — Windows build and bilingual smoke tests |
-| **Release workflow** | [Đóng gói và phát hành](.github/workflows/release.yml) — build, self-test, ZIP, GitHub Release |
-| **License** | [MIT](LICENSE) |
-
-Để phát hành phiên bản mới: cập nhật số `Version` trong `src/Core.cs` và `src/DonDepMayTinh.csproj`, sau đó chạy workflow phát hành trong **Actions** (hoặc tạo tag phù hợp). Kiểm tra kết quả trước khi giới thiệu bản mới cho người dùng.
+| **Tests** | `--selftest` (VI) · `--selftest-en` (EN) · `--screens <folder>` (UI screenshots) |
+| **CI** | [GitHub Actions](https://github.com/kenhgt247/don-dep-may-tinh/actions) — Windows build + bilingual self-tests on every change |
+| **Release** | Bump `Version` in `src/Core.cs` and `src/DonDepMayTinh.csproj` → **Actions → Đóng gói và phát hành → Run workflow** |
+| **License** | [MIT](LICENSE) · [Privacy](PRIVACY.md) · [Code signing policy](CODE_SIGNING_POLICY.md) |
 
 ---
 
@@ -181,9 +148,9 @@ Nếu phần mềm hữu ích, hãy **⭐ Star** repository để ủng hộ. Đ
 
 *Clean smarter. Keep what matters.*
 
-[⬇️ Download](https://github.com/kenhgt247/don-dep-may-tinh/releases/latest) ·
-[🐛 Report an issue](https://github.com/kenhgt247/don-dep-may-tinh/issues) ·
-[⭐ Star this project](https://github.com/kenhgt247/don-dep-may-tinh)
+[⬇️ Tải về / Download](https://github.com/kenhgt247/don-dep-may-tinh/releases/latest) ·
+[🐛 Báo lỗi / Report an issue](https://github.com/kenhgt247/don-dep-may-tinh/issues) ·
+[⭐ Star](https://github.com/kenhgt247/don-dep-may-tinh)
 
 **© kenhgt247 · [MIT License](LICENSE)**
 

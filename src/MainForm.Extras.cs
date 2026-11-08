@@ -47,9 +47,9 @@ namespace DonDep
                 Application.DoEvents();
                 // Cho ảnh chụp có dữ liệu thật (chỉ quét / đọc, không xóa gì).
                 var page = tabs.TabPages[i];
-                if (i == 0) { var t = ScanAsync(); waitIdle(); }
-                else if (page.Controls.Contains(brList)) { var t = ScanBrowsersAsync(); waitIdle(); }
-                else if (page.Controls.Contains(appList)) { var t = ScanAppsAsync(); waitIdle(); }
+                if (i == 0) { var t = Guard(ScanAsync); waitIdle(); }
+                else if (page.Controls.Contains(brList)) { var t = Guard(ScanBrowsersAsync); waitIdle(); }
+                else if (page.Controls.Contains(appList)) { var t = Guard(ScanAppsAsync); waitIdle(); }
                 else if (page.Controls.Contains(startList)) waitIdle();
                 else if (page.Controls.Contains(procList)) { MonitorTick(); System.Threading.Thread.Sleep(1500); MonitorTick(); }
                 waitIdle();

@@ -402,7 +402,7 @@ namespace DonDep
                     e.DrawDefault = true;
                 };
             }
-            DarkWindow(lv);
+            DarkWindow(lv, "DarkMode_ItemsView");   // tiêu đề nhóm chữ sáng, thanh cuộn tối
             lv.HandleCreated += (s, e) => DarkHeader(lv);
             if (lv.IsHandleCreated) DarkHeader(lv);
         }

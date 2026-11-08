@@ -69,7 +69,7 @@ namespace DonDep
                         System.IO.File.WriteAllText(System.IO.Path.Combine(dir, "diag.txt"),
                             "list vis=" + list.Visible + " bounds=" + list.Bounds + " items=" + list.Items.Count + " handle=" + list.IsHandleCreated + " parent=" + (list.Parent?.Name ?? list.Parent?.GetType().Name) +
                             "\nflow vis=" + flowDrives.Visible + " bounds=" + flowDrives.Bounds + " n=" + flowDrives.Controls.Count + " handle=" + flowDrives.IsHandleCreated +
-                            "\nctx=" + ctx +
+                            "\nctx=" + ctx + "\ndrivesError=" + drivesError +
                             "\ntest=" + DiagAdd() +
                             "\nfirst=" + (flowDrives.Controls.Count > 0 ? flowDrives.Controls[0].Bounds + " vis=" + flowDrives.Controls[0].Visible + " text=" + flowDrives.Controls[0].Text + " fc=" + flowDrives.Controls[0].ForeColor + " bc=" + flowDrives.Controls[0].BackColor : "-"));
                         using (var b = new System.Drawing.Bitmap(Math.Max(1, list.Width), Math.Max(1, list.Height))) { list.DrawToBitmap(b, new System.Drawing.Rectangle(0, 0, b.Width, b.Height)); b.Save(System.IO.Path.Combine(dir, "diag_list.png")); }

@@ -60,8 +60,14 @@ namespace DonDep
             Icon = App.AppIcon;
             AutoScaleMode = AutoScaleMode.None;
             Font = new Font("Segoe UI", 9.5f);
-            ClientSize = new Size(1180, 780);
-            MinimumSize = new Size(1100, 660);
+            ClientSize = new Size(1390, 840);
+            MinimumSize = new Size(1150, 680);
+            // Màn hình nhỏ (vd. laptop 1366×768): mở toàn màn hình thay vì bị tràn.
+            Load += (s, e) =>
+            {
+                var wa = Screen.FromControl(this).WorkingArea;
+                if (Width > wa.Width || Height > wa.Height) WindowState = FormWindowState.Maximized;
+            };
             StartPosition = FormStartPosition.CenterScreen;
             BuildInterface();
 
@@ -109,6 +115,7 @@ namespace DonDep
             Controls.Add(strip);
             UiLanguage.Attach(tabs);
             FixMnemonics(tabs);
+            Theme.ApplyMain(this, tabs, strip);   // chỉ đổi giao diện
             status = new Progress<string>(s => { if (s.Length > 160) s = s.Substring(0, 157) + "..."; lblStatus.Text = UiLanguage.T(s); });
             tabs.SelectedIndexChanged += (s, e) => { if (tabs.SelectedIndex == 4) LoadMovedList(); };
         }

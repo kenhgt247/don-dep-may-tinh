@@ -93,7 +93,7 @@ namespace DonDep
     // ------------------------------------------------------------------ ảnh "khoe" lên Facebook
     static class ShareCard
     {
-        static Image Logo()
+        internal static Image Logo()
         {
             // Lấy ảnh PNG 160 px nằm trong file biểu tượng của app.
             try

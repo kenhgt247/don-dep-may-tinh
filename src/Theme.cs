@@ -141,13 +141,28 @@ namespace DonDep
             tabs.Appearance = TabAppearance.FlatButtons;
             tabs.SizeMode = TabSizeMode.Fixed;
             tabs.ItemSize = new Size(0, 1);
-            EventHandler clip = (s, e) => { try { tabs.Region = new Region(tabs.DisplayRectangle); } catch { } };
-            tabs.Resize += clip; tabs.HandleCreated += clip; clip(null, null);
+            // Đặt bảng tab vào một khung và đẩy viền của nó ra ngoài phần nhìn thấy (không còn khung trắng).
+            var host = new Panel { Dock = DockStyle.Fill, BackColor = Bg };
+            form.Controls.Remove(tabs);
+            tabs.Dock = DockStyle.None;
+            host.Controls.Add(tabs);
+            EventHandler fit = (s, e) =>
+            {
+                try
+                {
+                    var r = tabs.DisplayRectangle;
+                    int l = r.X, t = r.Y, ri = Math.Max(0, tabs.Width - r.Right), b = Math.Max(0, tabs.Height - r.Bottom);
+                    var want = new Rectangle(-l, -t, host.ClientSize.Width + l + ri, host.ClientSize.Height + t + b);
+                    if (tabs.Bounds != want) tabs.Bounds = want;
+                }
+                catch { }
+            };
+            host.Resize += fit; tabs.HandleCreated += fit; host.HandleCreated += fit;
 
             // Thanh tiêu đề
             var header = new HeaderPanel { Dock = DockStyle.Top, Height = 64 };
             // Thanh bên
-            var side = new Panel { Dock = DockStyle.Left, Width = 200, BackColor = Side, Padding = new Padding(10, 10, 10, 10) };
+            var side = new Panel { Dock = DockStyle.Left, Width = 188, BackColor = Side, Padding = new Padding(10, 10, 10, 10) };
             var navs = new List<NavItem>();
             for (int i = tabs.TabPages.Count - 1; i >= 0; i--)
             {
@@ -171,11 +186,13 @@ namespace DonDep
             tabs.SelectedIndexChanged += (s, e) => { foreach (var n in navs) n.Invalidate(); header.Invalidate(); };
             header.Tabs = tabs;
 
+            form.Controls.Add(host);
             form.Controls.Add(side);
             form.Controls.Add(header);
             header.SendToBack();          // Top dock trước (rộng hết cửa sổ)
             strip.SendToBack();           // Status dưới cùng rộng hết
-            tabs.BringToFront();          // Fill phải ở trên cùng thứ tự
+            host.BringToFront();          // Fill phải ở trên cùng thứ tự
+            fit(null, null);
 
             // Thanh trạng thái + menu chuột phải
             ToolStripManager.Renderer = new DarkRenderer();
@@ -335,7 +352,7 @@ namespace DonDep
                     using (var pen = new Pen(Border)) gr.DrawPath(pen, path);
                 }
                 using (var f = new Font("Segoe UI Semibold", 9.5f))
-                    TextRenderer.DrawText(gr, g.Text, f, new Point(12, 3), Accent2, TextFormatFlags.NoPrefix);
+                    TextRenderer.DrawText(gr, g.Text.Replace("&&", "&"), f, new Point(12, 3), Accent2, TextFormatFlags.NoPrefix);
             };
         }
 

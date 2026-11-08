@@ -202,10 +202,12 @@ namespace DonDep
 
         void Msg(string text, MessageBoxIcon icon = MessageBoxIcon.Information)
         {
+            if (screensMode) { App.Log("[ảnh chụp] " + text); return; }   // chụp ảnh tự động: không mở hộp thoại
             MessageBox.Show(this, text, App.Name, MessageBoxButtons.OK, icon);
         }
         bool Confirm(string text)
         {
+            if (screensMode) return false;
             return MessageBox.Show(this, text, App.Name, MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2) == DialogResult.Yes;
         }
         void SetBusy(bool busy)

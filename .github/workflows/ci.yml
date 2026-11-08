@@ -43,7 +43,8 @@ jobs:
       - name: Screenshots
         shell: pwsh
         run: |
-          $p = Start-Process -FilePath 'out/DonDepMayTinh/Don Dep May Tinh.exe' -ArgumentList '--screens', "$PWD/screens" -Wait -PassThru
+          $p = Start-Process -FilePath 'out/DonDepMayTinh/Don Dep May Tinh.exe' -ArgumentList '--screens', "$PWD/screens" -PassThru
+          if (-not $p.WaitForExit(300000)) { Write-Host "::warning::screens timed out"; $p.Kill() }
           Write-Host "screens exit=$($p.ExitCode)"
           Get-ChildItem screens | ForEach-Object { Write-Host $_.Name }
       - name: Publish screenshots to ci-screens branch (manual runs only)

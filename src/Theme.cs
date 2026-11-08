@@ -262,7 +262,6 @@ namespace DonDep
         static void StyleButton(Button b)
         {
             b.FlatStyle = FlatStyle.Flat;
-            b.FlatAppearance.BorderSize = 0;
             b.Cursor = Cursors.Hand;
             bool hover = false, down = false;
             b.MouseEnter += (s, e) => { hover = true; b.Invalidate(); };

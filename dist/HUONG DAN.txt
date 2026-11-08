@@ -1,4 +1,4 @@
-﻿DỌN DẸP MÁY TÍNH (PC CLEANER) — phiên bản 1.6.1
+﻿DỌN DẸP MÁY TÍNH (PC CLEANER) — phiên bản 1.7.0
 ==============================================
 
 CÁCH MỞ
@@ -15,7 +15,7 @@ CÁCH MỞ
   Vào tab cuối "⚙ Cài đặt" → mục "Ngôn ngữ giao diện" → chọn Tiếng Việt hoặc English.
   App đổi ngay và nhớ lựa chọn cho lần mở sau. Đổi ngôn ngữ không xóa hay chuyển file nào.
 
-10 TAB CỦA APP
+10 MỤC CỦA APP (chọn ở thanh bên trái)
   1. Dọn dẹp
      - "Quét máy" (chỉ xem, chưa xóa gì) → bỏ chọn những gì muốn giữ → "Dọn dẹp ngay".
      - Rác hệ thống: file tạm, bộ nhớ đệm trình duyệt / Zalo / Teams, thùng rác,

@@ -41,6 +41,7 @@
 - 🇻🇳 **Làm cho người Việt** — hiểu Zalo, CapCut, Cốc Cốc; giao diện **Tiếng Việt / English**.
 - 🛡️ **An toàn trước tiên** — chặn thư mục hệ thống và tin nhắn Zalo, hỏi lại trước mỗi việc quan trọng, có **danh sách bảo vệ** và **lịch sử** mọi thao tác.
 - 🔄 **Tự cập nhật** — có bản mới, app tự tải, kiểm tra và thay thế.
+- 🎨 **Giao diện tối hiện đại** — thanh điều hướng bên trái, khung bo góc, nhìn như phần mềm trả phí.
 - 🪶 **Gọn nhẹ** — một file `.exe` dưới 1 MB, không cần cài thêm gì.
 
 ## ✨ 10 chức năng

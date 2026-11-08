@@ -1,4 +1,4 @@
-﻿PC CLEANER (DON DEP MAY TINH) — version 1.6.1
+﻿PC CLEANER (DON DEP MAY TINH) — version 1.7.0
 ==============================================
 
 GETTING STARTED
@@ -15,7 +15,7 @@ LANGUAGE
   Open the last tab "⚙ Settings" → "Display language" → choose English or Tiếng Việt.
   The change applies immediately and is remembered. No files are moved or deleted.
 
-THE 10 TABS
+THE 10 SECTIONS (pick them in the left sidebar)
   1. Cleanup
      - "Scan PC" only lists items; nothing is deleted yet. Untick what you want to keep,
        then click "Clean now".

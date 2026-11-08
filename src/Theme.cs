@@ -20,7 +20,7 @@ namespace DonDep
         public static readonly Color CardHi = Color.FromArgb(29, 46, 76);
         public static readonly Color Input = Color.FromArgb(11, 19, 33);
         public static readonly Color Border = Color.FromArgb(40, 58, 90);
-        public static readonly Color Text = Color.FromArgb(230, 237, 247);
+        public static readonly Color Fore = Color.FromArgb(230, 237, 247);
         public static readonly Color Muted = Color.FromArgb(143, 160, 186);
         public static readonly Color Accent = Color.FromArgb(56, 152, 255);
         public static readonly Color Accent2 = Color.FromArgb(34, 211, 238);
@@ -97,9 +97,9 @@ namespace DonDep
             if (argb == Color.ForestGreen.ToArgb() || argb == Color.Green.ToArgb() || argb == Color.SeaGreen.ToArgb() || argb == Color.DarkGreen.ToArgb() || argb == Color.FromArgb(22, 101, 52).ToArgb()) return Green;
             if (argb == Color.DarkOrange.ToArgb() || argb == Color.Orange.ToArgb() || argb == Color.Chocolate.ToArgb() || argb == Color.DarkGoldenrod.ToArgb()) return Amber;
             if (argb == Color.DimGray.ToArgb() || argb == Color.Gray.ToArgb() || argb == SystemColors.GrayText.ToArgb() || argb == Color.DarkGray.ToArgb() || argb == Color.SlateGray.ToArgb()) return Muted;
-            if (argb == Color.Black.ToArgb() || argb == SystemColors.ControlText.ToArgb() || argb == SystemColors.WindowText.ToArgb()) return Text;
+            if (argb == Color.Black.ToArgb() || argb == SystemColors.ControlText.ToArgb() || argb == SystemColors.WindowText.ToArgb()) return Fore;
             if (argb == Color.SteelBlue.ToArgb() || argb == Color.Blue.ToArgb() || argb == Color.DarkBlue.ToArgb() || argb == Color.RoyalBlue.ToArgb() || argb == Color.Navy.ToArgb() ) return Blue;
-            if (argb == Color.FromArgb(31, 56, 95).ToArgb() || argb == Color.FromArgb(51, 65, 85).ToArgb() || argb == Color.FromArgb(26, 86, 173).ToArgb()) return Text;
+            if (argb == Color.FromArgb(31, 56, 95).ToArgb() || argb == Color.FromArgb(51, 65, 85).ToArgb() || argb == Color.FromArgb(26, 86, 173).ToArgb()) return Fore;
             // Màu tối còn lại: làm sáng lên giữ nguyên sắc.
             float l = c.GetBrightness();
             if (l < 0.5f)
@@ -134,7 +134,7 @@ namespace DonDep
             if (fontIcon == null && icons != null) fontIcon = new Font(icons, 12f);
 
             form.BackColor = Bg;
-            form.ForeColor = Text;
+            form.ForeColor = Fore;
             DarkTitleBar(form);
 
             // Ẩn hàng tab gốc — điều hướng bằng thanh bên.
@@ -211,22 +211,22 @@ namespace DonDep
             else if (c is ListView) StyleList((ListView)c);
             else if (c is TextBoxBase)
             {
-                c.BackColor = Input; c.ForeColor = Text;
+                c.BackColor = Input; c.ForeColor = Fore;
                 var tb = c as TextBox; if (tb != null && tb.BorderStyle == BorderStyle.Fixed3D) tb.BorderStyle = BorderStyle.FixedSingle;
                 if (tb != null && tb.Multiline) DarkWindow(c);
             }
-            else if (c is NumericUpDown) { c.BackColor = Input; c.ForeColor = Text; ((NumericUpDown)c).BorderStyle = BorderStyle.FixedSingle; }
-            else if (c is ComboBox) { var cb = (ComboBox)c; cb.FlatStyle = FlatStyle.Flat; cb.BackColor = Input; cb.ForeColor = Text; DarkWindow(c, "DarkMode_CFD"); }
-            else if (c is ListBox) { var lb = (ListBox)c; lb.BackColor = Input; lb.ForeColor = Text; lb.BorderStyle = BorderStyle.FixedSingle; DarkWindow(c); }
-            else if (c is TreeView) { var tv = (TreeView)c; tv.BackColor = Card; tv.ForeColor = Text; tv.LineColor = Muted; DarkWindow(c); }
+            else if (c is NumericUpDown) { c.BackColor = Input; c.ForeColor = Fore; ((NumericUpDown)c).BorderStyle = BorderStyle.FixedSingle; }
+            else if (c is ComboBox) { var cb = (ComboBox)c; cb.FlatStyle = FlatStyle.Flat; cb.BackColor = Input; cb.ForeColor = Fore; DarkWindow(c, "DarkMode_CFD"); }
+            else if (c is ListBox) { var lb = (ListBox)c; lb.BackColor = Input; lb.ForeColor = Fore; lb.BorderStyle = BorderStyle.FixedSingle; DarkWindow(c); }
+            else if (c is TreeView) { var tv = (TreeView)c; tv.BackColor = Card; tv.ForeColor = Fore; tv.LineColor = Muted; DarkWindow(c); }
             else if (c is ProgressBar) StyleProgress((ProgressBar)c);
             else if (c is CheckBox || c is RadioButton)
             {
-                c.ForeColor = Text;
+                c.ForeColor = Fore;
                 c.BackColor = Color.Transparent;
                 c.ForeColorChanged += Remap;
             }
-            else if (c is LinkLabel) { var ll = (LinkLabel)c; ll.LinkColor = Accent2; ll.ActiveLinkColor = Accent; ll.VisitedLinkColor = Accent2; ll.ForeColor = Text; }
+            else if (c is LinkLabel) { var ll = (LinkLabel)c; ll.LinkColor = Accent2; ll.ActiveLinkColor = Accent; ll.VisitedLinkColor = Accent2; ll.ForeColor = Fore; }
             else if (c is Label)
             {
                 if (IsLightBack(c.BackColor)) c.BackColor = Card;
@@ -243,7 +243,7 @@ namespace DonDep
                 else if (c.BackColor.ToArgb() == Color.White.ToArgb()) c.BackColor = Card;
                 else if (IsLightBack(c.BackColor)) c.BackColor = Bg;
                 else if (c.BackColor == SystemColors.Control) c.BackColor = Color.Transparent;
-                c.ForeColor = Text;
+                c.ForeColor = Fore;
                 if (((ScrollableControl)c).AutoScroll) DarkWindow(c);
             }
             Style(c);
@@ -294,7 +294,7 @@ namespace DonDep
                         using (var pen = new Pen(selected ? Accent : hover && b.Enabled ? Color.FromArgb(70, 110, 170) : Border, selected ? 2f : 1f)) g.DrawPath(pen, path);
                     }
                 }
-                Color tc = !b.Enabled ? Color.FromArgb(95, 112, 140) : primary ? Color.White : Text;
+                Color tc = !b.Enabled ? Color.FromArgb(95, 112, 140) : primary ? Color.White : Fore;
                 TextRenderer.DrawText(g, b.Text, b.Font, new Rectangle(6, 0, b.Width - 12, b.Height), tc,
                     TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.WordBreak | TextFormatFlags.EndEllipsis | TextFormatFlags.NoPrefix);
             };
@@ -323,7 +323,7 @@ namespace DonDep
         static void StyleGroup(GroupBox g)
         {
             g.BackColor = Card;
-            g.ForeColor = Text;
+            g.ForeColor = Fore;
             g.Paint += (s, e) =>
             {
                 var gr = e.Graphics;
@@ -344,7 +344,7 @@ namespace DonDep
         static void StyleList(ListView lv)
         {
             lv.BackColor = Card;
-            lv.ForeColor = Text;
+            lv.ForeColor = Fore;
             lv.BorderStyle = BorderStyle.None;
             lv.GridLines = false;
             if (lv.View == View.Details)
@@ -432,7 +432,7 @@ namespace DonDep
                         if (seen.Contains(f) || f is MainForm) continue;
                         seen.Add(f);
                         f.FormClosed += (a, b) => seen.Remove(f);
-                        f.BackColor = Bg; f.ForeColor = Text;
+                        f.BackColor = Bg; f.ForeColor = Fore;
                         DarkTitleBar(f);
                         Style(f);
                         f.Invalidate(true);
@@ -466,7 +466,7 @@ namespace DonDep
             public DarkRenderer() : base(new DarkColors()) { RoundedEdges = false; }
             protected override void OnRenderItemText(ToolStripItemTextRenderEventArgs e)
             {
-                e.TextColor = e.Item.Enabled ? (e.Item.Owner is StatusStrip ? Muted : Text) : Color.FromArgb(95, 112, 140);
+                e.TextColor = e.Item.Enabled ? (e.Item.Owner is StatusStrip ? Muted : Fore) : Color.FromArgb(95, 112, 140);
                 base.OnRenderItemText(e);
             }
             protected override void OnRenderArrow(ToolStripArrowRenderEventArgs e) { e.ArrowColor = Muted; base.OnRenderArrow(e); }
@@ -491,7 +491,7 @@ namespace DonDep
                 using (var f1 = new Font("Segoe UI Semibold", 15f))
                 using (var f2 = new Font("Segoe UI", 9f))
                 {
-                    TextRenderer.DrawText(g, "PC Cleaner", f1, new Point(72, 9), Text, TextFormatFlags.NoPrefix);
+                    TextRenderer.DrawText(g, "PC Cleaner", f1, new Point(72, 9), Fore, TextFormatFlags.NoPrefix);
                     TextRenderer.DrawText(g, UiLanguage.L("Dọn Dẹp Máy Tính · bộ công cụ tối ưu ổ cứng cho Windows", "Disk cleanup & storage toolkit for Windows"), f2, new Point(74, 38), Muted, TextFormatFlags.NoPrefix);
                 }
                 // Tên trang hiện tại + nhãn phiên bản (chỉ để hiển thị)
@@ -516,7 +516,7 @@ namespace DonDep
                     TextRenderer.DrawText(g, "v" + App.Version, fb, rv, Muted, TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.NoPrefix);
                     var ps = TextRenderer.MeasureText(page, fp);
                     int px = rv.X - ps.Width - 28;
-                    if (px > 520) TextRenderer.DrawText(g, page, fp, new Point(px, 20), Text, TextFormatFlags.NoPrefix);
+                    if (px > 520) TextRenderer.DrawText(g, page, fp, new Point(px, 20), Fore, TextFormatFlags.NoPrefix);
                 }
             }
         }
@@ -559,7 +559,7 @@ namespace DonDep
                 if (sel)
                     using (var br = new LinearGradientBrush(new Rectangle(0, 10, 4, Height - 20), Accent, Accent2, LinearGradientMode.Vertical))
                         g.FillRectangle(br, 0, 10, 4, Height - 20);
-                Color fg = sel ? Color.White : hover ? Text : Muted;
+                Color fg = sel ? Color.White : hover ? Fore : Muted;
                 int tx = 14;
                 if (IconFont != null && !string.IsNullOrEmpty(Glyph))
                 {

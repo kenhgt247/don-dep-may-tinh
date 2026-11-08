@@ -259,7 +259,7 @@ namespace DonDep
                 if (c is TabPage) { ((TabPage)c).UseVisualStyleBackColor = false; c.BackColor = Bg; }
                 else if (c.BackColor.ToArgb() == Color.White.ToArgb()) c.BackColor = Card;
                 else if (IsLightBack(c.BackColor)) c.BackColor = Bg;
-                else if (c.BackColor == SystemColors.Control) c.BackColor = Color.Transparent;
+                else if (c.BackColor == SystemColors.Control) c.BackColor = Effective(c.Parent);   // màu đặc (ProgressBar con không chịu nền trong suốt)
                 c.ForeColor = Fore;
                 if (((ScrollableControl)c).AutoScroll) DarkWindow(c);
             }

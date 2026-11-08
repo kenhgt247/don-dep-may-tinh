@@ -34,6 +34,9 @@ jobs:
             $p = Start-Process -FilePath 'out/DonDepMayTinh/Don Dep May Tinh.exe' -ArgumentList $flag -Wait -PassThru
             $report = Get-Content out/DonDepMayTinh/selftest.txt -Raw -ErrorAction SilentlyContinue
             Write-Host "$flag exit=$($p.ExitCode) result=$report"
+            $short = ($report -replace "[\r\n]+", " | ")
+            if ($short.Length -gt 3000) { $short = $short.Substring(0, 3000) }
+            Write-Host "::notice title=Selftest $flag::$short"
             if ($p.ExitCode -ne 0 -or $report -notmatch 'UI_OK' -or $report -notmatch 'TRAY_OK' -or $report -notmatch 'dup=[1-9]') { throw "Selftest failed: $flag $report" }
           }
           Remove-Item out/DonDepMayTinh/selftest.txt, out/DonDepMayTinh/dup_a.txt, out/DonDepMayTinh/dup_b.txt -ErrorAction SilentlyContinue

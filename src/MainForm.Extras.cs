@@ -11,6 +11,7 @@ namespace DonDep
     {
         System.Windows.Forms.Panel settingsContent;
         bool screensMode;
+        [System.Runtime.InteropServices.DllImport("user32.dll")] static extern bool SetWindowPos(IntPtr h, IntPtr after, int x, int y, int cx, int cy, uint flags);
 
         protected override void WndProc(ref Message m)
         {
@@ -34,7 +35,8 @@ namespace DonDep
             StartPosition = FormStartPosition.Manual;
             Location = new System.Drawing.Point(0, 0);
             Show();
-            Size = new System.Drawing.Size(1440, 900);
+            SetWindowPos(Handle, IntPtr.Zero, 0, 0, 1440, 900, 0x0004 /* SWP_NOZORDER */);   // vượt giới hạn màn hình nhỏ của máy kiểm tra
+            Application.DoEvents();
             Action waitIdle = () =>
             {
                 var until = DateTime.Now.AddSeconds(60);

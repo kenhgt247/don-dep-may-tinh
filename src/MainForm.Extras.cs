@@ -10,19 +10,49 @@ namespace DonDep
     partial class MainForm
     {
         System.Windows.Forms.Panel settingsContent;
+        bool screensMode;
+
+        protected override void WndProc(ref Message m)
+        {
+            base.WndProc(ref m);
+            // Chỉ khi chụp ảnh tự động: cho phép cửa sổ lớn hơn màn hình của máy kiểm tra.
+            if (screensMode && m.Msg == 0x24 /* WM_GETMINMAXINFO */)
+            {
+                System.Runtime.InteropServices.Marshal.WriteInt32(m.LParam, 8, 2400);
+                System.Runtime.InteropServices.Marshal.WriteInt32(m.LParam, 12, 1600);
+                System.Runtime.InteropServices.Marshal.WriteInt32(m.LParam, 32, 2400);
+                System.Runtime.InteropServices.Marshal.WriteInt32(m.LParam, 36, 1600);
+            }
+        }
 
         /// Chụp ảnh từng tab (chỉ dùng khi kiểm tra tự động trên GitHub).
         public void SaveScreens(string dir)
         {
             System.IO.Directory.CreateDirectory(dir);
             string lang = UiLanguage.Code;
+            screensMode = true;
             StartPosition = FormStartPosition.Manual;
             Location = new System.Drawing.Point(0, 0);
             Show();
+            Size = new System.Drawing.Size(1440, 900);
+            Action waitIdle = () =>
+            {
+                var until = DateTime.Now.AddSeconds(60);
+                do { Application.DoEvents(); System.Threading.Thread.Sleep(50); } while (isBusy && DateTime.Now < until);
+                for (int k = 0; k < 10; k++) { Application.DoEvents(); System.Threading.Thread.Sleep(20); }
+            };
             for (int i = 0; i < tabs.TabPages.Count; i++)
             {
                 tabs.SelectedIndex = i;
                 Application.DoEvents();
+                // Cho ảnh chụp có dữ liệu thật (chỉ quét / đọc, không xóa gì).
+                var page = tabs.TabPages[i];
+                if (i == 0) { var t = ScanAsync(); waitIdle(); }
+                else if (page.Controls.Contains(brList)) { var t = ScanBrowsersAsync(); waitIdle(); }
+                else if (page.Controls.Contains(appList)) { var t = ScanAppsAsync(); waitIdle(); }
+                else if (page.Controls.Contains(startList)) waitIdle();
+                else if (page.Controls.Contains(procList)) { MonitorTick(); System.Threading.Thread.Sleep(1500); MonitorTick(); }
+                waitIdle();
                 using (var bmp = new System.Drawing.Bitmap(Width, Height))
                 {
                     DrawToBitmap(bmp, new System.Drawing.Rectangle(0, 0, Width, Height));

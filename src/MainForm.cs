@@ -66,7 +66,7 @@ namespace DonDep
             Load += (s, e) =>
             {
                 var wa = Screen.FromControl(this).WorkingArea;
-                if (Width > wa.Width || Height > wa.Height) WindowState = FormWindowState.Maximized;
+                if (!screensMode && (Width > wa.Width || Height > wa.Height)) WindowState = FormWindowState.Maximized;
             };
             StartPosition = FormStartPosition.CenterScreen;
             BuildInterface();

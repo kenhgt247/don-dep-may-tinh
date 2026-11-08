@@ -49,7 +49,19 @@ namespace DonDep
                 Application.DoEvents();
                 // Cho ảnh chụp có dữ liệu thật (chỉ quét / đọc, không xóa gì).
                 var page = tabs.TabPages[i];
-                if (i == 0) { var t = Guard(ScanAsync); waitIdle(); }
+                if (i == 0)
+                {
+                    var t = Guard(ScanAsync); waitIdle();
+                    try
+                    {
+                        System.IO.File.WriteAllText(System.IO.Path.Combine(dir, "diag.txt"),
+                            "list vis=" + list.Visible + " bounds=" + list.Bounds + " items=" + list.Items.Count + " handle=" + list.IsHandleCreated + " parent=" + (list.Parent?.Name ?? list.Parent?.GetType().Name) +
+                            "\nflow vis=" + flowDrives.Visible + " bounds=" + flowDrives.Bounds + " n=" + flowDrives.Controls.Count + " handle=" + flowDrives.IsHandleCreated +
+                            "\nfirst=" + (flowDrives.Controls.Count > 0 ? flowDrives.Controls[0].Bounds + " vis=" + flowDrives.Controls[0].Visible + " text=" + flowDrives.Controls[0].Text + " fc=" + flowDrives.Controls[0].ForeColor + " bc=" + flowDrives.Controls[0].BackColor : "-"));
+                        using (var b = new System.Drawing.Bitmap(Math.Max(1, list.Width), Math.Max(1, list.Height))) { list.DrawToBitmap(b, new System.Drawing.Rectangle(0, 0, b.Width, b.Height)); b.Save(System.IO.Path.Combine(dir, "diag_list.png")); }
+                    }
+                    catch (Exception ex) { System.IO.File.WriteAllText(System.IO.Path.Combine(dir, "diag.txt"), ex.ToString()); }
+                }
                 else if (page.Controls.Contains(brList)) { var t = Guard(ScanBrowsersAsync); waitIdle(); }
                 else if (page.Controls.Contains(appList)) { var t = Guard(ScanAppsAsync); waitIdle(); }
                 else if (page.Controls.Contains(startList)) waitIdle();

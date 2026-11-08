@@ -44,6 +44,10 @@
 - 🎨 **Giao diện tối hiện đại** — thanh điều hướng bên trái, khung bo góc, nhìn như phần mềm trả phí.
 - 🪶 **Gọn nhẹ** — một file `.exe` dưới 1 MB, không cần cài thêm gì.
 
+> 🆕 **Mới ở bản 1.8:** mục **Khởi động** (tắt bớt chương trình chạy cùng Windows) · dọn rác app AI **Claude, ChatGPT, Copilot, Cursor, VS Code** · **xóa cookie mà vẫn giữ đăng nhập** Facebook, Gmail, Zalo… · danh sách trình duyệt dễ đọc hơn.
+>
+> **Bản 1.7:** giao diện tối hiện đại với thanh điều hướng bên trái · **Bản 1.6:** dọn tàn dư sau khi gỡ, file cài đặt thừa, Hiệu năng, danh sách bảo vệ, Lịch sử · **Bản 1.5:** gỡ phần mềm, tự cập nhật, tự đưa ảnh Zalo lên Drive theo lịch.
+
 ## ✨ 11 chức năng
 
 | | Tab | Làm được gì |
@@ -60,14 +64,20 @@
 | 🕘 | **Lịch sử** | Mọi lần dọn, xóa, chuyển, gỡ đều được ghi lại kèm danh sách file. |
 | ⚙️ | **Cài đặt** | Đổi ngôn ngữ · **"App đã giúp bạn giải phóng X GB"** + ảnh khoe Facebook · chạy ngầm, báo ổ sắp đầy, **tự dọn rác theo lịch** · **tự đưa ảnh Zalo cũ lên Google Drive theo lịch** · **danh sách bảo vệ** · biểu tượng Desktop · cập nhật. |
 
+### 🖼️ Ảnh giao diện thật
+
 <table>
 <tr>
-<td width="50%"><img src="docs/screens/smart-folder.png" alt="Smart Folder" /><br/><sub>📁 Smart Folder — sắp xếp file không cần AI</sub></td>
-<td width="50%"><img src="docs/screens/hieu-nang.png" alt="Hiệu năng" /><br/><sub>📈 Hiệu năng — CPU, RAM, chương trình ngốn máy</sub></td>
+<td width="50%"><img src="docs/screens/go-phan-mem.png" alt="Gỡ phần mềm" /><br/><sub>🧰 <b>Gỡ phần mềm</b> — xem phần mềm nào nặng, lâu không mở; gỡ xong dọn luôn tàn dư</sub></td>
+<td width="50%"><img src="docs/screens/khoi-dong.png" alt="Khởi động" /><br/><sub>🚀 <b>Khởi động</b> — tắt bớt chương trình chạy cùng Windows, máy bật nhanh hơn</sub></td>
 </tr>
 <tr>
-<td width="50%"><img src="docs/screens/anh-khoe.png" alt="Ảnh khoe Facebook" /><br/><sub>🏆 Ảnh khoe lên Facebook — tạo bằng một nút bấm</sub></td>
-<td width="50%"><img src="docs/screens/cai-dat.png" alt="Cài đặt" /><br/><sub>⚙️ Cài đặt — tự động hóa, danh sách bảo vệ, ngôn ngữ</sub></td>
+<td width="50%"><img src="docs/screens/trinh-duyet.png" alt="Trình duyệt" /><br/><sub>🌍 <b>Trình duyệt</b> — dọn cache, lịch sử, cookie mà vẫn giữ đăng nhập</sub></td>
+<td width="50%"><img src="docs/screens/hieu-nang.png" alt="Hiệu năng" /><br/><sub>📈 <b>Hiệu năng</b> — CPU, RAM, mạng, chương trình ngốn máy</sub></td>
+</tr>
+<tr>
+<td width="50%"><img src="docs/screens/smart-folder.png" alt="Smart Folder" /><br/><sub>📁 <b>Smart Folder</b> — sắp xếp file cá nhân / công việc, không cần AI</sub></td>
+<td width="50%"><img src="docs/screens/anh-khoe.png" alt="Ảnh khoe Facebook" /><br/><sub>🏆 <b>Ảnh khoe Facebook</b> — "máy mình vừa nhẹ đi X GB", tạo bằng một nút</sub></td>
 </tr>
 </table>
 

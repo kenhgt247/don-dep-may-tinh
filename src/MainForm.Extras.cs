@@ -11,14 +11,6 @@ namespace DonDep
     {
         System.Windows.Forms.Panel settingsContent;
         bool screensMode;
-        string DiagAdd()
-        {
-            string r = "";
-            try { var l = new Label { Text = "x" }; flowDrives.Controls.Add(l); r += "label ok; "; } catch (Exception ex) { r += "label: " + ex.GetType().Name + " " + ex.Message + "; "; }
-            try { var b = new ProgressBar { Width = 100, Height = 10, Value = 5 }; flowDrives.Controls.Add(b); r += "bar ok; "; } catch (Exception ex) { r += "bar: " + ex.GetType().Name + " " + ex.Message + " @ " + ex.StackTrace.Replace("\r\n", " | ").Substring(0, Math.Min(600, ex.StackTrace.Length)) + "; "; }
-            try { foreach (var d in System.IO.DriveInfo.GetDrives()) r += d.Name + ":" + d.IsReady + ":" + d.DriveType + " "; } catch (Exception ex) { r += "drives: " + ex.Message; }
-            return r;
-        }
         [System.Runtime.InteropServices.DllImport("user32.dll")] static extern bool SetWindowPos(IntPtr h, IntPtr after, int x, int y, int cx, int cy, uint flags);
 
         protected override void WndProc(ref Message m)
@@ -40,13 +32,8 @@ namespace DonDep
             System.IO.Directory.CreateDirectory(dir);
             string lang = UiLanguage.Code;
             screensMode = true;
-            string ctx = System.Threading.SynchronizationContext.Current?.GetType().Name ?? "null";
-            // Giống khi chạy thật (Application.Run): các bước sau "await" quay về luồng giao diện.
-            if (!(System.Threading.SynchronizationContext.Current is WindowsFormsSynchronizationContext))
-                System.Threading.SynchronizationContext.SetSynchronizationContext(new WindowsFormsSynchronizationContext());
-            StartPosition = FormStartPosition.Manual;
-            Location = new System.Drawing.Point(0, 0);
-            Show();
+            WindowState = FormWindowState.Normal;
+            Application.DoEvents();
             SetWindowPos(Handle, IntPtr.Zero, 0, 0, 1440, 900, 0x0004 /* SWP_NOZORDER */);   // vượt giới hạn màn hình nhỏ của máy kiểm tra
             Application.DoEvents();
             Action waitIdle = () =>
@@ -61,21 +48,7 @@ namespace DonDep
                 Application.DoEvents();
                 // Cho ảnh chụp có dữ liệu thật (chỉ quét / đọc, không xóa gì).
                 var page = tabs.TabPages[i];
-                if (i == 0)
-                {
-                    var t = Guard(ScanAsync); waitIdle();
-                    try
-                    {
-                        System.IO.File.WriteAllText(System.IO.Path.Combine(dir, "diag.txt"),
-                            "list vis=" + list.Visible + " bounds=" + list.Bounds + " items=" + list.Items.Count + " handle=" + list.IsHandleCreated + " parent=" + (list.Parent?.Name ?? list.Parent?.GetType().Name) +
-                            "\nflow vis=" + flowDrives.Visible + " bounds=" + flowDrives.Bounds + " n=" + flowDrives.Controls.Count + " handle=" + flowDrives.IsHandleCreated +
-                            "\nctx=" + ctx + "\ndrivesError=" + drivesError +
-                            "\ntest=" + DiagAdd() +
-                            "\nfirst=" + (flowDrives.Controls.Count > 0 ? flowDrives.Controls[0].Bounds + " vis=" + flowDrives.Controls[0].Visible + " text=" + flowDrives.Controls[0].Text + " fc=" + flowDrives.Controls[0].ForeColor + " bc=" + flowDrives.Controls[0].BackColor : "-"));
-                        using (var b = new System.Drawing.Bitmap(Math.Max(1, list.Width), Math.Max(1, list.Height))) { list.DrawToBitmap(b, new System.Drawing.Rectangle(0, 0, b.Width, b.Height)); b.Save(System.IO.Path.Combine(dir, "diag_list.png")); }
-                    }
-                    catch (Exception ex) { System.IO.File.WriteAllText(System.IO.Path.Combine(dir, "diag.txt"), ex.ToString()); }
-                }
+                if (i == 0) { var t = Guard(ScanAsync); waitIdle(); }
                 else if (page.Controls.Contains(brList)) { var t = Guard(ScanBrowsersAsync); waitIdle(); }
                 else if (page.Controls.Contains(appList)) { var t = Guard(ScanAppsAsync); waitIdle(); }
                 else if (page.Controls.Contains(startList)) waitIdle();

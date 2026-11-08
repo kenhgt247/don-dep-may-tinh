@@ -414,10 +414,9 @@ namespace DonDep
             cfg.Save();
         }
 
-        string drivesError = "";
         void UpdateDrives()
         {
-            drivesError = "called; ";
+            if (InvokeRequired) { BeginInvoke((Action)UpdateDrives); return; }
             flowDrives.SuspendLayout();
             flowDrives.Controls.Clear();
             long keep = (long)numKeep.Value * Fmt.GB;
@@ -433,7 +432,7 @@ namespace DonDep
                     var bar = new ProgressBar { Width = 330, Height = 10, Value = Math.Min(100, Math.Max(0, pct)), Margin = new Padding(3, 0, 3, 6) };
                     flowDrives.Controls.Add(lbl); flowDrives.Controls.Add(bar);
                 }
-                catch (Exception ex) { drivesError = ex.GetType().Name + ": " + ex.Message + " @ " + ex.StackTrace; }
+                catch { }
             }
             flowDrives.ResumeLayout();
         }

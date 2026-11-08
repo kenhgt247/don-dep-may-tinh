@@ -29,8 +29,13 @@ namespace DonDep
             int si = Array.FindIndex(args, a => a.Equals("--screens", StringComparison.OrdinalIgnoreCase));
             if (si >= 0 && si + 1 < args.Length)
             {
+                // Chạy như thật (Application.Run) rồi chụp từng mục sau khi cửa sổ đã hiện.
                 foreach (var lang in new[] { "vi", "en" })
-                    using (var f = new MainForm(lang == "en" ? "en" : "vi_force")) f.SaveScreens(args[si + 1]);
+                    using (var f = new MainForm(lang == "en" ? "en" : "vi_force"))
+                    {
+                        f.Shown += (s, e) => f.BeginInvoke((Action)(() => { try { f.SaveScreens(args[si + 1]); } finally { f.Close(); } }));
+                        Application.Run(f);
+                    }
                 return 0;
             }
             if (selfTest)

@@ -24,7 +24,8 @@ namespace DonDep
     {
         public static long TotalFreed;
         public static int Cleanups;
-        public static string LastZaloAuto = "", FirstUse = "";
+        public static string LastZaloAuto = "", FirstUse = "", CoffeeLast = "";
+        public static bool CoffeeOff;
         static string FilePath => Path.Combine(App.DataDir, "trangthai.json");
 
         static T WithLock<T>(Func<T> f)
@@ -52,6 +53,8 @@ namespace DonDep
                 if (d.TryGetValue("Cleanups", out v) && v != null) Cleanups = Convert.ToInt32(v);
                 if (d.TryGetValue("LastZaloAuto", out v) && v != null) LastZaloAuto = v.ToString();
                 if (d.TryGetValue("FirstUse", out v) && v != null) FirstUse = v.ToString();
+                if (d.TryGetValue("CoffeeLast", out v) && v != null) CoffeeLast = v.ToString();
+                if (d.TryGetValue("CoffeeOff", out v) && v is bool) CoffeeOff = (bool)v;
             }
             catch { }
         }
@@ -62,7 +65,7 @@ namespace DonDep
             {
                 Directory.CreateDirectory(App.DataDir);
                 if (string.IsNullOrEmpty(FirstUse)) FirstUse = DateTime.Now.ToString("yyyy-MM-dd");
-                var d = new Dictionary<string, object> { { "TotalFreed", TotalFreed }, { "Cleanups", Cleanups }, { "LastZaloAuto", LastZaloAuto }, { "FirstUse", FirstUse } };
+                var d = new Dictionary<string, object> { { "TotalFreed", TotalFreed }, { "Cleanups", Cleanups }, { "LastZaloAuto", LastZaloAuto }, { "FirstUse", FirstUse }, { "CoffeeLast", CoffeeLast }, { "CoffeeOff", CoffeeOff } };
                 File.WriteAllText(FilePath, new JavaScriptSerializer().Serialize(d), new UTF8Encoding(false));
             }
             catch { }
@@ -75,6 +78,9 @@ namespace DonDep
             WithLock(() => { LoadUnlocked(); TotalFreed += bytes; Cleanups++; SaveUnlocked(); return 0; });
             App.Log("Tổng dung lượng app đã giúp giải phóng: " + Fmt.Size(TotalFreed));
         }
+
+        public static void MarkCoffee(DateTime when) { WithLock(() => { LoadUnlocked(); CoffeeLast = when.ToString("o"); SaveUnlocked(); return 0; }); }
+        public static void SetCoffeeOff() { WithLock(() => { LoadUnlocked(); CoffeeOff = true; SaveUnlocked(); return 0; }); }
 
         public static void MarkZaloAuto(DateTime when)
         {

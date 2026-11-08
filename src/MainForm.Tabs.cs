@@ -554,12 +554,14 @@ namespace DonDep
             button.Cursor = Cursors.Hand;
         }
 
+        const int CoffeeHeight = 250, Shift = CoffeeHeight;   // khoảng trống cho thẻ "Ủng hộ tác giả"
+
         void BuildAutoTab(TabPage tab)
         {
             // Scrollable settings page: fits smaller Windows resolutions without clipping.
             var scroll = new Panel { Dock = DockStyle.Fill, AutoScroll = true,
                 BackColor = Color.FromArgb(245, 248, 252) };
-            var content = new Panel { Location = Point.Empty, Size = new Size(1088, 1330),
+            var content = new Panel { Location = Point.Empty, Size = new Size(1088, 1330 + Shift),
                 BackColor = Color.FromArgb(245, 248, 252) };
             scroll.Controls.Add(content);
             tab.Controls.Add(scroll);
@@ -604,6 +606,18 @@ namespace DonDep
                                                    "The picture is saved in Pictures and copied — press Ctrl+V in Facebook to paste it."), 292, 72, 740, 22));
             grpStats.Controls.AddRange(new Control[] { lblStats, btnShare });
             content.Controls.Add(grpStats);
+
+            // ---- Ủng hộ tác giả 1 ly cà phê (chỉ hiển thị mã QR)
+            var grpCoffee = new GroupBox { Text = Coffee.Title, Location = new Point(16, 351), Size = new Size(1050, CoffeeHeight - 13), BackColor = Color.White };
+            var qrPic = new PictureBox { Image = Coffee.Qr(), SizeMode = PictureBoxSizeMode.Zoom, Location = new Point(20, 30), Size = new Size(150, 190), BackColor = Color.White, Cursor = Cursors.Hand };
+            var coffeeText = Lbl(Coffee.Body, 190, 32, 820, 120);
+            var coffeeHint = Lbl(Coffee.ScanHint, 190, 156, 820, 22);
+            var btnCoffee = Btn(UiLanguage.L("🔍 Phóng to mã QR", "🔍 Enlarge QR code"), 190, 184, 200, 34, false);
+            btnCoffee.BackColor = Color.FromArgb(255, 222, 89);
+            grpCoffee.Controls.AddRange(new Control[] { qrPic, coffeeText, coffeeHint, btnCoffee });
+            content.Controls.Add(grpCoffee);
+            btnCoffee.Click += (s, e) => Coffee.ShowLarge(this);
+            qrPic.Click += (s, e) => Coffee.ShowLarge(this);
             UpdateStatsLabel();
             btnShare.Click += (s, e) =>
             {
@@ -617,7 +631,7 @@ namespace DonDep
             };
 
             var grp = new GroupBox { Text = "Tự động & chạy nền cùng Windows",
-                Location = new Point(16, 351), Size = new Size(1050, 250), BackColor = Color.White };
+                Location = new Point(16, 351 + Shift), Size = new Size(1050, 250), BackColor = Color.White };
             chkStartup = new CheckBox { Text = "Bật: tự chạy ngầm khi mở máy (biểu tượng nhỏ ở góc phải thanh Taskbar)", Location = new Point(16, 28), Size = new Size(690, 26), Checked = File.Exists(Shortcut.StartupLink) };
             numAlert = Num(grp, "Cảnh báo khi một ổ còn trống dưới (GB):", 66, 1, 500, cfg.AlertGB, 36, 300);
             chkAutoClean = new CheckBox { Text = "Tự động dọn RÁC HỆ THỐNG theo lịch (không bao giờ tự chuyển hay xóa file cá nhân)", Location = new Point(16, 104), Size = new Size(690, 26), Checked = cfg.AutoClean };
@@ -636,7 +650,7 @@ namespace DonDep
 
             // ---- Tự đưa ảnh / video / file Zalo cũ lên Google Drive
             var grpZalo = new GroupBox { Text = UiLanguage.L("☁ Tự động đưa ảnh, video, file Zalo cũ lên Google Drive", "☁ Automatically move old Zalo photos, videos and files to Google Drive"),
-                Location = new Point(16, 614), Size = new Size(1050, 196), BackColor = Color.White };
+                Location = new Point(16, 614 + Shift), Size = new Size(1050, 196), BackColor = Color.White };
             chkZaloAuto = new CheckBox { Text = UiLanguage.L("Bật: app chạy ngầm sẽ tự chuyển file Zalo cũ lên Drive theo lịch (không bao giờ đụng tin nhắn)",
                                                              "On: the background app moves old Zalo files to Drive on a schedule (messages are never touched)"),
                 Location = new Point(16, 28), Size = new Size(1010, 26), Checked = cfg.ZaloAuto };
@@ -661,7 +675,7 @@ namespace DonDep
 
             // ---- Danh sách bảo vệ
             var grpProt = new GroupBox { Text = UiLanguage.L("🛡 Danh sách bảo vệ — không bao giờ dọn, xóa hay chuyển", "🛡 Protected list — never cleaned, deleted or moved"),
-                Location = new Point(16, 823), Size = new Size(1050, 170), BackColor = Color.White };
+                Location = new Point(16, 823 + Shift), Size = new Size(1050, 170), BackColor = Color.White };
             lstProtect = new ListBox { Location = new Point(16, 26), Size = new Size(800, 132), HorizontalScrollbar = true };
             var btnProtDir = Btn(UiLanguage.L("Thêm thư mục…", "Add folder…"), 830, 26, 200, 32, false);
             var btnProtFile = Btn(UiLanguage.L("Thêm file…", "Add file…"), 830, 64, 200, 32, false);
@@ -693,12 +707,12 @@ namespace DonDep
                 cfg.Save(); RefreshProtectList();
             };
 
-            var grpShort = new GroupBox { Text = "Biểu tượng & truy cập nhanh", Location = new Point(16, 1006), Size = new Size(1050, 100), BackColor = Color.White };
+            var grpShort = new GroupBox { Text = "Biểu tượng & truy cập nhanh", Location = new Point(16, 1006 + Shift), Size = new Size(1050, 100), BackColor = Color.White };
             grpShort.Controls.Add(Lbl("Tạo biểu tượng \"Dọn Dẹp Máy Tính\" trên Desktop và trong menu Start để mở app nhanh.", 16, 28, 1010, 22));
             var btnShortcut = Btn("Tạo biểu tượng", 16, 54, 180, 34, false);
             grpShort.Controls.Add(btnShortcut);
 
-            var grpUpd = new GroupBox { Text = "Phiên bản & cập nhật", Location = new Point(16, 1119), Size = new Size(1050, 100), BackColor = Color.White };
+            var grpUpd = new GroupBox { Text = "Phiên bản & cập nhật", Location = new Point(16, 1119 + Shift), Size = new Size(1050, 100), BackColor = Color.White };
             grpUpd.Controls.Add(Lbl("Bạn đang dùng bản " + App.Version + ". App tự kiểm tra bản mới mỗi lần mở. Trang chủ: github.com/" + App.Repo, 16, 28, 1010, 22));
             var btnUpdate = Btn("Kiểm tra bản mới", 16, 54, 180, 34, false);
             var btnHome = Btn("Mở trang chủ", 206, 54, 160, 34, false);
@@ -873,6 +887,8 @@ namespace DonDep
             sb.Append(" zaloOld=").Append(ZaloAuto.FindOld(cfg, 90, null).Count);
             UpdateStatsLabel(); UpdateZaloLastLabel();
             SelfTestTools(sb);
+            if (Coffee.Qr() == null) throw new Exception("Coffee QR resource missing");
+            sb.Append(" coffee=OK");
             var br = Browsers.Detect();
             FillBrowserList(br);
             UpdateBrowserSummary();

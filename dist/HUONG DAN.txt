@@ -1,4 +1,4 @@
-﻿DỌN DẸP MÁY TÍNH (PC CLEANER) — phiên bản 1.7.0
+﻿DỌN DẸP MÁY TÍNH (PC CLEANER) — phiên bản 1.7.1
 ==============================================
 
 CÁCH MỞ
@@ -75,6 +75,8 @@ CÁCH MỞ
      - Tự động đưa ảnh, video, file Zalo cũ lên Google Drive theo lịch
        (ví dụ: file cũ hơn 90 ngày, mỗi 7 ngày). Cần bật chạy ngầm và kết nối Drive.
        Có nút "Xem trước & chạy ngay".
+     - ☕ Ủng hộ tác giả 1 ly cà phê: mã QR (VietQR) nếu bạn thấy phần mềm hữu ích.
+       Hoàn toàn tự nguyện — phần mềm vẫn miễn phí đầy đủ.
      - Danh sách bảo vệ: thư mục / file KHÔNG BAO GIỜ bị dọn, xóa hay chuyển.
      - Ngôn ngữ, chạy ngầm cùng Windows (biểu tượng nhỏ ở góc phải thanh Taskbar),
        báo khi một ổ còn trống dưới mức bạn đặt (mặc định 5 GB).

@@ -754,7 +754,8 @@ namespace DonDep
             foreach (var k in freeAfter.Keys.OrderBy(x => x)) { long b; if (freeBefore.TryGetValue(k, out b) && freeAfter[k] - b > 10 * Fmt.MB) report += "\n    " + k + "  +" + Fmt.Size(freeAfter[k] - b) + "  (nay còn trống " + Fmt.Size(freeAfter[k]) + ")"; }
             UpdateDrives();
             App.Log("===== Xong =====");
-            AppState.AddFreed(AppState.Gain(freeBefore, freeAfter));
+            long freedNow = AppState.Gain(freeBefore, freeAfter);
+            AppState.AddFreed(freedNow);
             UpdateStatsLabel();
             Status("Đã dọn xong.");
             string done = "Đã dọn xong!";
@@ -768,6 +769,7 @@ namespace DonDep
                 if (moves.Count > movedEntries.Count) done += " File nào chưa chuyển được vẫn còn nguyên trên máy (xem nhật ký).";
             }
             Msg(done);
+            Coffee.MaybeAsk(this, freedNow);   // thỉnh thoảng mới hiện (xem Coffee.cs)
         }
 
         static MovedEntry Entry(CleanItem o, string dest, string code)

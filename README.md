@@ -22,7 +22,7 @@
 </p>
 
 [🇻🇳 Giới thiệu](#-giới-thiệu) ·
-[✨ 10 chức năng](#-10-chức-năng) ·
+[✨ 11 chức năng](#-11-chức-năng) ·
 [⬇️ Tải về](#️-tải-về--cài-đặt) ·
 [🛡️ An toàn](#️-an-toàn-dữ-liệu) ·
 [🇬🇧 English](#-english)
@@ -44,17 +44,18 @@
 - 🎨 **Giao diện tối hiện đại** — thanh điều hướng bên trái, khung bo góc, nhìn như phần mềm trả phí.
 - 🪶 **Gọn nhẹ** — một file `.exe` dưới 1 MB, không cần cài thêm gì.
 
-## ✨ 10 chức năng
+## ✨ 11 chức năng
 
 | | Tab | Làm được gì |
 |:-:|---|---|
-| 🧹 | **Dọn dẹp** | Quét **rác hệ thống** (file tạm, thùng rác, gói cập nhật cũ, bộ nhớ đệm trình duyệt / Zalo / Teams), bộ nhớ đệm **CapCut** (kể cả bản CapCut cũ), **Telegram, Messenger, Discord, Adobe, Steam, Epic**; **file cài đặt thừa** (.exe, .msi, .iso ở Downloads, Desktop, thư mục Zalo / Telegram); **ảnh/video Zalo cũ**; file cũ trong **Downloads**; **file lớn**. Với file cá nhân, chọn từng file: **chuyển lên Drive / ổ ngoài** hay **xóa vĩnh viễn**. |
+| 🧹 | **Dọn dẹp** | Quét **rác hệ thống** (file tạm, thùng rác, gói cập nhật cũ, bộ nhớ đệm trình duyệt / Zalo / Teams), bộ nhớ đệm **CapCut** (kể cả bản CapCut cũ), **Telegram, Messenger, Discord, Adobe, Steam, Epic**, app AI **Claude, ChatGPT, Copilot, Cursor**; **file cài đặt thừa** (.exe, .msi, .iso ở Downloads, Desktop, thư mục Zalo / Telegram); **ảnh/video Zalo cũ**; file cũ trong **Downloads**; **file lớn**. Với file cá nhân, chọn từng file: **chuyển lên Drive / ổ ngoài** hay **xóa vĩnh viễn**. |
 | 🗺️ | **Bản đồ ổ đĩa** | Thư mục nào chiếm nhiều chỗ nhất, đi sâu từng cấp. Bấm vào là biết **đó là gì, có xóa được không**. Chuột phải để xóa (Thùng rác / vĩnh viễn) hoặc chuyển đi. |
 | 🧩 | **File trùng** | Tìm file giống hệt nhau, giữ lại 1 bản, bản thừa vào Thùng rác. |
 | 📁 | **Smart Folder** | Tự sắp xếp file **cá nhân** (theo loại) hoặc **công việc** (công văn, quyết định, báo cáo, hợp đồng… — đọc cả nội dung Word/Excel/PowerPoint). Chạy hoàn toàn trên máy, không AI, không gửi dữ liệu đi. Xem trước, **hoàn tác** được. |
 | ☁️ | **Đã chuyển đi** | Danh sách file đã chuyển lên Drive / ổ ngoài; lấy về đúng chỗ cũ bất cứ lúc nào. |
-| 🌍 | **Trình duyệt** | Chrome, Edge, **Cốc Cốc**, Brave, Opera, Firefox — theo từng tài khoản: dọn bộ nhớ đệm, lịch sử, cookie. **Không đụng mật khẩu, dấu trang, tiện ích.** |
+| 🌍 | **Trình duyệt** | Chrome, Edge, **Cốc Cốc**, Brave, Opera, Firefox — theo từng tài khoản: dọn bộ nhớ đệm, lịch sử, cookie **mà vẫn giữ đăng nhập** Facebook, Gmail, Zalo… (tự chọn danh sách). **Không đụng mật khẩu, dấu trang, tiện ích.** |
 | 🧰 | **Gỡ phần mềm** | Phần mềm đã cài theo **dung lượng**, ngày cài, **lần mở gần nhất**; đánh dấu phần mềm hơn 6 tháng chưa mở; gỡ ngay trong app, gỡ xong **dọn luôn tàn dư** còn sót. |
+| 🚀 | **Khởi động** | Chương trình chạy cùng Windows: tắt / bật lại một chạm để máy bật nhanh hơn (chỉ tạm ngưng như Task Manager, không xóa). Driver, bảo mật, **bộ gõ tiếng Việt** được đánh dấu "nên giữ". |
 | 📈 | **Hiệu năng** | CPU, RAM, mạng, ổ đĩa theo thời gian thực; chương trình nào đang ngốn máy; đóng chương trình ngay trong app. |
 | 🕘 | **Lịch sử** | Mọi lần dọn, xóa, chuyển, gỡ đều được ghi lại kèm danh sách file. |
 | ⚙️ | **Cài đặt** | Đổi ngôn ngữ · **"App đã giúp bạn giải phóng X GB"** + ảnh khoe Facebook · chạy ngầm, báo ổ sắp đầy, **tự dọn rác theo lịch** · **tự đưa ảnh Zalo cũ lên Google Drive theo lịch** · **danh sách bảo vệ** · biểu tượng Desktop · cập nhật. |
@@ -122,8 +123,9 @@ Chạy trên **Windows 10 / 11** (.NET Framework 4.8 có sẵn trong Windows). H
 | 🧩 **Duplicates** | Identical files; keeps one copy, extras go to the Recycle Bin. |
 | 📁 **Smart Folder** | Offline, rule-based organizer for personal and work files, with preview and undo. No AI, no uploads. |
 | ☁️ **Moved files** | Restore anything moved to Drive / external disk. |
-| 🌍 **Browsers** | Cache, history, cookies per profile (Chrome, Edge, Cốc Cốc, Brave, Opera, Firefox). Passwords, bookmarks and extensions are never touched. |
+| 🌍 **Browsers** | Cache, history, cookies per profile (Chrome, Edge, Cốc Cốc, Brave, Opera, Firefox) — delete cookies while keeping sign-ins for chosen sites. Passwords, bookmarks and extensions are never touched. |
 | 🧰 **Uninstall** | Programs by size and estimated last use; runs the program's own uninstaller, then offers to remove leftover folders. |
+| 🚀 **Startup** | Disable / re-enable startup programs (like Task Manager, nothing deleted); drivers, security and Vietnamese keyboards flagged. |
 | 📈 **Performance** | Live CPU, memory, network, disks and the heaviest programs. |
 | 🕘 **History** | Every cleanup, deletion, move and uninstall, with file-level details. |
 | ⚙️ **Settings** | Language · "space freed" counter with a shareable picture · tray mode, low-disk alerts, scheduled junk cleanup · **scheduled upload of old Zalo media to your Google Drive** · protected list · shortcuts · **self-update** (SHA-256 verified). |

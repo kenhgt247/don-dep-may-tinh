@@ -1,4 +1,4 @@
-﻿PC CLEANER (DON DEP MAY TINH) — version 1.7.1
+﻿PC CLEANER (DON DEP MAY TINH) — version 1.8.0
 ==============================================
 
 GETTING STARTED
@@ -15,13 +15,14 @@ LANGUAGE
   Open the last tab "⚙ Settings" → "Display language" → choose English or Tiếng Việt.
   The change applies immediately and is remembered. No files are moved or deleted.
 
-THE 10 SECTIONS (pick them in the left sidebar)
+THE 11 SECTIONS (pick them in the left sidebar)
   1. Cleanup
      - "Scan PC" only lists items; nothing is deleted yet. Untick what you want to keep,
        then click "Clean now".
      - Personal files: right-click each file to choose "move to Drive / external disk"
        or "delete permanently".
-     - Also cleans caches of CapCut (plus old CapCut versions), Telegram, Messenger,
+     - Also cleans caches of AI / coding apps (Claude, ChatGPT, Copilot, Cursor, VS Code)
+       and of CapCut (plus old CapCut versions), Telegram, Messenger,
        Discord, Adobe, Steam and Epic Games. You are asked to close running apps first.
        CapCut projects and chat messages are never touched.
      - "Leftover installers": .exe, .msi, .iso... in Downloads, Desktop and Zalo / Telegram
@@ -50,7 +51,8 @@ THE 10 SECTIONS (pick them in the left sidebar)
      - "Scan browsers" shows space used by Chrome, Edge, Coc Coc, Brave, Opera and Firefox
        per profile.
      - Cache: pre-selected, safe. History: optional.
-     - Cookies: deleting them signs you out of websites (you are asked twice).
+     - Cookies: "Keep sign-ins…" lists sites you stay signed in to when cookies are
+       deleted (Facebook, Google, YouTube, Zalo, Microsoft, GitHub… by default).
      - Saved passwords, bookmarks and extensions are never touched.
   7. Uninstall
      - "Scan installed programs" lists programs with size, install date, last opened
@@ -59,12 +61,16 @@ THE 10 SECTIONS (pick them in the left sidebar)
        Drivers, Visual C++, .NET etc. are flagged and need a second confirmation.
      - After uninstalling, the app looks for LEFTOVER folders (AppData, ProgramData,
        Program Files) and offers to send them to the Recycle Bin.
-  8. Performance
+  8. Startup
+     - Programs that start with Windows. Disable them to boot faster — this only pauses
+       them (like Task Manager); re-enable any time. Drivers, security and Vietnamese
+       keyboards are flagged "keep".
+  9. Performance
      - Live CPU, memory, network, disks and the heaviest programs. Close a program from
        the list (Windows components are blocked).
-  9. History
+  10. History
      - Every cleanup, deletion, move, uninstall... is recorded. Click a row for details.
-  10. ⚙ Settings
+  11. ⚙ Settings
      - Your results: total space freed + "Create a picture to share" (saved in Pictures
        and copied — press Ctrl+V in Facebook).
      - Automatically move old Zalo photos/videos/files to Google Drive on a schedule

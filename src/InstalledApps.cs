@@ -95,7 +95,7 @@ namespace DonDep
             return a;
         }
 
-        static string ExeFromCommand(string cmd)
+        internal static string ExeFromCommand(string cmd)
         {
             if (string.IsNullOrWhiteSpace(cmd)) return null;
             cmd = cmd.Trim();

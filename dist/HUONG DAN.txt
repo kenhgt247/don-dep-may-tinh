@@ -1,4 +1,4 @@
-﻿DỌN DẸP MÁY TÍNH (PC CLEANER) — phiên bản 1.7.1
+﻿DỌN DẸP MÁY TÍNH (PC CLEANER) — phiên bản 1.8.0
 ==============================================
 
 CÁCH MỞ
@@ -15,13 +15,14 @@ CÁCH MỞ
   Vào tab cuối "⚙ Cài đặt" → mục "Ngôn ngữ giao diện" → chọn Tiếng Việt hoặc English.
   App đổi ngay và nhớ lựa chọn cho lần mở sau. Đổi ngôn ngữ không xóa hay chuyển file nào.
 
-10 MỤC CỦA APP (chọn ở thanh bên trái)
+11 MỤC CỦA APP (chọn ở thanh bên trái)
   1. Dọn dẹp
      - "Quét máy" (chỉ xem, chưa xóa gì) → bỏ chọn những gì muốn giữ → "Dọn dẹp ngay".
      - Rác hệ thống: file tạm, bộ nhớ đệm trình duyệt / Zalo / Teams, thùng rác,
        gói cập nhật Zalo, bản Zalo cũ (chưa chọn sẵn)...
      - Bộ nhớ đệm CapCut (và các bản CapCut cũ), Telegram, Messenger, Discord,
-       Adobe (Premiere, After Effects), Steam, Epic Games. Phần mềm nào đang mở
+       Adobe (Premiere, After Effects), Steam, Epic Games, app AI / lập trình (Claude,
+       ChatGPT, Copilot, Cursor, Windsurf, VS Code). Phần mềm nào đang mở
        thì app nhắc tắt trước. Không bao giờ đụng dự án CapCut hay tin nhắn.
      - Với file cá nhân, chuột phải để chọn từng file: chuyển lên Drive / ổ ngoài
        hay xóa vĩnh viễn.
@@ -53,7 +54,9 @@ CÁCH MỞ
      - "Quét trình duyệt" → thấy Chrome, Edge, Cốc Cốc, Brave, Opera, Firefox
        chiếm bao nhiêu chỗ, tách theo từng tài khoản (profile).
      - Bộ nhớ đệm: chọn sẵn, xóa an toàn. Lịch sử: tự chọn nếu muốn.
-     - Cookie: xóa sẽ bị ĐĂNG XUẤT khỏi Facebook, Gmail, Zalo web... (hỏi 2 lần).
+     - Cookie: nút "Giữ đăng nhập…" chọn các trang KHÔNG bị đăng xuất khi xóa cookie
+       (mặc định: Facebook, Google/Gmail, YouTube, Zalo, Microsoft, GitHub, TikTok, Shopee).
+       Để trống danh sách = xóa hết cookie như trước (hỏi 2 lần).
      - Không bao giờ đụng mật khẩu đã lưu, dấu trang, tiện ích mở rộng.
      - Nên tắt trình duyệt trước khi dọn (app sẽ nhắc).
   7. Gỡ phần mềm
@@ -63,13 +66,17 @@ CÁCH MỞ
        đó sẽ mở ra. Driver, Visual C++, .NET... được đánh dấu cảnh báo, hỏi 2 lần.
      - Gỡ xong, app tìm thư mục TÀN DƯ còn sót (AppData, ProgramData, Program Files)
        và hỏi bạn có muốn dọn không — được đưa vào Thùng rác, vẫn khôi phục được.
-  8. Hiệu năng
+  8. Khởi động
+     - Danh sách chương trình chạy cùng Windows. Chọn rồi bấm "Tắt mục đã chọn" để máy
+       bật nhanh hơn. Chỉ tạm ngưng (giống Task Manager), bật lại lúc nào cũng được.
+     - Driver, bảo mật, bộ gõ tiếng Việt (UniKey, EVKey...) được đánh dấu "nên giữ".
+  9. Hiệu năng
      - Xem trực tiếp CPU, RAM, mạng, ổ đĩa và chương trình nào đang ngốn máy nhất.
      - Chọn một chương trình → "Đóng chương trình đã chọn". Thành phần Windows bị chặn.
-  9. Lịch sử
+  10. Lịch sử
      - Mọi lần dọn rác, xóa, chuyển lên Drive, gỡ phần mềm... đều được ghi lại.
        Bấm một dòng để xem chi tiết từng file.
-  10. ⚙ Cài đặt
+  11. ⚙ Cài đặt
      - Thành tích: "App đã giúp bạn giải phóng X GB" + nút "Tạo ảnh khoe lên Facebook"
        (ảnh lưu trong thư mục Ảnh và đã chép sẵn — vào Facebook bấm Ctrl+V để dán).
      - Tự động đưa ảnh, video, file Zalo cũ lên Google Drive theo lịch

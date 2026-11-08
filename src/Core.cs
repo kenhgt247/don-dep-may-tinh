@@ -17,7 +17,7 @@ namespace DonDep
 {
     static class App
     {
-        public const string Version = "1.7.1";
+        public const string Version = "1.8.0";
         public const string Repo = "kenhgt247/don-dep-may-tinh";
         public const string Name = "Dọn Dẹp Máy Tính";
         public static string Title => UiLanguage.T(Name) + " " + Version + (IsAdmin ? UiLanguage.T("  —  quyền quản trị") : "");
@@ -83,6 +83,7 @@ namespace DonDep
         public List<string> ExtraZalo = new List<string>();
         public List<string> DupFolders = new List<string>();
         public List<string> Protected = new List<string>();
+        public List<string> KeepCookies = new List<string>(CookieKeeper.Defaults);
 
         public static Settings Load()
         {
@@ -111,6 +112,7 @@ namespace DonDep
                 s.ExtraZalo = GetList(d, "ExtraZalo");
                 s.DupFolders = GetList(d, "DupFolders");
                 s.Protected = GetList(d, "Protected");
+                if (d.ContainsKey("KeepCookies")) s.KeepCookies = GetList(d, "KeepCookies");
             }
             catch { }
             return s;
@@ -126,7 +128,7 @@ namespace DonDep
                     { "Days", Days }, { "LargeMB", LargeMB }, { "KeepGB", KeepGB }, { "AlertGB", AlertGB }, { "AutoDays", AutoDays },
                     { "DupMinMB", DupMinMB }, { "DestMode", DestMode }, { "DestFolder", DestFolder }, { "LastAutoClean", LastAutoClean },
                     { "AutoClean", AutoClean }, { "ExtraZalo", ExtraZalo.ToArray() }, { "DupFolders", DupFolders.ToArray() }, { "Language", Language },
-                    { "Protected", Protected.ToArray() }, { "ZaloAuto", ZaloAuto }, { "ZaloAutoDays", ZaloAutoDays }, { "ZaloAutoEvery", ZaloAutoEvery }
+                    { "Protected", Protected.ToArray() }, { "KeepCookies", KeepCookies.ToArray() }, { "ZaloAuto", ZaloAuto }, { "ZaloAutoDays", ZaloAutoDays }, { "ZaloAutoEvery", ZaloAutoEvery }
                 };
                 File.WriteAllText(App.SettingsFile, new JavaScriptSerializer().Serialize(d), new UTF8Encoding(false));
                 Protect.Invalidate();
@@ -628,6 +630,36 @@ namespace DonDep
                 try { webs = Directory.GetDirectories(epic, "webcache*"); } catch { }
                 foreach (var w in webs) app("Bộ nhớ đệm Epic Games (" + Path.GetFileName(w) + ")", w, new[] { "EpicGamesLauncher", "EpicWebHelper" });
             }
+            // App AI & trình soạn code (Electron): chỉ thư mục bộ nhớ đệm, không đụng lịch sử trò chuyện / dự án.
+            var aiApps = new[]
+            {
+                new { Name = "Claude", Dir = Path.Combine(roam, "Claude"), Procs = new[] { "claude", "Claude" } },
+                new { Name = "Cursor", Dir = Path.Combine(roam, "Cursor"), Procs = new[] { "Cursor" } },
+                new { Name = "Windsurf", Dir = Path.Combine(roam, "Windsurf"), Procs = new[] { "Windsurf" } },
+                new { Name = "VS Code", Dir = Path.Combine(roam, "Code"), Procs = new[] { "Code" } },
+                new { Name = "ChatGPT", Dir = Path.Combine(roam, "ChatGPT"), Procs = new[] { "ChatGPT" } },
+            };
+            foreach (var a in aiApps)
+                foreach (var sub in new[] { "Cache", "Code Cache", "GPUCache", "DawnCache", "DawnGraphiteCache", "DawnWebGPUCache", "CachedData", "CachedExtensionVSIXs", @"Service Worker\CacheStorage" })
+                    app("Bộ nhớ đệm " + a.Name + " (" + sub + ")", Path.Combine(a.Dir, sub), a.Procs);
+            // App cài từ Microsoft Store (ChatGPT, Copilot, Claude…): tìm thư mục bộ nhớ đệm trong gói của chính app đó.
+            string pkgs = Path.Combine(local, "Packages");
+            if (Directory.Exists(pkgs))
+            {
+                var storeAi = new[]
+                {
+                    new { Prefix = "OpenAI.ChatGPT", Name = "ChatGPT", Procs = new[] { "ChatGPT" } },
+                    new { Prefix = "Microsoft.Copilot", Name = "Copilot", Procs = new[] { "Copilot", "M365Copilot" } },
+                    new { Prefix = "Claude", Name = "Claude", Procs = new[] { "claude", "Claude" } },
+                    new { Prefix = "AnthropicPBC.Claude", Name = "Claude", Procs = new[] { "claude", "Claude" } },
+                };
+                string[] all = new string[0];
+                try { all = Directory.GetDirectories(pkgs); } catch { }
+                foreach (var a in storeAi)
+                    foreach (var p in all.Where(d => Path.GetFileName(d).StartsWith(a.Prefix, StringComparison.OrdinalIgnoreCase)))
+                        foreach (var c in CacheDirsInside(Path.Combine(p, "LocalCache"), 6).Concat(CacheDirsInside(Path.Combine(p, "LocalState"), 6)))
+                            app("Bộ nhớ đệm " + a.Name + " (" + Path.GetFileName(c) + ")", c, a.Procs);
+            }
             add("Bộ nhớ đệm npm (lập trình)", Path.Combine(local, "npm-cache"), null);
             add("Bộ nhớ đệm pip (lập trình)", Path.Combine(local, @"pip\cache"), null);
 
@@ -662,6 +694,29 @@ namespace DonDep
                 add("Báo cáo lỗi Windows (hệ thống)", Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), @"Microsoft\Windows\WER"), null);
             }
             return items;
+        }
+
+        /// Thư mục bộ nhớ đệm (Cache, Code Cache, GPUCache) bên trong một thư mục app, tìm sâu tối đa `depth` cấp.
+        static IEnumerable<string> CacheDirsInside(string root, int depth)
+        {
+            var found = new List<string>();
+            if (!Directory.Exists(root)) return found;
+            var names = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "Cache", "Code Cache", "GPUCache", "DawnCache", "GrShaderCache", "ShaderCache" };
+            var stack = new Stack<Tuple<string, int>>();
+            stack.Push(Tuple.Create(root, 0));
+            while (stack.Count > 0 && found.Count < 40)
+            {
+                var t = stack.Pop();
+                string[] subs;
+                try { subs = Directory.GetDirectories(t.Item1); } catch { continue; }
+                foreach (var d in subs)
+                {
+                    try { if ((File.GetAttributes(d) & FileAttributes.ReparsePoint) != 0) continue; } catch { continue; }
+                    if (names.Contains(Path.GetFileName(d))) found.Add(d);
+                    else if (t.Item2 < depth) stack.Push(Tuple.Create(d, t.Item2 + 1));
+                }
+            }
+            return found;
         }
 
         public static long RecycleBinSize()

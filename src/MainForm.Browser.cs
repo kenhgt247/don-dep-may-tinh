@@ -25,7 +25,11 @@ namespace DonDep
             btnClean.BackColor = Yellow;
             var btnCacheOnly = Btn("Chỉ chọn bộ nhớ đệm", 444, 14, 170, 32);
             var btnNone = Btn("Bỏ chọn hết", 620, 14, 120, 32);
-            top.Controls.Add(Lbl("Không bao giờ đụng mật khẩu đã lưu, dấu trang (bookmark) và tiện ích mở rộng. Nên tắt trình duyệt trước khi dọn.", 750, 8, 410, 44));
+            var btnKeep = Btn(UiLanguage.L("🔐 Giữ đăng nhập…", "🔐 Keep sign-ins…"), 748, 14, 170, 32, false);
+            btnKeep.Click += (s, e) => EditKeepCookies();
+            top.Controls.Add(btnKeep);
+            top.Controls.Add(Lbl("Không bao giờ đụng mật khẩu đã lưu, dấu trang (bookmark) và tiện ích mở rộng. Nên tắt trình duyệt trước khi dọn.", 928, 8, 400, 44));
+            Browsers.KeepDomains = cfg.KeepCookies.Select(CookieKeeper.Normalize).Where(x => x != null).Distinct().ToList();
             lblBrSum = Lbl("Bấm \"Quét trình duyệt\" để xem mỗi trình duyệt đang chiếm bao nhiêu chỗ.", 8, 60, 1150, 24);
             lblBrSum.Font = new Font("Segoe UI", 10f, FontStyle.Bold);
             top.Controls.AddRange(new Control[] { btnScan, btnClean, btnCacheOnly, btnNone, lblBrSum });
@@ -58,6 +62,37 @@ namespace DonDep
             foreach (ListViewItem it in brList.CheckedItems) { var b = (BrowserItem)it.Tag; sum += b.Size; n++; if (b.Kind == BrowserItemKind.Cookies) cookies = true; }
             lblBrSum.Text = "Đã chọn " + n + " mục — " + Fmt.Size(sum) + (cookies ? "   •   ⚠ Có chọn Cookie: sẽ bị đăng xuất khỏi các trang web" : "");
             lblBrSum.ForeColor = cookies ? Color.Firebrick : SystemColors.ControlText;
+        }
+
+        void EditKeepCookies()
+        {
+            using (var f = new Form { Text = UiLanguage.L("Giữ đăng nhập khi xóa cookie", "Keep sign-ins when deleting cookies"), ClientSize = new Size(560, 470),
+                FormBorderStyle = FormBorderStyle.FixedDialog, MaximizeBox = false, MinimizeBox = false, StartPosition = FormStartPosition.CenterParent, ShowInTaskbar = false, Font = Font, Icon = Icon })
+            {
+                var info = new Label { Location = new Point(16, 12), Size = new Size(528, 92), UseMnemonic = false,
+                    Text = Sqlite.Available
+                        ? UiLanguage.L("Khi xóa cookie, bạn vẫn GIỮ ĐĂNG NHẬP các trang dưới đây (mỗi dòng một trang, ví dụ facebook.com). Tên miền con cũng được giữ (google.com giữ cả mail.google.com).\nĐể trống danh sách = xóa hết cookie như trước.",
+                                       "When cookies are deleted you STAY SIGNED IN to the sites below (one per line, e.g. facebook.com). Subdomains are kept too (google.com keeps mail.google.com).\nEmpty list = delete all cookies as before.")
+                        : UiLanguage.L("Windows trên máy này quá cũ nên không hỗ trợ giữ đăng nhập — xóa cookie sẽ xóa hết.", "This Windows version is too old to keep sign-ins — deleting cookies removes all of them.") };
+                var box = new TextBox { Location = new Point(16, 110), Size = new Size(528, 290), Multiline = true, ScrollBars = ScrollBars.Vertical, AcceptsReturn = true,
+                    Text = string.Join(Environment.NewLine, cfg.KeepCookies) };
+                var ok = new Button { Text = UiLanguage.L("Lưu", "Save"), Location = new Point(300, 414), Size = new Size(120, 36), DialogResult = DialogResult.OK };
+                var def = new Button { Text = UiLanguage.L("Mặc định", "Defaults"), Location = new Point(16, 414), Size = new Size(120, 36) };
+                var cancel = new Button { Text = UiLanguage.L("Hủy", "Cancel"), Location = new Point(424, 414), Size = new Size(120, 36), DialogResult = DialogResult.Cancel };
+                def.Click += (s, e) => box.Text = string.Join(Environment.NewLine, CookieKeeper.Defaults);
+                f.Controls.AddRange(new Control[] { info, box, ok, def, cancel });
+                f.AcceptButton = null; f.CancelButton = cancel;
+                if (f.ShowDialog(this) != DialogResult.OK) return;
+                var lines = box.Lines.Select(l => l.Trim()).Where(l => l.Length > 0).ToList();
+                var good = lines.Select(CookieKeeper.Normalize).Where(x => x != null).Distinct().ToList();
+                var bad = lines.Where(l => CookieKeeper.Normalize(l) == null).ToList();
+                cfg.KeepCookies = good;
+                cfg.Save();
+                Browsers.KeepDomains = good;
+                if (brList.Items.Count > 0) FillBrowserList(brList.Items.Cast<ListViewItem>().Select(i => (BrowserItem)i.Tag).ToList());
+                Status(UiLanguage.L("Đã lưu: giữ đăng nhập " + good.Count + " trang.", "Saved: keeping sign-ins for " + good.Count + " sites."));
+                if (bad.Count > 0) Msg(UiLanguage.P(UiLanguage.L("Bỏ qua các dòng không phải tên trang web:\n", "Ignored lines that are not website names:\n") + string.Join("\n", bad)));
+            }
         }
 
         async Task ScanBrowsersAsync()
@@ -122,10 +157,13 @@ namespace DonDep
             foreach (var g in sel.GroupBy(b => b.Browser))
                 msg.Append("\n• ").Append(g.Key).Append(": ").Append(string.Join(", ", g.Select(b => b.KindText.Split('(')[0].Trim()).Distinct()));
             if (hist.Count > 0) msg.Append("\n\n⚠ LỊCH SỬ: mất danh sách trang web đã xem và lịch sử tải về.");
-            if (cookies.Count > 0) msg.Append("\n\n⚠ COOKIE: bạn sẽ bị ĐĂNG XUẤT khỏi các trang web (Facebook, Gmail, Zalo web, ngân hàng…) trong các tài khoản đã chọn. Hãy chắc chắn bạn nhớ mật khẩu.");
+            if (cookies.Count > 0 && Browsers.KeepActive)
+                msg.Append(UiLanguage.L("\n\n🔐 COOKIE: vẫn GIỮ ĐĂNG NHẬP các trang: " + string.Join(", ", Browsers.KeepDomains) + ".\nCác trang khác sẽ bị đăng xuất. (Sửa danh sách bằng nút \"Giữ đăng nhập…\")",
+                                        "\n\n🔐 COOKIES: you STAY SIGNED IN to: " + string.Join(", ", Browsers.KeepDomains) + ".\nOther sites will be signed out. (Edit the list with \"Keep sign-ins…\")"));
+            else if (cookies.Count > 0) msg.Append("\n\n⚠ COOKIE: bạn sẽ bị ĐĂNG XUẤT khỏi các trang web (Facebook, Gmail, Zalo web, ngân hàng…) trong các tài khoản đã chọn. Hãy chắc chắn bạn nhớ mật khẩu.");
             msg.Append("\n\nMật khẩu đã lưu, dấu trang và tiện ích mở rộng KHÔNG bị xóa.\n\nTiếp tục?");
             if (!Confirm(msg.ToString())) { Status("Đã hủy."); return; }
-            if (cookies.Count > 0 && !Confirm("Xác nhận lần nữa: xóa Cookie của " + cookies.Count + " tài khoản trình duyệt?\n\nBạn sẽ phải đăng nhập lại các trang web.")) { Status("Đã hủy."); return; }
+            if (cookies.Count > 0 && !Browsers.KeepActive && !Confirm("Xác nhận lần nữa: xóa Cookie của " + cookies.Count + " tài khoản trình duyệt?\n\nBạn sẽ phải đăng nhập lại các trang web.")) { Status("Đã hủy."); return; }
 
             SetBusy(true);
             var freeBefore = Fs.FreeMap();

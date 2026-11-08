@@ -815,7 +815,7 @@ namespace DonDep
         {
             var sb = new StringBuilder();
             UpdateDrives();
-            if (tabs.TabPages.Count != 10) throw new Exception("Expected ten tabs");
+            if (tabs.TabPages.Count != 11) throw new Exception("Expected eleven tabs");
             sb.Append("tabs=").Append(tabs.TabPages.Count);
             string expectedFirstTab = UiLanguage.English ? "Cleanup" : "Dọn dẹp";
             if (tabs.TabPages[0].Text != expectedFirstTab) throw new Exception("Language tab mismatch: " + tabs.TabPages[0].Text);
@@ -824,7 +824,8 @@ namespace DonDep
             if (tabs.TabPages[3].Text != "Smart Folder" ||
                 tabs.TabPages[4].Text != expectedMoved ||
                 tabs.TabPages[6].Text != UiLanguage.L("Gỡ phần mềm", "Uninstall") ||
-                tabs.TabPages[9].Text != expectedSettings)
+                tabs.TabPages[7].Text != UiLanguage.L("Khởi động", "Startup") ||
+                tabs.TabPages[10].Text != expectedSettings)
                 throw new Exception("Navigation order or Settings translation mismatch.");
             if (btnSettingsVietnamese == null || btnSettingsEnglish == null ||
                 btnSettingsVietnamese.IsDisposed || btnSettingsEnglish.IsDisposed ||
@@ -889,6 +890,9 @@ namespace DonDep
             SelfTestTools(sb);
             if (Coffee.Qr() == null) throw new Exception("Coffee QR resource missing");
             sb.Append(" coffee=OK");
+            StartupItems.SelfTest();
+            CookieKeeper.SelfTest();
+            sb.Append(" startup=OK cookies=").Append(Sqlite.Available ? "keep" : "all");
             var br = Browsers.Detect();
             FillBrowserList(br);
             UpdateBrowserSummary();

@@ -121,7 +121,7 @@ namespace DonDep
             return null;
         }
 
-        static readonly string[] Glyphs = { "", "", "", "", "", "", "", "", "", "" };
+        static readonly string[] Glyphs = { "", "", "", "", "", "", "", "", "", "", "" };
 
         public static void ApplyMain(Form form, TabControl tabs, StatusStrip strip)
         {

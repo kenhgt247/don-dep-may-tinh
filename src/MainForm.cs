@@ -93,6 +93,7 @@ namespace DonDep
             var tabMoved = NewTab("Đã chuyển đi");
             var tabBrowser = NewTab("Trình duyệt");
             var tabPrograms = NewTab(UiLanguage.L("Gỡ phần mềm", "Uninstall"));
+            var tabStartup = NewTab(UiLanguage.L("Khởi động", "Startup"));
             var tabMonitor = NewTab(UiLanguage.L("Hiệu năng", "Performance"));
             var tabHistory = NewTab(UiLanguage.L("Lịch sử", "History"));
             var tabSettings = NewTab("⚙ Cài đặt");
@@ -103,6 +104,7 @@ namespace DonDep
             BuildMovedTab(tabMoved);
             BuildBrowserTab(tabBrowser);
             BuildProgramsTab(tabPrograms);
+            BuildStartupTab(tabStartup);
             BuildMonitorTab(tabMonitor);
             BuildHistoryTab(tabHistory);
             BuildAutoTab(tabSettings);

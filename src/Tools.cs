@@ -96,6 +96,7 @@ namespace DonDep
                 case "tudon": return UiLanguage.L("Tự dọn rác theo lịch", "Scheduled junk cleanup");
                 case "zalo_tudong": return UiLanguage.L("Tự đưa ảnh Zalo lên Drive", "Zalo media auto-moved to Drive");
                 case "laylai": return UiLanguage.L("Lấy file về chỗ cũ", "Restored files");
+                case "khoidong": return UiLanguage.L("Chương trình chạy cùng Windows", "Startup programs");
                 default: return k;
             }
         }

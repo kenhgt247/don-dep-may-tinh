@@ -41,7 +41,11 @@ namespace DonDep
                 {
                     case BrowserItemKind.Cache: return "An toàn — trang web tự tải lại khi cần";
                     case BrowserItemKind.History: return "Mất danh sách trang đã xem và lịch sử tải về";
-                    default: return "⚠ Sẽ bị ĐĂNG XUẤT khỏi Facebook, Gmail, Zalo web…";
+                    default:
+                        return Browsers.KeepActive
+                            ? UiLanguage.L("🔐 Giữ đăng nhập " + Browsers.KeepDomains.Count + " trang đã chọn; các trang khác sẽ bị đăng xuất",
+                                           "🔐 Keeps sign-ins for " + Browsers.KeepDomains.Count + " chosen sites; other sites are signed out")
+                            : "⚠ Sẽ bị ĐĂNG XUẤT khỏi Facebook, Gmail, Zalo web…";
                 }
             }
         }
@@ -49,6 +53,10 @@ namespace DonDep
 
     static class Browsers
     {
+        /// Các trang giữ đăng nhập khi xóa cookie (lấy từ Cài đặt).
+        public static List<string> KeepDomains = new List<string>();
+        public static bool KeepActive => KeepDomains.Count > 0 && Sqlite.Available;
+
         class ChromiumDef { public string Name, UserData; public string[] Proc; }
 
         static List<ChromiumDef> Chromium()
@@ -184,11 +192,28 @@ namespace DonDep
                 }
                 catch { }
             }
+            long before = it.Size;
+            if (it.Kind == BrowserItemKind.Cookies && KeepActive)
+            {
+                // Xóa có chọn lọc: chỉ xóa cookie của các trang KHÔNG nằm trong danh sách giữ đăng nhập.
+                foreach (var f in it.Files)
+                {
+                    string n = Path.GetFileName(f);
+                    if (!(n.Equals("Cookies", StringComparison.OrdinalIgnoreCase) || n.Equals("cookies.sqlite", StringComparison.OrdinalIgnoreCase)) || !File.Exists(f)) continue;
+                    try
+                    {
+                        int del = CookieKeeper.DeleteExcept(f, n.EndsWith(".sqlite", StringComparison.OrdinalIgnoreCase), KeepDomains);
+                        App.Log("Xóa " + del + " cookie trong " + f + " (giữ đăng nhập: " + string.Join(", ", KeepDomains) + ")");
+                    }
+                    catch (Exception ex) { App.Log("Không xóa được cookie (trình duyệt còn mở?) " + f + ": " + ex.Message); }
+                }
+                Measure(it);
+                return it.Size;
+            }
             foreach (var f in it.Files)
             {
                 try { if (File.Exists(f)) { File.SetAttributes(f, FileAttributes.Normal); File.Delete(f); } } catch { }
             }
-            long before = it.Size;
             Measure(it);
             App.Log("Dọn " + it.Browser + " (" + it.Profile + ") — " + it.KindText + ": " + Fmt.Size(Math.Max(0, before - it.Size)));
             return it.Size;
